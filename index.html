@@ -1,0 +1,1033 @@
+<title>RamanID</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #F7F9F8;
+    --surface: #FFFFFF;
+    --ink: #16241D;
+    --muted: #5B6B63;
+    --line: #DDE5E0;
+    --accent: #0B9A55;
+    --accent-ink: #067347;
+    --accent-soft: #E2F3EA;
+    --warn: #B7791F;
+    --warn-soft: #F8EFDD;
+    --tmpl: #6B5CD6;
+    --bar-track: #EDF2EF;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0E1512;
+      --surface: #17211C;
+      --ink: #E5EFE9;
+      --muted: #93A69C;
+      --line: #2A3830;
+      --accent: #34C57F;
+      --accent-ink: #6FDCA8;
+      --accent-soft: #12362A;
+      --warn: #D9A24A;
+      --warn-soft: #35290F;
+      --tmpl: #9D8FEC;
+      --bar-track: #202D26;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0E1512;
+    --surface: #17211C;
+    --ink: #E5EFE9;
+    --muted: #93A69C;
+    --line: #2A3830;
+    --accent: #34C57F;
+    --accent-ink: #6FDCA8;
+    --accent-soft: #12362A;
+    --warn: #D9A24A;
+    --warn-soft: #35290F;
+    --tmpl: #9D8FEC;
+    --bar-track: #202D26;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 28px 20px 64px; }
+
+  header { margin-bottom: 26px; }
+  .spectrum-strip {
+    height: 5px; border-radius: 3px; margin-bottom: 18px;
+    background: linear-gradient(90deg,
+      #7A5FD0 0%, #4D74D8 18%, #3FA8C9 33%,
+      var(--accent) 47%, var(--accent) 52%,
+      #B8B23A 68%, #C9803A 84%, #B8503A 100%);
+    opacity: .85;
+  }
+  h1 {
+    font-family: "Spectral", Georgia, serif;
+    font-weight: 700; font-size: 2.1rem; margin: 0 0 4px;
+    letter-spacing: -0.01em; text-wrap: balance;
+  }
+  .sub { color: var(--muted); margin: 0; max-width: 60ch; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; padding: 20px; margin-bottom: 18px;
+  }
+  .drop {
+    border: 1.5px dashed var(--line); border-radius: 8px;
+    padding: 30px 20px; text-align: center; cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .drop:hover, .drop:focus-visible, .drop.over {
+    border-color: var(--accent); background: var(--accent-soft); outline: none;
+  }
+  .drop.disabled { pointer-events: none; opacity: 0.5; }
+  .drop strong { color: var(--accent-ink); }
+  .drop p { margin: 4px 0; }
+  .drop .hint { color: var(--muted); font-size: .875rem; }
+  .demos { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
+  .demos span { color: var(--muted); font-size: .875rem; }
+  button.demo {
+    font: inherit; font-size: .875rem; font-weight: 500;
+    color: var(--accent-ink); background: none;
+    border: 1px solid var(--line); border-radius: 6px;
+    padding: 6px 12px; cursor: pointer;
+  }
+  button.demo:hover, button.demo:focus-visible { border-color: var(--accent); background: var(--accent-soft); outline: none; }
+  button.demo:disabled { pointer-events: none; opacity: 0.5; }
+
+  #results { display: none; }
+  .banner {
+    display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap;
+    border-radius: 10px; padding: 16px 20px; margin-bottom: 18px;
+    background: var(--accent-soft); border: 1px solid var(--accent);
+  }
+  .banner.unknown { background: var(--warn-soft); border-color: var(--warn); }
+  .banner .verdict { font-family: "Spectral", Georgia, serif; font-size: 1.45rem; font-weight: 700; }
+  .banner.unknown .verdict { color: var(--warn); }
+  .banner .verdict em { font-style: normal; color: var(--accent-ink); }
+  .banner.unknown .verdict em { color: var(--warn); }
+  .banner .detail { color: var(--muted); font-size: .9rem; }
+
+  h2 {
+    font-family: "Spectral", Georgia, serif; font-weight: 600;
+    font-size: 1.15rem; margin: 0 0 12px;
+  }
+  .filelabel { font-family: "IBM Plex Mono", Consolas, monospace; font-size: .8rem; color: var(--muted); word-break: break-all; }
+
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+  td.num { font-family: "IBM Plex Mono", Consolas, monospace; font-size: .875rem; white-space: nowrap; }
+  .postbar { display: flex; align-items: center; gap: 10px; min-width: 160px; }
+  .track { flex: 1; height: 8px; border-radius: 4px; background: var(--bar-track); overflow: hidden; }
+  .fill { height: 100%; border-radius: 4px; background: var(--accent); }
+  tr.top .fill { background: var(--accent); }
+  tr:not(.top) .fill { opacity: .45; }
+  .tablewrap { overflow-x: auto; }
+
+  .chartwrap { overflow-x: auto; }
+  svg text { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 11px; fill: var(--muted); }
+  .legend { display: flex; gap: 18px; font-size: .875rem; color: var(--muted); margin-top: 8px; flex-wrap: wrap; }
+  .key { display: inline-block; width: 18px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: "IBM Plex Mono", Consolas, monospace; font-size: .8rem;
+    padding: 3px 10px; border-radius: 999px;
+    background: var(--accent-soft); color: var(--accent-ink); border: 1px solid var(--accent);
+  }
+  .chip.miss { background: var(--bar-track); color: var(--muted); border-color: var(--line); }
+  .chiplabel { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 12px 0 8px; }
+
+  .error {
+    display: none; border: 1px solid var(--warn); background: var(--warn-soft);
+    color: var(--ink); border-radius: 8px; padding: 12px 16px; margin-bottom: 18px;
+  }
+
+  .loading {
+    text-align: center; padding: 40px 20px; color: var(--muted);
+  }
+  .loading .bar {
+    width: 200px; height: 4px; border-radius: 2px;
+    background: var(--bar-track); margin: 14px auto 0; overflow: hidden;
+  }
+  .loading .bar .fill {
+    height: 100%; border-radius: 2px; background: var(--accent);
+    transition: width .3s;
+  }
+
+  footer { color: var(--muted); font-size: .82rem; margin-top: 30px; max-width: 68ch; }
+  footer code { font-family: "IBM Plex Mono", Consolas, monospace; font-size: .78rem; }
+  footer a { color: var(--accent-ink); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="spectrum-strip"></div>
+    <h1>RamanID</h1>
+    <p class="sub">Substance identification from Raman spectra via Bayesian spectral matching
+    — <span id="libcount">...</span> Raman spectra (<span id="classcount">...</span> substances)
+    + <span id="libcountmm">...</span> fluorescence / absorption curves.
+    Drop multiple files from the same specimen for multi-modal fusion (v3).</p>
+  </header>
+
+  <div class="card">
+    <div class="loading" id="loading">
+      <p>Loading spectral library...</p>
+      <div class="bar"><div class="fill" id="loadbar" style="width:0%"></div></div>
+    </div>
+    <div id="dropwrap" style="display:none">
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Select or drop spectrum files">
+        <p><strong>Drop one or more spectrum files from the same specimen</strong> or click to browse</p>
+        <p class="hint">.txt Raman (cm⁻¹) · .csv fluorescence (nm, filename contains 532/633/785/808) · .txt absorption (nm)</p>
+      </div>
+      <input type="file" id="fileinput" accept=".txt,.csv,.dat" multiple hidden>
+      <div class="chips" id="tray" style="margin-top:12px"></div>
+      <div class="demos">
+        <span>No file? Try a sample:</span>
+        <button class="demo" data-demo="0">Toluene 532 nm (Raman)</button>
+        <button class="demo" data-demo="1">Glucose 532 nm (Raman)</button>
+        <button class="demo" id="demomm">Metal can (fluorescence + absorption)</button>
+        <button class="demo" id="clearall" hidden>Clear all</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="error" id="error"></div>
+
+  <div id="results">
+    <div class="banner" id="banner">
+      <span class="verdict" id="verdict"></span>
+      <span class="detail" id="verdictDetail"></span>
+    </div>
+
+    <div class="card" id="fusedcard" style="display:none">
+      <h2>Multi-modal fused result (v3)</h2>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>#</th><th>Material</th><th>Score</th><th>Posterior</th><th>Contribution (log BF)</th></tr></thead>
+          <tbody id="fusedbody"></tbody>
+        </table>
+      </div>
+      <p class="filelabel" id="fusednote"></p>
+    </div>
+
+    <div class="card" id="ramancard">
+      <h2>Class posterior (Raman, v2 Bayes)</h2>
+      <p class="filelabel" id="fname"></p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th>#</th><th>Class</th><th>log BF / ch</th><th>Posterior</th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" id="chartcard">
+      <h2>Query spectrum vs best-match template</h2>
+      <div class="chartwrap"><svg id="chart" viewBox="0 0 840 300" width="100%" role="img" aria-label="Spectrum chart"></svg></div>
+      <div class="legend">
+        <span><span class="key" style="background:var(--ink)"></span>Query (preprocessed)</span>
+        <span><span class="key" style="background:var(--tmpl)"></span>Template <span id="tmplname"></span></span>
+        <span><span class="key" style="background:var(--accent)"></span>Matched peak (&plusmn;6 cm⁻¹)</span>
+      </div>
+      <div class="chiplabel">Query peaks</div>
+      <div class="chips" id="peakchips"></div>
+    </div>
+  </div>
+
+  <footer>
+    <strong>Method.</strong> Bayesian spectral matching (Zhong/Girolami-style analytic marginal likelihood):
+    <code>y = &alpha;&middot;template + Legendre baseline + noise</code>, Jeffreys prior, &alpha;/&beta;/&sigma;&sup2;
+    integrated out analytically. Score = per-channel log Bayes factor vs baseline-only null.
+    Tempered softmax posterior (<code>&kappa;=0.12</code>, ECE 0.082 on VAST LOO),
+    open-set threshold <code>&tau;=0.552</code>.
+    Multi-modal fusion (v3): weighted sum of per-modality log BF
+    (Raman 1.0, fluorescence 0.25, absorption 1.0).
+    All computation runs in your browser — spectrum files never leave your machine.
+    <br><br>
+    Library: VAST (210 spectra, 34 classes) + RRUFF minerals + ROD + pharma (figshare) + NICODOM demo.
+    Source code: <a href="https://github.com/SisypheanHUS/VAST/tree/main/raman_id">github.com/SisypheanHUS/VAST</a>
+  </footer>
+</div>
+
+<script>
+// RamanID core: JS port of ramanlib.py + bayes.py (v2 model).
+// Kept dependency-free so it runs in the browser and under Node for parity tests.
+
+const GRID_START = 450.0, GRID_STEP = 2.0, GRID_N = 1376;
+const GRID_END = GRID_START + GRID_STEP * (GRID_N - 1);
+const MIN_OVERLAP = Math.floor(0.30 * GRID_N);
+// Calibrated constants — keep in sync with bayes.py (see evaluate_bayes.py output).
+const LAMBDA = 0.01, N_BASE = 6, KAPPA = 0.12, NULL_TAU = 0.552;
+const ALS_LAM = 1e5, ALS_P = 0.01, ALS_ITER = 10;
+
+function gridWavenumber(i) { return GRID_START + GRID_STEP * i; }
+
+// ---- parsing ---------------------------------------------------------------
+
+function parseSpectrum(text) {
+  const xs = [], ys = [];
+  for (const line of text.split(/\r?\n/)) {
+    const parts = line.replace(/,/g, "\t").split(/[\s\t]+/).filter(Boolean);
+    if (parts.length < 2) continue;
+    const x = Number(parts[0]), y = Number(parts[1]);
+    if (Number.isFinite(x) && Number.isFinite(y)) { xs.push(x); ys.push(y); }
+  }
+  if (xs.length < 50) throw new Error("File không phải phổ 2 cột (cần ≥50 điểm số).");
+  const idx = xs.map((_, i) => i).sort((a, b) => xs[a] - xs[b]);
+  const ux = [], uy = [];
+  for (const i of idx) {
+    if (ux.length && xs[i] === ux[ux.length - 1]) continue;
+    ux.push(xs[i]); uy.push(ys[i]);
+  }
+  return { x: ux, y: uy };
+}
+
+// ---- preprocessing ---------------------------------------------------------
+
+function interpToGrid(x, y) {
+  const v = new Float64Array(GRID_N).fill(NaN);
+  let j = 0;
+  for (let i = 0; i < GRID_N; i++) {
+    const g = gridWavenumber(i);
+    if (g < x[0] || g > x[x.length - 1]) continue;
+    while (j < x.length - 2 && x[j + 1] < g) j++;
+    while (j > 0 && x[j] > g) j--;
+    const t = (g - x[j]) / (x[j + 1] - x[j]);
+    v[i] = y[j] + t * (y[j + 1] - y[j]);
+  }
+  return v;
+}
+
+// Cubic polyfit on (0..m-1, y) via 4x4 normal equations; returns coeffs.
+function polyfit3(seg, start, m) {
+  const A = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]], b = [0,0,0,0];
+  for (let t = 0; t < m; t++) {
+    const p = [1, t, t*t, t*t*t], yv = seg[start + t];
+    for (let r = 0; r < 4; r++) {
+      b[r] += p[r] * yv;
+      for (let c = 0; c < 4; c++) A[r][c] += p[r] * p[c];
+    }
+  }
+  return solveDense(A, b);
+}
+
+function polyEval3(c, t) { return c[0] + c[1]*t + c[2]*t*t + c[3]*t*t*t; }
+
+// Savitzky-Golay window 9, order 3, edges via polynomial fit (scipy 'interp').
+const SG9 = [-21, 14, 39, 54, 59, 54, 39, 14, -21].map(v => v / 231);
+
+function savgol9(seg) {
+  const n = seg.length, out = new Float64Array(n);
+  if (n < 9) { out.set(seg); return out; }
+  for (let i = 4; i < n - 4; i++) {
+    let s = 0;
+    for (let k = -4; k <= 4; k++) s += SG9[k + 4] * seg[i + k];
+    out[i] = s;
+  }
+  const cl = polyfit3(seg, 0, 9), cr = polyfit3(seg, n - 9, 9);
+  for (let t = 0; t < 4; t++) {
+    out[t] = polyEval3(cl, t);
+    out[n - 4 + t] = polyEval3(cr, 5 + t);
+  }
+  return out;
+}
+
+// Asymmetric least squares baseline: solve (W + lam*D2'D2) z = W y, banded.
+function alsBaseline(seg) {
+  const n = seg.length;
+  const p0 = new Float64Array(n), p1 = new Float64Array(n), p2 = new Float64Array(n);
+  for (let i = 0; i < n; i++) {
+    p0[i] = i === 0 || i === n - 1 ? 1 : i === 1 || i === n - 2 ? 5 : 6;
+    p1[i] = i === 0 || i === n - 2 ? -2 : -4;           // M[i,i+1], i < n-1
+    p2[i] = 1;                                          // M[i,i+2], i < n-2
+  }
+  const w = new Float64Array(n).fill(1);
+  let z = new Float64Array(n);
+  const d0 = new Float64Array(n), rhs = new Float64Array(n);
+  const l0 = new Float64Array(n), l1 = new Float64Array(n), l2 = new Float64Array(n);
+  for (let it = 0; it < ALS_ITER; it++) {
+    for (let i = 0; i < n; i++) { d0[i] = w[i] + ALS_LAM * p0[i]; rhs[i] = w[i] * seg[i]; }
+    // banded Cholesky, bandwidth 2
+    for (let i = 0; i < n; i++) {
+      const a2 = i >= 2 ? ALS_LAM * p2[i - 2] / l0[i - 2] : 0;
+      const a1 = i >= 1 ? (ALS_LAM * p1[i - 1] - (i >= 2 ? a2 * l1[i - 1] : 0)) / l0[i - 1] : 0;
+      l2[i] = a2; l1[i] = a1;
+      l0[i] = Math.sqrt(d0[i] - a1 * a1 - a2 * a2);
+    }
+    for (let i = 0; i < n; i++)   // forward Ly = rhs
+      z[i] = (rhs[i] - (i >= 1 ? l1[i] * z[i - 1] : 0) - (i >= 2 ? l2[i] * z[i - 2] : 0)) / l0[i];
+    for (let i = n - 1; i >= 0; i--)  // backward L'x = y
+      z[i] = (z[i] - (i + 1 < n ? l1[i + 1] * z[i + 1] : 0) - (i + 2 < n ? l2[i + 2] * z[i + 2] : 0)) / l0[i];
+    for (let i = 0; i < n; i++) w[i] = seg[i] > z[i] ? ALS_P : seg[i] < z[i] ? 1 - ALS_P : 0;
+  }
+  return z;
+}
+
+// Full preprocess: grid + smooth + baseline + min-shift + L2 normalize.
+function preprocess(x, y) {
+  const v = interpToGrid(x, y);
+  let i0 = -1, i1 = -1;
+  for (let i = 0; i < GRID_N; i++) if (!Number.isNaN(v[i])) { if (i0 < 0) i0 = i; i1 = i; }
+  if (i0 < 0 || i1 - i0 + 1 < 100) throw new Error("Phổ phủ quá ít dải 450–3200 cm⁻¹.");
+  let seg = savgol9(v.subarray(i0, i1 + 1));
+  const base = alsBaseline(seg);
+  let mn = Infinity;
+  for (let i = 0; i < seg.length; i++) { seg[i] -= base[i]; if (seg[i] < mn) mn = seg[i]; }
+  let ss = 0;
+  for (let i = 0; i < seg.length; i++) { seg[i] -= mn; ss += seg[i] * seg[i]; }
+  const norm = Math.sqrt(ss);
+  if (!(norm > 0)) throw new Error("Phổ phẳng, không chuẩn hóa được.");
+  const out = new Float64Array(GRID_N).fill(NaN);
+  for (let i = 0; i < seg.length; i++) out[i0 + i] = seg[i] / norm;
+  return { v: out, i0, i1 };
+}
+
+// ---- Bayesian evidence -----------------------------------------------------
+
+function solveDense(A, b) {  // small SPD/general systems via Gaussian elimination
+  const n = b.length, M = A.map((row, i) => [...row, b[i]]);
+  for (let c = 0; c < n; c++) {
+    let piv = c;
+    for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[piv][c])) piv = r;
+    [M[c], M[piv]] = [M[piv], M[c]];
+    for (let r = c + 1; r < n; r++) {
+      const f = M[r][c] / M[c][c];
+      for (let k = c; k <= n; k++) M[r][k] -= f * M[c][k];
+    }
+  }
+  const x = new Float64Array(n);
+  for (let r = n - 1; r >= 0; r--) {
+    let s = M[r][n];
+    for (let k = r + 1; k < n; k++) s -= M[r][k] * x[k];
+    x[r] = s / M[r][r];
+  }
+  return x;
+}
+
+// Legendre polynomials P0..P5 at grid index i, x scaled over the FULL grid.
+function legendreRow(i) {
+  const t = ((gridWavenumber(i) - GRID_START) / (GRID_END - GRID_START)) * 2 - 1;
+  const P = [1, t];
+  for (let k = 2; k < N_BASE; k++) P[k] = ((2 * k - 1) * t * P[k - 1] - (k - 1) * P[k - 2]) / k;
+  return P;
+}
+
+// log evidence pieces for design X (n x p): 0.5*p*log(lam) - 0.5*logdet(A) - (n/2)*log(S)
+// (terms that cancel in Bayes factors on the same y are omitted).
+function evidenceCore(cols, yv) {
+  const p = cols.length, n = yv.length;
+  const A = Array.from({ length: p }, () => new Float64Array(p));
+  const Xty = new Float64Array(p);
+  for (let r = 0; r < p; r++) {
+    for (let c = r; c < p; c++) {
+      let s = 0;
+      for (let i = 0; i < n; i++) s += cols[r][i] * cols[c][i];
+      A[r][c] = s; A[c][r] = s;
+    }
+    let s = 0;
+    for (let i = 0; i < n; i++) s += cols[r][i] * yv[i];
+    Xty[r] = s;
+    A[r][r] += LAMBDA;
+  }
+  // Cholesky for logdet + solve
+  const L = Array.from({ length: p }, () => new Float64Array(p));
+  for (let r = 0; r < p; r++) {
+    for (let c = 0; c <= r; c++) {
+      let s = A[r][c];
+      for (let k = 0; k < c; k++) s -= L[r][k] * L[c][k];
+      L[r][c] = r === c ? Math.sqrt(s) : s / L[c][c];
+    }
+  }
+  let logdet = 0;
+  for (let r = 0; r < p; r++) logdet += 2 * Math.log(L[r][r]);
+  const tmp = new Float64Array(p);
+  for (let r = 0; r < p; r++) {
+    let s = Xty[r];
+    for (let k = 0; k < r; k++) s -= L[r][k] * tmp[k];
+    tmp[r] = s / L[r][r];
+  }
+  const bvec = new Float64Array(p);
+  for (let r = p - 1; r >= 0; r--) {
+    let s = tmp[r];
+    for (let k = r + 1; k < p; k++) s -= L[k][r] * bvec[k];
+    bvec[r] = s / L[r][r];
+  }
+  let yy = 0, yb = 0;
+  for (let i = 0; i < n; i++) yy += yv[i] * yv[i];
+  for (let r = 0; r < p; r++) yb += Xty[r] * bvec[r];
+  const S = Math.max(yy - yb, 1e-12);
+  return 0.5 * p * Math.log(LAMBDA) - 0.5 * logdet - (n / 2) * Math.log(S);
+}
+
+// Per-channel log Bayes factor of query vs one library spectrum.
+function pairBF(q, spec) {
+  const a0 = Math.max(q.i0, spec.i0), a1 = Math.min(q.i1, spec.i1);
+  const nv = a1 - a0 + 1;
+  if (nv < MIN_OVERLAP) return null;
+  const yv = new Float64Array(nv), tcol = new Float64Array(nv);
+  const base = Array.from({ length: N_BASE }, () => new Float64Array(nv));
+  for (let i = 0; i < nv; i++) {
+    yv[i] = q.v[a0 + i]; tcol[i] = spec.v[a0 + i];
+    const P = legendreRow(a0 + i);
+    for (let k = 0; k < N_BASE; k++) base[k][i] = P[k];
+  }
+  const ev1 = evidenceCore([tcol, ...base], yv);
+  const ev0 = evidenceCore(base, yv);
+  return (ev1 - ev0) / nv;
+}
+
+// Match query against the whole library.
+function classify(q, library) {
+  const best = new Map();
+  for (const entry of library) {
+    const bf = pairBF(q, entry);
+    if (bf === null) continue;
+    const cur = best.get(entry.label);
+    if (!cur || bf > cur.bf) best.set(entry.label, { bf, entry });
+  }
+  if (!best.size) return { results: [], unknown: true };
+  const labs = [...best.keys()];
+  const bfs = labs.map(l => best.get(l).bf);
+  const mx = Math.max(...bfs);
+  const z = bfs.map(b => Math.exp((b - mx) / KAPPA));
+  const zs = z.reduce((a, b) => a + b, 0);
+  const results = labs
+    .map((l, i) => ({ label: l, bf: bfs[i], post: z[i] / zs, entry: best.get(l).entry }))
+    .sort((a, b) => b.bf - a.bf);
+  return { results, unknown: mx < NULL_TAU };
+}
+
+// ---- peaks -----------------------------------------------------------------
+
+function findPeaks(q, prominence = 0.03) {
+  const v = q.v, peaks = [];
+  for (let i = q.i0 + 1; i < q.i1; i++) {
+    if (!(v[i] > v[i - 1] && v[i] > v[i + 1])) continue;
+    let lmin = v[i], rmin = v[i];
+    for (let j = i - 1; j >= q.i0 && v[j] <= v[i]; j--) lmin = Math.min(lmin, v[j]);
+    for (let j = i + 1; j <= q.i1 && v[j] <= v[i]; j++) rmin = Math.min(rmin, v[j]);
+    const prom = v[i] - Math.max(lmin, rmin);
+    if (prom >= prominence) peaks.push({ pos: gridWavenumber(i), idx: i, prom });
+  }
+  return peaks;
+}
+
+// ---- multimodal (v3): fluorescence / absorption on nm grids ---------------
+// Port of multimodal.py. Same evidence core; nm curves are scored on their
+// Savitzky-Golay 1st derivative with a low-order Legendre null.
+
+const FLUOR_GRID = { start: 400, step: 1, n: 701 };   // 400..1100 nm
+const ABS_GRID = { start: 300, step: 1, n: 901 };     // 300..1200 nm
+const EX_WAVELENGTHS = [532, 633, 785, 808];
+const N_BASE_NM = 3, MIN_OVERLAP_NM = 80;
+const W_RAMAN = 1.0, W_FLUOR = 0.25, W_ABS = 1.0;
+const KAPPA_MM = 0.12, COUNT_PENALTY = 0.02;
+const MIN_XMAX = 1500;  // .txt below this x range = absorption, not Raman
+const CATEGORY_MAP = {
+  PS: "Plastic", PE: "Plastic", PP: "Plastic", PVP: "Plastic",
+  "Methylmetha Crylate": "Plastic", PDMS: "Plastic",
+  "Borosilicate glass": "Glass",
+};
+
+function parseEx(name) {
+  for (const m of name.split(/[^0-9]+/)) {
+    const v = Number(m);
+    if (EX_WAVELENGTHS.includes(v)) return v;
+  }
+  return null;
+}
+
+function interpToGridNm(x, y, grid) {
+  const v = new Float64Array(grid.n).fill(NaN);
+  let j = 0;
+  for (let i = 0; i < grid.n; i++) {
+    const g = grid.start + grid.step * i;
+    if (g < x[0] || g > x[x.length - 1]) continue;
+    while (j < x.length - 2 && x[j + 1] < g) j++;
+    while (j > 0 && x[j] > g) j--;
+    const t = (g - x[j]) / (x[j + 1] - x[j]);
+    v[i] = y[j] + t * (y[j + 1] - y[j]);
+  }
+  return v;
+}
+
+// SG 1st derivative, window `win`, order 3, scipy mode='interp' semantics:
+// each point takes the derivative of the cubic least-squares fit to its
+// window (edge points reuse the first/last window). Exact SG by definition.
+function savgolDeriv(seg, win) {
+  const n = seg.length, half = (win - 1) / 2, out = new Float64Array(n);
+  const dEval = (c, t) => c[1] + 2 * c[2] * t + 3 * c[3] * t * t;
+  for (let i = 0; i < n; i++) {
+    const start = Math.min(Math.max(i - half, 0), n - win);
+    out[i] = dEval(polyfit3(seg, start, win), i - start);
+  }
+  return out;
+}
+
+// preprocess_nm: interp, SG 1st derivative, L2 normalize.
+function preprocessNm(x, y, grid) {
+  const v = interpToGridNm(x, y, grid);
+  let i0 = -1, i1 = -1;
+  for (let i = 0; i < grid.n; i++) if (!Number.isNaN(v[i])) { if (i0 < 0) i0 = i; i1 = i; }
+  const len = i0 < 0 ? 0 : i1 - i0 + 1;
+  if (len < MIN_OVERLAP_NM) throw new Error("Đường cong phủ quá ít dải bước sóng của thư viện.");
+  const win = Math.min(15, len - (1 - len % 2));
+  const seg = savgolDeriv(Array.from(v.subarray(i0, i1 + 1)), win);
+  let ss = 0;
+  for (let i = 0; i < seg.length; i++) ss += seg[i] * seg[i];
+  const norm = Math.sqrt(ss);
+  if (!(norm > 0)) throw new Error("Đường cong phẳng, không chuẩn hóa được.");
+  const out = new Float64Array(grid.n).fill(NaN);
+  for (let i = 0; i < seg.length; i++) out[i0 + i] = seg[i] / norm;
+  return { v: out, i0, i1, grid };
+}
+
+function legendreRowNm(i, grid, nBase) {
+  const end = grid.start + grid.step * (grid.n - 1);
+  const t = ((grid.start + grid.step * i - grid.start) / (end - grid.start)) * 2 - 1;
+  const P = [1, t];
+  for (let k = 2; k < nBase; k++) P[k] = ((2 * k - 1) * t * P[k - 1] - (k - 1) * P[k - 2]) / k;
+  return P.slice(0, nBase);
+}
+
+function pairBFNm(q, spec, grid) {
+  const a0 = Math.max(q.i0, spec.i0), a1 = Math.min(q.i1, spec.i1);
+  const nv = a1 - a0 + 1;
+  if (nv < MIN_OVERLAP_NM) return null;
+  const yv = new Float64Array(nv), tcol = new Float64Array(nv);
+  const base = Array.from({ length: N_BASE_NM }, () => new Float64Array(nv));
+  for (let i = 0; i < nv; i++) {
+    yv[i] = q.v[a0 + i]; tcol[i] = spec.v[a0 + i];
+    const P = legendreRowNm(a0 + i, grid, N_BASE_NM);
+    for (let k = 0; k < N_BASE_NM; k++) base[k][i] = P[k];
+  }
+  return (evidenceCore([tcol, ...base], yv) - evidenceCore(base, yv)) / nv;
+}
+
+function countPenalty(entries) {
+  const counts = new Map();
+  for (const e of entries) counts.set(e.label, (counts.get(e.label) || 0) + 1);
+  const pen = new Map();
+  for (const [lab, n] of counts) pen.set(lab, COUNT_PENALTY * Math.log(n));
+  return pen;
+}
+
+// queries: [{ex, q}] — best per (class, ex) over curves, mean over ex, - penalty.
+function fluorClassBFs(queries, fluorLib) {
+  const perEx = new Map();  // "label|ex" -> best bf
+  for (const { ex, q } of queries) {
+    for (const e of fluorLib) {
+      if (e.ex !== ex) continue;
+      const bf = pairBFNm(q, e, FLUOR_GRID);
+      if (bf === null) continue;
+      const key = e.label + "|" + ex;
+      if (!perEx.has(key) || bf > perEx.get(key)) perEx.set(key, bf);
+    }
+  }
+  const byClass = new Map();
+  for (const [key, bf] of perEx) {
+    const lab = key.slice(0, key.lastIndexOf("|"));
+    if (!byClass.has(lab)) byClass.set(lab, []);
+    byClass.get(lab).push(bf);
+  }
+  const pen = countPenalty(fluorLib), out = new Map();
+  for (const [lab, bfs] of byClass)
+    out.set(lab, bfs.reduce((a, b) => a + b, 0) / bfs.length - pen.get(lab));
+  return out;
+}
+
+// queries: [q] — best per class over curves, - penalty.
+function absClassBFs(queries, absLib) {
+  const best = new Map();
+  for (const q of queries) {
+    for (const e of absLib) {
+      const bf = pairBFNm(q, e, ABS_GRID);
+      if (bf === null) continue;
+      if (!best.has(e.label) || bf > best.get(e.label)) best.set(e.label, bf);
+    }
+  }
+  const pen = countPenalty(absLib), out = new Map();
+  for (const [lab, bf] of best) out.set(lab, bf - pen.get(lab));
+  return out;
+}
+
+// Raman evidence in category space from a classify() result.
+function ramanCategoryBFs(results) {
+  const best = new Map();
+  for (const r of results) {
+    const lab = CATEGORY_MAP[r.label] || r.label;
+    if (!best.has(lab) || r.bf > best.get(lab)) best.set(lab, r.bf);
+  }
+  return best;
+}
+
+// bfByMod: {raman?: Map, fluor?: Map, abs?: Map} -> sorted fused results.
+function fuse(bfByMod, topK = 5) {
+  const weights = { raman: W_RAMAN, fluor: W_FLUOR, abs: W_ABS };
+  const classes = new Set();
+  for (const m of Object.keys(bfByMod)) for (const c of bfByMod[m].keys()) classes.add(c);
+  if (!classes.size) return [];
+  const rows = [...classes].map(c => {
+    let score = 0;
+    const parts = {};
+    for (const m of Object.keys(bfByMod)) {
+      if (bfByMod[m].has(c)) { parts[m] = bfByMod[m].get(c); score += weights[m] * parts[m]; }
+    }
+    return { label: c, score, parts };
+  });
+  const mx = Math.max(...rows.map(r => r.score));
+  const zs = rows.map(r => Math.exp((r.score - mx) / KAPPA_MM));
+  const zsum = zs.reduce((a, b) => a + b, 0);
+  rows.forEach((r, i) => { r.post = zs[i] / zsum; });
+  return rows.sort((a, b) => b.score - a.score).slice(0, topK);
+}
+
+// ---- library decoding ------------------------------------------------------
+
+function decodeSegment(e, n, dec) {
+  const bin = dec(e.b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  const f32 = new Float32Array(bytes.buffer);
+  const v = new Float64Array(n).fill(NaN);
+  for (let i = 0; i < f32.length; i++) v[e.i0 + i] = f32[i];
+  return { v, i0: e.i0, i1: e.i0 + f32.length - 1 };
+}
+
+function decodeLibrary(data, atob_) {
+  const dec = atob_ || (typeof atob !== "undefined" ? atob : null);
+  return data.entries.map(e =>
+    ({ label: e.label, source: e.source, ...decodeSegment(e, GRID_N, dec) }));
+}
+
+// {fluor: [...], abs: [...]} with per-entry label/ex on the nm grids.
+function decodeLibraryMm(data, atob_) {
+  const dec = atob_ || (typeof atob !== "undefined" ? atob : null);
+  return {
+    fluor: (data.mm_fluor || []).map(e =>
+      ({ label: e.label, ex: e.ex, ...decodeSegment(e, FLUOR_GRID.n, dec) })),
+    abs: (data.mm_abs || []).map(e =>
+      ({ label: e.label, ...decodeSegment(e, ABS_GRID.n, dec) })),
+  };
+}
+
+if (typeof module !== "undefined") {
+  module.exports = { parseSpectrum, preprocess, classify, findPeaks, decodeLibrary,
+                     pairBF, gridWavenumber, GRID_N, NULL_TAU, KAPPA,
+                     decodeLibraryMm, preprocessNm, pairBFNm, fluorClassBFs,
+                     absClassBFs, ramanCategoryBFs, fuse, parseEx,
+                     FLUOR_GRID, ABS_GRID, MIN_XMAX, CATEGORY_MAP };
+}
+
+</script>
+<script>
+let DATA, LIBRARY, LIBMM;
+const PEAK_TOL = 6.0;
+const MOD_VN = { raman: "Raman", fluor: "fluorescence", abs: "absorption" };
+const $ = id => document.getElementById(id);
+let tray = [];
+
+(async function init() {
+  try {
+    const resp = await fetch("data.json");
+    if (!resp.ok) throw new Error("Failed to load library (" + resp.status + ")");
+    const total = +resp.headers.get("content-length") || 0;
+    const reader = resp.body.getReader();
+    const chunks = [];
+    let loaded = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      loaded += value.length;
+      if (total) $("loadbar").style.width = Math.min(100, loaded / total * 100).toFixed(0) + "%";
+    }
+    $("loadbar").style.width = "100%";
+    const blob = new Blob(chunks);
+    DATA = JSON.parse(await blob.text());
+  } catch (e) {
+    $("loading").innerHTML = "<p style='color:var(--warn)'>Failed to load spectral library: " +
+      e.message + "</p><p>Try refreshing the page.</p>";
+    return;
+  }
+
+  LIBRARY = decodeLibrary(DATA);
+  LIBMM = decodeLibraryMm(DATA);
+
+  $("libcount").textContent = LIBRARY.length;
+  $("classcount").textContent = new Set(LIBRARY.map(e => e.label)).size;
+  $("libcountmm").textContent = LIBMM.fluor.length + LIBMM.abs.length;
+  $("loading").style.display = "none";
+  $("dropwrap").style.display = "block";
+  wireEvents();
+})();
+
+function showError(msg) {
+  $("error").textContent = msg;
+  $("error").style.display = "block";
+}
+
+function fmtPct(p) {
+  return p >= 0.9995 ? ">99.9%" : p < 0.0005 ? "<0.1%" : (p * 100).toFixed(1) + "%";
+}
+
+function addFile(text, name) {
+  const { x, y } = parseSpectrum(text);
+  let item;
+  if (/\.csv$/i.test(name)) {
+    const ex = parseEx(name);
+    if (ex === null)
+      throw new Error(name + ": .csv fluorescence filename must contain excitation wavelength (532/633/785/808).");
+    item = { name, kind: "fluor", ex, q: preprocessNm(x, y, FLUOR_GRID) };
+  } else if (x[x.length - 1] >= MIN_XMAX) {
+    const q = preprocess(x, y);
+    item = { name, kind: "raman", q, peakless: findPeaks(q).length === 0 };
+  } else {
+    item = { name, kind: "abs", q: preprocessNm(x, y, ABS_GRID) };
+  }
+  tray = tray.filter(t => t.name !== name);
+  tray.push(item);
+}
+
+function renderTray() {
+  const el = $("tray");
+  el.innerHTML = "";
+  for (const t of tray) {
+    const c = document.createElement("span");
+    c.className = "chip" + (t.peakless ? " miss" : "");
+    const label = MOD_VN[t.kind] + (t.kind === "fluor" ? " " + t.ex + "nm" : "")
+      + (t.peakless ? " · no peaks" : "");
+    c.textContent = t.name + " [" + label + "] ✕";
+    c.style.cursor = "pointer";
+    c.title = "Click to remove";
+    c.addEventListener("click", function() { tray = tray.filter(u => u !== t); renderAll(); });
+    el.appendChild(c);
+  }
+  $("clearall").hidden = !tray.length;
+}
+
+function renderAll() {
+  renderTray();
+  $("error").style.display = "none";
+  if (!tray.length) { $("results").style.display = "none"; return; }
+
+  const bfByMod = {};
+  const ramanUsable = tray.filter(t => t.kind === "raman" && !t.peakless);
+  let bestRaman = null;
+  if (ramanUsable.length) {
+    const best = new Map();
+    for (const t of ramanUsable) {
+      const r = classify(t.q, LIBRARY);
+      t.res = r;
+      for (const [lab, bf] of ramanCategoryBFs(r.results))
+        if (!best.has(lab) || bf > best.get(lab)) best.set(lab, bf);
+      if (!bestRaman || r.results[0].bf > bestRaman.res.results[0].bf) bestRaman = t;
+    }
+    if (best.size) bfByMod.raman = best;
+  }
+  const fluorQ = tray.filter(t => t.kind === "fluor").map(t => ({ ex: t.ex, q: t.q }));
+  if (fluorQ.length) {
+    const m = fluorClassBFs(fluorQ, LIBMM.fluor);
+    if (m.size) bfByMod.fluor = m;
+  }
+  const absQ = tray.filter(t => t.kind === "abs").map(t => t.q);
+  if (absQ.length) {
+    const m = absClassBFs(absQ, LIBMM.abs);
+    if (m.size) bfByMod.abs = m;
+  }
+  if (!Object.keys(bfByMod).length) {
+    showError("Could not extract evidence from the loaded files (peakless Raman or insufficient library overlap).");
+    $("results").style.display = "none";
+    return;
+  }
+  const fused = fuse(bfByMod);
+  const mods = Object.keys(bfByMod);
+  const multimodal = mods.length > 1 || !bfByMod.raman;
+  $("results").style.display = "block";
+
+  const peaklessNote = tray.some(t => t.peakless)
+    ? " Peakless Raman spectra excluded from evidence (metal / burnt sample?)." : "";
+  if (multimodal) {
+    const top = fused[0];
+    $("banner").className = "banner";
+    $("verdict").innerHTML = "Material: <em></em>";
+    $("verdict").querySelector("em").textContent = top.label;
+    $("verdictDetail").textContent =
+      "fusion " + mods.map(m => MOD_VN[m]).join(" + ") + ", score " + top.score.toFixed(3) +
+      " (posterior uncalibrated — ranking only)." + peaklessNote;
+  } else {
+    const { results, unknown } = bestRaman.res;
+    const top = results[0];
+    $("banner").className = "banner" + (unknown ? " unknown" : "");
+    if (unknown) {
+      $("verdict").textContent = "Possibly NOT in the library";
+      $("verdictDetail").textContent =
+        "best evidence " + top.bf.toFixed(3) + " < τ=" + NULL_TAU +
+        " — closest class: " + top.label + ". " +
+        "Posterior below is only meaningful as a relative ranking among known classes.";
+    } else {
+      $("verdict").innerHTML = "Identification: <em></em>";
+      $("verdict").querySelector("em").textContent = top.label;
+      $("verdictDetail").textContent =
+        "log BF/ch = " + top.bf.toFixed(3) + ", posterior " + fmtPct(top.post) + peaklessNote;
+    }
+  }
+
+  $("fusedcard").style.display = multimodal ? "block" : "none";
+  if (multimodal) {
+    const tb = $("fusedbody");
+    tb.innerHTML = "";
+    fused.forEach(function(r, i) {
+      var parts = ["raman", "fluor", "abs"]
+        .filter(function(m) { return m in r.parts; })
+        .map(function(m) { return MOD_VN[m] + " " + (r.parts[m] >= 0 ? "+" : "") + r.parts[m].toFixed(2); })
+        .join(", ");
+      var tr = document.createElement("tr");
+      if (i === 0) tr.className = "top";
+      tr.innerHTML =
+        '<td class="num">' + (i + 1) + "</td><td></td>" +
+        '<td class="num">' + r.score.toFixed(3) + "</td>" +
+        '<td><div class="postbar"><div class="track"><div class="fill" style="width:' +
+        Math.max(1, r.post * 100) + '%"></div></div>' +
+        '<span class="num">' + fmtPct(r.post) + "</span></div></td>" +
+        '<td class="num"></td>';
+      tr.children[1].textContent = r.label;
+      tr.children[4].textContent = parts;
+      tb.appendChild(tr);
+    });
+    $("fusednote").textContent =
+      "Specific polymer labels (PS/PE/PP…) are merged to Plastic at the material level — see Raman table below for chemical-level detail.";
+  }
+
+  $("ramancard").style.display = bestRaman ? "block" : "none";
+  $("chartcard").style.display = bestRaman ? "block" : "none";
+  if (bestRaman) renderRaman(bestRaman.q, bestRaman.res.results, bestRaman.name);
+}
+
+function renderRaman(q, results, name) {
+  $("fname").textContent = name;
+  var tbody = $("tbody");
+  tbody.innerHTML = "";
+  results.slice(0, 10).forEach(function(r, i) {
+    var tr = document.createElement("tr");
+    if (i === 0) tr.className = "top";
+    tr.innerHTML =
+      '<td class="num">' + (i + 1) + "</td><td></td>" +
+      '<td class="num">' + r.bf.toFixed(3) + "</td>" +
+      '<td><div class="postbar"><div class="track"><div class="fill" style="width:' +
+      Math.max(1, r.post * 100) + '%"></div></div>' +
+      '<span class="num">' + fmtPct(r.post) + "</span></div></td>";
+    tr.children[1].textContent = r.label;
+    tbody.appendChild(tr);
+  });
+
+  var top = results[0];
+  drawChart(q, top.entry);
+  $("tmplname").textContent = "(" + top.label + ")";
+
+  var qp = findPeaks(q);
+  var tp = findPeaks(top.entry);
+  var chips = $("peakchips");
+  chips.innerHTML = "";
+  if (!qp.length) chips.innerHTML = '<span class="chip miss">no prominent peaks detected</span>';
+  for (var p of qp) {
+    var matched = tp.some(function(t) { return Math.abs(t.pos - p.pos) <= PEAK_TOL; });
+    var c = document.createElement("span");
+    c.className = "chip" + (matched ? "" : " miss");
+    c.textContent = p.pos.toFixed(0) + " cm⁻¹" + (matched ? "" : " ?");
+    c.title = matched ? "Matches template peak" : "No corresponding template peak";
+    chips.appendChild(c);
+  }
+}
+
+function drawChart(q, tmpl) {
+  var svg = $("chart");
+  var W = 840, H = 300, L = 46, R = 12, T = 14, B = 34;
+  var pw = W - L - R, ph = H - T - B;
+  var x2px = function(i) { return L + ((gridWavenumber(i) - 450) / (3200 - 450)) * pw; };
+
+  function pathFor(s, color, width, dash) {
+    var max = 0;
+    for (var i = s.i0; i <= s.i1; i++) max = Math.max(max, s.v[i]);
+    var d = "";
+    for (var i = s.i0; i <= s.i1; i++) {
+      var yv = T + ph - (s.v[i] / max) * ph * 0.95;
+      d += (d ? "L" : "M") + x2px(i).toFixed(1) + " " + yv.toFixed(1);
+    }
+    return '<path d="' + d + '" fill="none" stroke="' + color + '" stroke-width="' + width + '"' +
+      (dash ? ' stroke-dasharray="' + dash + '"' : "") + '/>';
+  }
+
+  var s = "";
+  for (var t = 500; t <= 3200; t += 500) {
+    var px = L + ((t - 450) / (3200 - 450)) * pw;
+    s += '<line x1="' + px + '" y1="' + T + '" x2="' + px + '" y2="' + (T + ph) + '" stroke="var(--line)" stroke-width="1"/>';
+    s += '<text x="' + px + '" y="' + (H - 12) + '" text-anchor="middle">' + t + '</text>';
+  }
+  s += '<text x="' + (L + pw / 2) + '" y="' + (H - 0.5) + '" text-anchor="middle">Raman shift (cm⁻¹)</text>';
+  s += pathFor(tmpl, "var(--tmpl)", 1.4, "5 3");
+  s += pathFor(q, "var(--ink)", 1.6);
+
+  var tp = findPeaks(tmpl);
+  var qmax = 0;
+  for (var i = q.i0; i <= q.i1; i++) qmax = Math.max(qmax, q.v[i]);
+  for (var p of findPeaks(q)) {
+    var matched = tp.some(function(t) { return Math.abs(t.pos - p.pos) <= PEAK_TOL; });
+    var py = T + ph - (q.v[p.idx] / qmax) * ph * 0.95 - 8;
+    s += '<path d="M' + x2px(p.idx).toFixed(1) + ' ' + py +
+      ' l -4 -7 l 8 0 z" fill="' + (matched ? "var(--accent)" : "var(--muted)") + '"/>';
+  }
+  svg.innerHTML = s;
+}
+
+function wireEvents() {
+  var drop = $("drop"), input = $("fileinput");
+
+  function addFiles(files) {
+    Promise.all(Array.from(files).map(function(f) {
+      return f.text().then(function(t) { return { t: t, name: f.name }; });
+    })).then(function(loaded) {
+      var errors = [];
+      for (var item of loaded) {
+        try { addFile(item.t, item.name); } catch (e) { errors.push(e.message || String(e)); }
+      }
+      renderAll();
+      if (errors.length) showError(errors.join(" "));
+    });
+  }
+
+  drop.addEventListener("click", function() { input.click(); });
+  drop.addEventListener("keydown", function(e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); input.click(); } });
+  ["dragover", "dragenter"].forEach(function(ev) { drop.addEventListener(ev, function(e) { e.preventDefault(); drop.classList.add("over"); }); });
+  ["dragleave", "drop"].forEach(function(ev) { drop.addEventListener(ev, function(e) { e.preventDefault(); drop.classList.remove("over"); }); });
+  drop.addEventListener("drop", function(e) { addFiles(e.dataTransfer.files); });
+  input.addEventListener("change", function() { addFiles(input.files); input.value = ""; });
+
+  document.querySelectorAll("button.demo[data-demo]").forEach(function(b) {
+    b.addEventListener("click", function() {
+      var d = DATA.demos[Number(b.dataset.demo)];
+      tray = [];
+      try { addFile(d.text, d.name); } catch (e) { showError(e.message); }
+      renderAll();
+    });
+  });
+  $("demomm").addEventListener("click", function() {
+    tray = [];
+    var errors = [];
+    for (var d of DATA.demos_mm) {
+      try { addFile(d.text, d.name); } catch (e) { errors.push(e.message || String(e)); }
+    }
+    renderAll();
+    if (errors.length) showError(errors.join(" "));
+  });
+  $("clearall").addEventListener("click", function() { tray = []; renderAll(); });
+}
+</script>
