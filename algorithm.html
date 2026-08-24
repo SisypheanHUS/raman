@@ -1,0 +1,884 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thuật toán — RamanID</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* ---- Industry design system tokens (light) — kept identical to index.html ---- */
+  :root {
+    --color-bg: #f2f2f3;
+    --color-surface: #e9e9ea;
+    --color-text: #1d1f20;
+    --color-accent: #5980a6;
+    --color-divider: color-mix(in srgb, #1d1f20 16%, transparent);
+
+    --color-neutral-100: #f5f5f8;
+    --color-neutral-200: #e7e7ea;
+    --color-neutral-500: #98989b;
+    --color-neutral-700: #5d5d60;
+
+    --color-accent-100: #eef6ff;
+    --color-accent-300: #b5d9fd;
+    --color-accent-500: #749dc4;
+    --color-accent-700: #416180;
+    --color-accent-800: #2c455d;
+    --color-accent-900: #1d2d3d;
+
+    --font-heading: "Barlow Condensed", system-ui, sans-serif;
+    --font-heading-weight: 600;
+    --font-body: "Barlow", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+    --font-math: "Cambria Math", "STIX Two Math", "Latin Modern Math", "Times New Roman", serif;
+
+    --space-1: 3.4px; --space-2: 6.8px; --space-3: 10.2px;
+    --space-4: 13.6px; --space-6: 20.4px;
+    --radius-md: 4px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --color-bg: #1a1c1e; --color-surface: #232527; --color-text: #e7e7ea;
+      --color-divider: rgba(255,255,255,.14);
+      --color-neutral-100: #2b2b2d; --color-neutral-200: #3a3b3d;
+      --color-neutral-500: #98989b; --color-neutral-700: #d4d4d7;
+      --color-accent-100: #1d2d3d; --color-accent-300: #416180;
+      --color-accent-500: #94bce3; --color-accent-700: #b5d9fd; --color-accent-800: #d6ebff;
+      --color-accent-900: #eef6ff;
+    }
+  }
+  :root[data-theme="dark"] {
+    --color-bg: #1a1c1e; --color-surface: #232527; --color-text: #e7e7ea;
+    --color-divider: rgba(255,255,255,.14);
+    --color-neutral-100: #2b2b2d; --color-neutral-200: #3a3b3d;
+    --color-neutral-500: #98989b; --color-neutral-700: #d4d4d7;
+    --color-accent-100: #1d2d3d; --color-accent-300: #416180;
+    --color-accent-500: #94bce3; --color-accent-700: #b5d9fd; --color-accent-800: #d6ebff;
+    --color-accent-900: #eef6ff;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+  h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: var(--font-heading-weight); line-height: 1.12; letter-spacing: -.015em; margin: 0 0 var(--space-2); }
+  a { color: var(--color-accent); text-underline-offset: 3px; }
+  code { font-family: var(--font-mono); font-size: 13px; }
+  :focus { outline: none; }
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+  /* ---- nav ---- */
+  .nav { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3) var(--space-6); border-bottom: 1px solid var(--color-divider); max-width: 960px; margin: 0 auto; }
+  .nav-brand { display: flex; align-items: center; gap: 8px; font-family: var(--font-heading); font-weight: 600; font-size: 18px; margin-right: auto; }
+  .nav .tagline { margin-right: auto; font-size: 12px; opacity: .5; }
+  .nav a { color: inherit; text-decoration: none; font-size: 14px; }
+  .nav a:hover { color: var(--color-accent); }
+  .nav a.active { color: var(--color-accent); border-bottom: 2px solid var(--color-accent); padding-bottom: 2px; }
+
+  /* ---- paper layout ---- */
+  .page { max-width: 960px; margin: 0 auto; padding: 40px var(--space-6) 20px; }
+  .paper { max-width: 76ch; margin: 0 auto; }
+  .paper-head { text-align: center; margin-bottom: 28px; }
+  .paper-head .kind { font-family: var(--font-heading); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; opacity: .5; margin-bottom: 10px; }
+  .paper-head h1 { font-size: 28px; margin-bottom: 12px; }
+  .paper-head .authors { font-size: 14.5px; margin: 0 0 4px; }
+  .paper-head .affil { font-size: 13px; opacity: .6; margin: 0; }
+  .paper-head .date { font-size: 12px; opacity: .45; margin-top: 6px; font-family: var(--font-mono); }
+
+  .abstract { border-top: 1px solid var(--color-divider); border-bottom: 1px solid var(--color-divider); padding: 16px 20px; margin: 0 0 32px; font-size: 14px; line-height: 1.65; }
+  .abstract .lbl { font-family: var(--font-heading); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--color-accent); margin-bottom: 6px; }
+  .abstract p { margin: 0 0 8px; }
+  .abstract .kw { font-size: 13px; opacity: .65; }
+
+  .toc { font-size: 13.5px; background: var(--color-neutral-100); border: 1px solid var(--color-divider); padding: 14px 18px; margin: 0 0 32px; columns: 2; column-gap: 24px; }
+  .toc a { color: inherit; text-decoration: none; display: block; padding: 2px 0; break-inside: avoid; }
+  .toc a:hover { color: var(--color-accent); }
+  .toc a .no { font-family: var(--font-mono); font-size: 12px; opacity: .5; margin-right: 6px; }
+
+  .sec { margin-bottom: 34px; }
+  .sec h2 { font-size: 20px; color: var(--color-accent); margin: 0 0 12px; padding-top: 6px; }
+  .sec h3 { font-size: 16px; margin: 18px 0 8px; }
+  .sec h4 { font-size: 14px; margin: 14px 0 6px; opacity: .85; }
+  .sec p { font-size: 14.5px; line-height: 1.68; margin: 0 0 10px; }
+  .sec ul, .sec ol { font-size: 14.5px; line-height: 1.62; margin: 0 0 12px; padding-left: 22px; }
+  .sec li { margin-bottom: 4px; }
+  .num { font-family: var(--font-mono); font-size: .8em; opacity: .55; margin-right: 8px; font-weight: 400; }
+
+  /* math */
+  .m { font-family: var(--font-math); font-size: 1.04em; }
+  .m i { font-style: italic; }
+  .m b { font-weight: 700; font-style: italic; }
+  .eq { display: flex; align-items: center; gap: 16px; font-family: var(--font-math); font-size: 16px; line-height: 1.6; padding: 6px 12px 6px 28px; margin: 8px 0 12px; overflow-x: auto; }
+  .eq .body { flex: 1; text-align: center; white-space: normal; min-width: 0; }
+  .eq .body .ln { display: block; }
+  .eq .body i { font-style: italic; }
+  .eq .body b { font-weight: 700; font-style: italic; }
+  .eq .tag { flex: none; font-family: var(--font-body); font-size: 12.5px; opacity: .5; }
+  .eq .big { font-size: 1.35em; vertical-align: -.12em; }
+  .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; font-size: .92em; margin: 0 3px; }
+  .frac > span:first-child { border-bottom: 1px solid currentColor; padding: 0 3px; }
+  .frac > span:last-child { padding: 0 3px; }
+  .cases { display: inline-grid; grid-template-columns: auto auto; column-gap: 14px; row-gap: 2px; text-align: left; vertical-align: middle; border-left: 1.5px solid currentColor; padding-left: 10px; margin-left: 4px; }
+
+  /* algorithm boxes */
+  .algo { border-top: 2px solid var(--color-text); border-bottom: 1px solid var(--color-text); padding: 10px 0 8px; margin: 14px 0 18px; font-size: 13.5px; }
+  .algo .title { font-family: var(--font-heading); font-weight: 600; font-size: 14px; border-bottom: 1px solid var(--color-divider); padding-bottom: 6px; margin-bottom: 8px; }
+  .algo .title span { font-weight: 400; opacity: .8; }
+  .algo ol { list-style: none; counter-reset: ln; margin: 0; padding: 0; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.7; }
+  .algo ol li { counter-increment: ln; padding-left: 34px; position: relative; white-space: pre-wrap; }
+  .algo ol li::before { content: counter(ln); position: absolute; left: 0; width: 22px; text-align: right; opacity: .4; font-size: 11px; }
+  .algo ol li.i1 { padding-left: 52px; }
+  .algo ol li.i2 { padding-left: 70px; }
+  .algo ol li.i3 { padding-left: 88px; }
+  .algo .kw { color: var(--color-accent); font-weight: 500; }
+  .algo .io { padding-left: 34px; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.7; }
+  .algo .io b { font-family: var(--font-body); font-weight: 600; }
+
+  /* tables & figures */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 12px 0; }
+  .data-table th, .data-table td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--color-divider); vertical-align: top; }
+  .data-table th { font-family: var(--font-heading); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; opacity: .55; }
+  .data-table td:first-child { font-weight: 500; }
+  .data-table .mono { font-family: var(--font-mono); font-size: 12px; }
+  .data-table .r { text-align: right; }
+  .caption { font-size: 12.5px; opacity: .65; margin: 4px 0 14px; line-height: 1.5; }
+  .caption b { font-weight: 600; opacity: 1; }
+  .figure { margin: 14px 0 6px; }
+  .figure svg { width: 100%; height: auto; display: block; }
+  .note { border-left: 3px solid var(--color-accent); background: var(--color-neutral-100); padding: 10px 14px; margin: 12px 0; font-size: 13.5px; line-height: 1.6; }
+  .note b { color: var(--color-accent); }
+
+  .refs { font-size: 13.5px; line-height: 1.55; padding-left: 0; list-style: none; counter-reset: ref; }
+  .refs li { counter-increment: ref; padding-left: 34px; position: relative; margin-bottom: 7px; }
+  .refs li::before { content: "[" counter(ref) "]"; position: absolute; left: 0; font-family: var(--font-mono); font-size: 12px; opacity: .55; }
+  .cite { font-family: var(--font-mono); font-size: .82em; opacity: .7; }
+
+  .footer { border-top: 1px solid var(--color-divider); margin-top: 30px; padding: 18px 0 40px; font-size: 12.5px; opacity: .55; text-align: center; }
+
+  @media (max-width: 640px) {
+    .nav a { display: none; }
+    .paper-head h1 { font-size: 22px; }
+    .page { padding-left: var(--space-3); padding-right: var(--space-3); }
+    .toc { columns: 1; }
+    .data-table { font-size: 12px; }
+    .data-table th, .data-table td { padding: 6px 6px; }
+    .eq { padding-left: 8px; font-size: 14.5px; }
+  }
+  @media print {
+    .nav, .toc { display: none; }
+    body { background: #fff; color: #000; }
+  }
+</style>
+
+<nav class="nav">
+  <div class="nav-brand">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18l3-4 2-6 2 4 2-9 2 9 2-2 3 4 4 4"></path></svg>
+    RamanID
+  </div>
+  <span class="tagline">Nhận diện phổ trên trình duyệt</span>
+  <a href="index.html">Nhận diện</a>
+  <a href="catalog.html">Thư viện</a>
+  <a href="algorithm.html" class="active">Thuật toán</a>
+  <a href="about.html">Giới thiệu</a>
+</nav>
+
+<div class="page">
+<div class="paper">
+
+  <div class="paper-head">
+    <div class="kind">Bản mô tả kỹ thuật · Technical note</div>
+    <h1>Nhận diện vật liệu từ phổ quang học bằng hợp lý biên Bayes giải tích: thuật toán RamanID</h1>
+    <p class="authors">Đinh Thái Tuấn, Vũ Dương</p>
+    <p class="affil">Trung tâm Điện tử Lượng tử, Viện Vật lý (IOP), Viện Hàn lâm Khoa học và Công nghệ Việt Nam (VAST)</p>
+    <div class="date">Phiên bản 3 · 08/2026</div>
+  </div>
+
+  <div class="abstract">
+    <div class="lbl">Tóm tắt</div>
+    <p>
+      Chúng tôi mô tả thuật toán nhận diện vật liệu của RamanID: so khớp một phổ đo với thư viện
+      16 024 phổ tham chiếu (2 507 lớp) bằng <em>hợp lý biên Bayes</em> (Bayesian marginal likelihood)
+      tính theo công thức đóng. Mỗi lớp ứng viên được mô hình hoá là tổ hợp tuyến tính của phổ mẫu,
+      các thành phần biến thiên trong lớp (PCA), một nền đa thức Legendre và nhiễu Gaussian; các hệ số
+      biên độ, nền và phương sai nhiễu được tích phân loại bỏ giải tích với tiên nghiệm Jeffreys, cho
+      ra log Bayes factor so với mô hình chỉ-nền. Xác suất hậu nghiệm thu được bằng softmax có làm mềm
+      (κ = 0.06, hiệu chuẩn theo ECE), và quyết định "không có trong thư viện" tách riêng bằng một
+      ngưỡng τ = 0.659 hiệu chuẩn tại 10% từ chối nhầm. Với mẫu không có vân tay Raman, bằng chứng từ
+      huỳnh quang và hấp thụ được hợp nhất muộn (late fusion) trên thang log Bayes factor. Đánh giá
+      leave-one-out trên 202 phổ VAST đạt top-1 90.1% (95.9% trên hoá chất tinh khiết), ECE 0.038.
+      Toàn bộ thuật toán chạy trong trình duyệt bằng JavaScript, không cần máy chủ.
+    </p>
+    <p class="kw"><b>Từ khoá:</b> phổ Raman, so khớp thư viện, Bayes factor, hợp lý biên, open-set, hiệu chuẩn xác suất, đa phương thức.</p>
+  </div>
+
+  <div class="toc">
+    <a href="#s1"><span class="no">1</span>Giới thiệu</a>
+    <a href="#s2"><span class="no">2</span>Bài toán và ký hiệu</a>
+    <a href="#s3"><span class="no">3</span>Tiền xử lý phổ</a>
+    <a href="#s4"><span class="no">4</span>Mô hình sinh và hợp lý biên</a>
+    <a href="#s5"><span class="no">5</span>Mô hình biến thiên trong lớp</a>
+    <a href="#s6"><span class="no">6</span>Suy luận và quyết định</a>
+    <a href="#s7"><span class="no">7</span>Hợp nhất đa phương thức</a>
+    <a href="#s8"><span class="no">8</span>Hiệu chuẩn và đánh giá</a>
+    <a href="#s9"><span class="no">9</span>Cài đặt và độ phức tạp</a>
+    <a href="#s10"><span class="no">10</span>Hạn chế và hướng phát triển</a>
+    <a href="#refs"><span class="no">—</span>Tài liệu tham khảo</a>
+  </div>
+
+  <!-- ============================================================ 1 -->
+  <div class="sec" id="s1">
+    <h2><span class="num">1</span>Giới thiệu</h2>
+    <p>
+      Nhận diện chất từ phổ Raman theo cách truyền thống là so khớp phổ đo với một thư viện phổ chuẩn
+      bằng chỉ số tương đồng (hit quality index, HQI — thực chất là cosine giữa hai vector phổ). Cách
+      này nhanh và không cần huấn luyện, nhưng có ba điểm yếu: điểm số không có ý nghĩa xác suất, không
+      có cơ chế tự nhiên để nói "chất này không có trong thư viện", và nền huỳnh quang còn sót hay
+      biến thiên giữa các máy đo làm điểm số dao động khó lý giải.
+    </p>
+    <p>
+      Các phương pháp học sâu (CNN trên phổ) giải quyết một phần vấn đề nhưng đòi hỏi hàng trăm đến
+      hàng nghìn phổ mỗi lớp — điều kiện không thể có với thư viện thực tế, nơi đa số lớp chỉ có 1–3
+      phổ. RamanID chọn hướng thứ ba, tiếp nối dòng công trình của Zhong, Girolami và cộng sự [1] và
+      Moores và cộng sự [2]: đặt so khớp thư viện vào khuôn khổ <em>so sánh mô hình Bayes</em>, trong
+      đó mỗi lớp ứng viên là một mô hình sinh của phổ đo, và điểm số là <em>Bayes factor</em> giữa mô
+      hình "có chất" và mô hình "chỉ có nền". Vì mô hình tuyến tính theo tham số với tiên nghiệm liên
+      hợp, mọi tích phân đều có công thức đóng — không cần MCMC — nên thuật toán đủ nhẹ để chạy trong
+      trình duyệt hay thiết bị cầm tay.
+    </p>
+    <p>Đóng góp của bản mô tả này:</p>
+    <ul>
+      <li>Trình bày đầy đủ pipeline tiền xử lý dùng chung cho phổ thư viện và phổ đo (§3).</li>
+      <li>Dẫn ra công thức đóng của hợp lý biên và log Bayes factor theo kênh (§4), cùng cách mở rộng
+        thiết kế bằng các thành phần PCA trong lớp để hấp thụ biến thiên máy đo (§5).</li>
+      <li>Tách hai quyết định: hậu nghiệm giữa các lớp (softmax làm mềm) và cờ open-set (ngưỡng τ),
+        kèm giải thích bằng peak và chế độ hỗn hợp (§6).</li>
+      <li>Mở rộng sang huỳnh quang và hấp thụ bằng hợp nhất muộn trên thang log Bayes factor, kể cả
+        suy luận mù bước sóng kích thích (§7).</li>
+      <li>Quy trình hiệu chuẩn κ, τ và các kết quả đánh giá leave-one-out (§8).</li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ 2 -->
+  <div class="sec" id="s2">
+    <h2><span class="num">2</span>Bài toán và ký hiệu</h2>
+    <p>
+      Cho thư viện <span class="m">𝓛 = {(<b>s</b><sub>j</sub>, c<sub>j</sub>)}<sub>j=1..N</sub></span> gồm
+      <span class="m">N</span> phổ tham chiếu đã tiền xử lý, mỗi phổ gắn một nhãn lớp
+      <span class="m">c<sub>j</sub> ∈ 𝓒</span> (|𝓒| = 2 507). Cho phổ đo <span class="m"><b>y</b></span>. Cần trả về:
+    </p>
+    <ol>
+      <li>một xếp hạng các lớp kèm xác suất hậu nghiệm <span class="m">P(c | <b>y</b>)</span>;</li>
+      <li>một cờ <em>unknown</em> cho biết <span class="m"><b>y</b></span> có khả năng không thuộc lớp nào trong 𝓒;</li>
+      <li>bằng chứng diễn giải được (các peak khớp / không khớp).</li>
+    </ol>
+    <p>Ký hiệu dùng xuyên suốt:</p>
+    <table class="data-table">
+      <thead><tr><th>Ký hiệu</th><th>Ý nghĩa</th><th>Giá trị</th></tr></thead>
+      <tbody>
+        <tr><td class="m">ν<sub>i</sub></td><td>Lưới Raman shift chung, <span class="m">ν<sub>i</sub> = 450 + 2i</span> cm⁻¹</td><td class="mono">i = 0…1375 (n<sub>g</sub> = 1376 kênh)</td></tr>
+        <tr><td class="m">𝓜(<b>y</b>)</td><td>Mask kênh hợp lệ của một phổ (vùng máy đo phủ)</td><td class="mono">tập con của {0…1375}</td></tr>
+        <tr><td class="m">𝓜<sub>∩</sub></td><td>Phần giao mask của hai phổ đang so; <span class="m">n = |𝓜<sub>∩</sub>|</span></td><td class="mono">yêu cầu n ≥ 413 (30%)</td></tr>
+        <tr><td class="m"><b>t</b><sub>c</sub></td><td>Phổ mẫu (template) của lớp <span class="m">c</span></td><td class="mono">vector n<sub>g</sub></td></tr>
+        <tr><td class="m">P<sub>k</sub>(x)</td><td>Đa thức Legendre bậc <span class="m">k</span> trên <span class="m">x ∈ [−1, 1]</span></td><td class="mono">k = 0…5</td></tr>
+        <tr><td class="m">λ</td><td>Độ chính xác tiên nghiệm của hệ số hồi quy</td><td class="mono">0.01</td></tr>
+        <tr><td class="m">κ</td><td>Nhiệt độ softmax (tempering)</td><td class="mono">0.06 (Raman), 0.12 (fusion)</td></tr>
+        <tr><td class="m">τ</td><td>Ngưỡng open-set trên log BF/kênh tốt nhất</td><td class="mono">0.659</td></tr>
+      </tbody>
+    </table>
+    <div class="figure">
+      <svg viewBox="0 0 760 118" xmlns="http://www.w3.org/2000/svg" font-family="Barlow, system-ui, sans-serif" font-size="12" fill="currentColor" role="img" aria-label="Sơ đồ pipeline RamanID">
+        <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <g stroke="currentColor" fill="none" stroke-width="1">
+          <rect x="4" y="30" width="118" height="58"/><rect x="160" y="30" width="118" height="58"/><rect x="316" y="30" width="118" height="58"/><rect x="472" y="30" width="118" height="58"/><rect x="628" y="30" width="128" height="58"/>
+          <line x1="122" y1="59" x2="158" y2="59" marker-end="url(#arr)"/><line x1="278" y1="59" x2="314" y2="59" marker-end="url(#arr)"/><line x1="434" y1="59" x2="470" y2="59" marker-end="url(#arr)"/><line x1="590" y1="59" x2="626" y2="59" marker-end="url(#arr)"/>
+        </g>
+        <g text-anchor="middle">
+          <text x="63" y="52" font-weight="600">Phổ đo</text><text x="63" y="70" opacity=".65">.txt / .csv, 2 cột</text>
+          <text x="219" y="52" font-weight="600">Tiền xử lý</text><text x="219" y="70" opacity=".65">lưới · SG · ALS · L2</text>
+          <text x="375" y="52" font-weight="600">Bằng chứng</text><text x="375" y="70" opacity=".65">log BF mỗi lớp</text>
+          <text x="531" y="52" font-weight="600">Quyết định</text><text x="531" y="70" opacity=".65">softmax(κ) · ngưỡng τ</text>
+          <text x="692" y="52" font-weight="600">Kết quả</text><text x="692" y="70" opacity=".65">lớp · P · unknown · peak</text>
+          <text x="219" y="108" opacity=".5" font-size="11">§3</text><text x="375" y="108" opacity=".5" font-size="11">§4–5, §7</text><text x="531" y="108" opacity=".5" font-size="11">§6</text>
+        </g>
+      </svg>
+    </div>
+    <p class="caption"><b>Hình 1.</b> Sơ đồ khối của thuật toán. Thư viện đi qua đúng khối Tiền xử lý này khi được xây dựng, nên phổ đo và phổ tham chiếu luôn ở cùng một không gian biểu diễn.</p>
+  </div>
+
+  <!-- ============================================================ 3 -->
+  <div class="sec" id="s3">
+    <h2><span class="num">3</span>Tiền xử lý phổ</h2>
+    <p>
+      Mọi phổ — thư viện lẫn phổ đo mới — đi qua cùng một pipeline năm bước. Mục tiêu là đưa phổ từ
+      các máy/laser khác nhau về một biểu diễn bất biến với thang cường độ, độ phân giải và nền
+      huỳnh quang trôi chậm, đồng thời giữ nguyên vị trí và hình dạng peak.
+    </p>
+
+    <h3>3.1 Lưới chung và mask hợp lệ</h3>
+    <p>
+      Phổ thô <span class="m">{(x<sub>m</sub>, y<sub>m</sub>)}</span> (đã sắp xếp tăng dần theo
+      <span class="m">x</span>, loại điểm trùng) được nội suy tuyến tính về lưới cố định
+      <span class="m">ν<sub>i</sub> = 450 + 2i</span> cm⁻¹, <span class="m">i = 0, …, 1375</span>.
+      Kênh nằm ngoài <span class="m">[x<sub>min</sub>, x<sub>max</sub>]</span> nhận giá trị NaN và bị loại
+      khỏi mask 𝓜. Dải 450–3200 cm⁻¹ được chọn vì: dưới 450 cm⁻¹ nhiễu Rayleigh/notch filter và
+      nhiều phổ thư viện bắt đầu từ ~400 cm⁻¹; trên 3200 cm⁻¹ hầu như không còn thông tin, nhưng vùng
+      CH-stretch 2800–3100 và OH ~3200 cần được giữ để phân biệt polymer và dung môi. Phổ phủ dưới 100
+      kênh bị từ chối.
+    </p>
+
+    <h3>3.2 Làm mượt Savitzky–Golay</h3>
+    <p>
+      Bộ lọc Savitzky–Golay [3] cửa sổ 9 điểm, bậc 3, tương đương tích chập với nhân đối xứng
+    </p>
+    <div class="eq"><span class="body"><i>ŷ</i><sub>i</sub> = Σ<sub>k=−4</sub><sup>4</sup> <i>h</i><sub>k</sub> <i>y</i><sub>i+k</sub>,&nbsp;&nbsp; <b>h</b> = (−21, 14, 39, 54, 59, 54, 39, 14, −21) / 231</span><span class="tag">(1)</span></div>
+    <p>
+      Bốn điểm biên mỗi phía được thay bằng giá trị của đa thức bậc 3 khớp bình phương tối thiểu trên
+      9 điểm đầu/cuối (ngữ nghĩa <code>mode="interp"</code> của SciPy). Cửa sổ 9 điểm × 2 cm⁻¹ = 18 cm⁻¹
+      nhỏ hơn bề rộng peak Raman điển hình nên giữ được biên độ và vị trí peak, đồng thời giảm nhiễu
+      shot. Hệ quả phụ là các kênh lân cận trở nên tương quan — điểm này được xử lý ở tầng mô hình bằng
+      tham số κ (§6.2).
+    </p>
+
+    <h3>3.3 Trừ nền bằng bình phương tối thiểu bất đối xứng (ALS)</h3>
+    <p>
+      Nền huỳnh quang được ước lượng bằng ALS của Eilers &amp; Boelens [4]: tìm đường cong trơn
+      <span class="m"><b>z</b></span> cực tiểu hoá
+    </p>
+    <div class="eq"><span class="body"><i>J</i>(<b>z</b>) = Σ<sub>i</sub> <i>w</i><sub>i</sub> (<i>y</i><sub>i</sub> − <i>z</i><sub>i</sub>)<sup>2</sup> + <i>λ</i><sub>ALS</sub> ‖<b>D</b><sub>2</sub><b>z</b>‖<sup>2</sup>,&nbsp;&nbsp; <i>w</i><sub>i</sub> = <span class="cases"><span><i>p</i></span><span>nếu <i>y</i><sub>i</sub> &gt; <i>z</i><sub>i</sub></span><span>1 − <i>p</i></span><span>ngược lại</span></span></span><span class="tag">(2)</span></div>
+    <p>
+      với <span class="m"><b>D</b><sub>2</sub></span> là toán tử sai phân bậc hai. Trọng số bất đối xứng
+      (<span class="m">p</span> = 0.01) phạt nặng các điểm <em>dưới</em> nền và gần như bỏ qua các điểm
+      <em>trên</em> nền, nên peak Raman (dương, nhọn) không kéo nền lên; số hạng phạt độ cong
+      (<span class="m">λ<sub>ALS</sub></span> = 10⁵) buộc nền trơn ở thang hàng trăm cm⁻¹. Với
+      <span class="m"><b>w</b></span> cố định, điều kiện dừng là hệ tuyến tính năm đường chéo
+    </p>
+    <div class="eq"><span class="body">(<b>W</b> + <i>λ</i><sub>ALS</sub> <b>D</b><sub>2</sub><sup>⊤</sup><b>D</b><sub>2</sub>) <b>z</b> = <b>W</b><b>y</b></span><span class="tag">(3)</span></div>
+    <p>
+      được giải bằng phân tích Cholesky dải (bandwidth 2), rồi cập nhật <span class="m"><b>w</b></span>
+      theo dấu của <span class="m"><b>y</b> − <b>z</b></span>; lặp 10 vòng. Mỗi vòng có chi phí
+      <span class="m">O(n)</span>.
+    </p>
+
+    <h3>3.4 Dịch cực tiểu và chuẩn hoá L2</h3>
+    <p>
+      Sau khi trừ nền, tín hiệu được dịch để cực tiểu bằng 0 (bảo đảm không âm), rồi chuẩn hoá theo
+      chuẩn Euclid trên các kênh hợp lệ:
+    </p>
+    <div class="eq"><span class="body"><i>ỹ</i><sub>i</sub> = <span class="frac"><span><i>y</i><sub>i</sub> − min<sub>j∈𝓜</sub> <i>y</i><sub>j</sub></span><span>‖ <b>y</b> − min <b>y</b> ‖<sub>2, 𝓜</sub></span></span>,&nbsp;&nbsp; <i>i</i> ∈ 𝓜</span><span class="tag">(4)</span></div>
+    <p>
+      Nhờ đó kết quả bất biến với công suất laser, thời gian tích luỹ và hệ số khuếch đại, và các mô hình
+      Bayes ở §4 có thể dùng một tiên nghiệm chung cho biên độ.
+    </p>
+
+    <div class="algo">
+      <div class="title">Thuật toán 1 <span>— Tiền xử lý một phổ Raman</span></div>
+      <div class="io"><b>Vào:</b> cặp cột (x, y) thô. <b>Ra:</b> vector ỹ trên lưới 1376 kênh (NaN ngoài vùng phủ), mask 𝓜.</div>
+      <ol>
+        <li>sắp xếp theo x, loại điểm trùng; <span class="kw">nếu</span> ít hơn 50 điểm → lỗi</li>
+        <li>v ← nội suy tuyến tính (x, y) lên lưới ν<sub>i</sub>; NaN ngoài [x<sub>min</sub>, x<sub>max</sub>]</li>
+        <li>[i<sub>0</sub>, i<sub>1</sub>] ← đoạn kênh hợp lệ; <span class="kw">nếu</span> i<sub>1</sub> − i<sub>0</sub> + 1 &lt; 100 → lỗi</li>
+        <li>seg ← SavitzkyGolay(v[i<sub>0</sub>..i<sub>1</sub>], cửa sổ 9, bậc 3)         ▷ pt. (1)</li>
+        <li>z ← ALS(seg, λ<sub>ALS</sub> = 10⁵, p = 0.01, 10 vòng)                  ▷ pt. (2)–(3)</li>
+        <li>seg ← seg − z;  seg ← seg − min(seg)</li>
+        <li>seg ← seg / ‖seg‖<sub>2</sub>;  <span class="kw">nếu</span> ‖seg‖<sub>2</sub> = 0 → lỗi (phổ phẳng)</li>
+        <li><span class="kw">trả về</span> ỹ với ỹ[i<sub>0</sub>..i<sub>1</sub>] = seg, NaN nơi khác</li>
+      </ol>
+    </div>
+
+    <h3>3.5 So khớp có mask</h3>
+    <p>
+      Hai phổ chỉ được so trên phần giao <span class="m">𝓜<sub>∩</sub> = 𝓜(<b>y</b>) ∩ 𝓜(<b>s</b>)</span>.
+      Nếu <span class="m">|𝓜<sub>∩</sub>| &lt; 0.30 · 1376 = 413</span> kênh, cặp bị bỏ qua. Cơ chế này cho
+      phép phổ laser 532 nm (phủ đủ dải) so được với phổ 785 nm (thường thiếu vùng cao) mà không cần
+      cắt thư viện về dải chung nhỏ nhất. Mọi đại lượng bằng chứng ở §4 đều được chuẩn hoá theo
+      <span class="m">n = |𝓜<sub>∩</sub>|</span> để các cặp có độ phủ khác nhau ở cùng thang.
+    </p>
+  </div>
+
+  <!-- ============================================================ 4 -->
+  <div class="sec" id="s4">
+    <h2><span class="num">4</span>Mô hình sinh và hợp lý biên</h2>
+
+    <h3>4.1 Mô hình tuyến tính có nền</h3>
+    <p>
+      Với lớp ứng viên <span class="m">c</span> có phổ mẫu <span class="m"><b>t</b><sub>c</sub></span>,
+      giả thuyết <span class="m">H<sub>c</sub></span> phát biểu rằng phổ đo (đã tiền xử lý) là phổ mẫu
+      được co giãn, cộng một nền trơn còn sót sau ALS và nhiễu trắng:
+    </p>
+    <div class="eq"><span class="body"><i>y</i><sub>i</sub> = <i>α</i> <i>t</i><sub>c,i</sub> + Σ<sub>k=0</sub><sup>5</sup> <i>β</i><sub>k</sub> <i>P</i><sub>k</sub>(<i>x</i><sub>i</sub>) + <i>ε</i><sub>i</sub>,&nbsp;&nbsp; <i>ε</i><sub>i</sub> ~ 𝓝(0, <i>σ</i><sup>2</sup>),&nbsp;&nbsp; <i>i</i> ∈ 𝓜<sub>∩</sub></span><span class="tag">(5)</span></div>
+    <p>
+      trong đó <span class="m">x<sub>i</sub> = 2(ν<sub>i</sub> − 450)/(3200 − 450) − 1 ∈ [−1, 1]</span>
+      là toạ độ chuẩn hoá trên <em>toàn</em> lưới (không phải trên phần giao, để cơ sở nền không đổi
+      hình dạng theo độ phủ), và <span class="m">P<sub>0..5</sub></span> là đa thức Legendre — cơ sở trực
+      giao trên [−1, 1], điều kiện số tốt hơn nhiều so với đơn thức
+      <span class="m">1, x, x², …</span>. Giả thuyết đối chứng <span class="m">H<sub>0</sub></span>
+      (mô hình null) là (5) bỏ số hạng <span class="m">α <b>t</b><sub>c</sub></span>: phổ chỉ gồm nền và
+      nhiễu.
+    </p>
+    <p>Viết gọn dạng ma trận với <span class="m">n = |𝓜<sub>∩</sub>|</span>:</p>
+    <div class="eq"><span class="body"><b>y</b> = <b>X</b><b>w</b> + <b>ε</b>,&nbsp;&nbsp; <b>X</b><sub>c</sub> = [ <b>t</b><sub>c</sub> | <b>P</b><sub>0</sub> … <b>P</b><sub>5</sub> ] ∈ ℝ<sup>n×7</sup>,&nbsp;&nbsp; <b>X</b><sub>0</sub> = [ <b>P</b><sub>0</sub> … <b>P</b><sub>5</sub> ] ∈ ℝ<sup>n×6</sup></span><span class="tag">(6)</span></div>
+
+    <h3>4.2 Tiên nghiệm</h3>
+    <p>
+      Để tích phân được theo công thức đóng, dùng tiên nghiệm liên hợp chuẩn–nghịch gamma ở dạng giới
+      hạn không thông tin cho phương sai (tiên nghiệm Jeffreys):
+    </p>
+    <div class="eq"><span class="body"><b>w</b> | <i>σ</i><sup>2</sup> ~ 𝓝(<b>0</b>, <i>σ</i><sup>2</sup> <i>λ</i><sup>−1</sup> <b>I</b><sub>p</sub>),&nbsp;&nbsp; <i>p</i>(<i>σ</i><sup>2</sup>) ∝ 1 / <i>σ</i><sup>2</sup></span><span class="tag">(7)</span></div>
+    <p>
+      Việc buộc phương sai tiên nghiệm của <span class="m"><b>w</b></span> tỉ lệ với
+      <span class="m">σ²</span> là điều làm cho <span class="m">σ²</span> tích phân được giải tích và làm
+      Bayes factor bất biến với thang cường độ. Tham số <span class="m">λ = 0.01</span> nhỏ (tiên nghiệm
+      rộng) vì sau chuẩn hoá L2, <span class="m">α</span> có bậc 1 và các <span class="m">β<sub>k</sub></span>
+      có bậc 0.01–0.1; giá trị này chỉ đóng vai trò ổn định số và phạt nhẹ độ phức tạp mô hình (Occam
+      factor), không phải tham số hiệu chuẩn.
+    </p>
+
+    <h3>4.3 Hợp lý biên theo công thức đóng</h3>
+    <p>
+      Hợp lý biên (evidence) của mô hình có ma trận thiết kế <span class="m"><b>X</b> ∈ ℝ<sup>n×p</sup></span>
+      là tích phân theo cả <span class="m"><b>w</b></span> và <span class="m">σ²</span>:
+    </p>
+    <div class="eq"><span class="body"><i>p</i>(<b>y</b> | <b>X</b>) = <span class="big">∫∫</span> 𝓝(<b>y</b> | <b>X</b><b>w</b>, <i>σ</i><sup>2</sup><b>I</b>) 𝓝(<b>w</b> | <b>0</b>, <i>σ</i><sup>2</sup><i>λ</i><sup>−1</sup><b>I</b>) <i>σ</i><sup>−2</sup> d<b>w</b> d<i>σ</i><sup>2</sup></span><span class="tag">(8)</span></div>
+    <p>
+      <b>Bước 1 — tích phân theo <span class="m"><b>w</b></span>.</b> Với <span class="m">σ²</span> cố định,
+      tích của hai Gaussian là Gaussian theo <span class="m"><b>w</b></span>; hoàn thành bình phương với
+      <span class="m"><b>A</b> = <b>X</b><sup>⊤</sup><b>X</b> + λ<b>I</b><sub>p</sub></span> cho
+    </p>
+    <div class="eq"><span class="body"><span class="ln"><span class="big">∫</span> 𝓝(<b>y</b> | <b>X</b><b>w</b>, <i>σ</i><sup>2</sup><b>I</b>) 𝓝(<b>w</b> | <b>0</b>, <i>σ</i><sup>2</sup><i>λ</i><sup>−1</sup><b>I</b>) d<b>w</b></span><span class="ln">= (2π<i>σ</i><sup>2</sup>)<sup>−n/2</sup> <i>λ</i><sup>p/2</sup> |<b>A</b>|<sup>−1/2</sup> exp( −<i>S</i> / 2<i>σ</i><sup>2</sup> )</span></span><span class="tag">(9)</span></div>
+    <div class="eq"><span class="body"><i>S</i> = <b>y</b><sup>⊤</sup><b>y</b> − <b>y</b><sup>⊤</sup><b>X</b> <b>A</b><sup>−1</sup> <b>X</b><sup>⊤</sup><b>y</b>&nbsp;&nbsp;(tổng bình phương phần dư của hồi quy ridge)</span><span class="tag">(10)</span></div>
+    <p>
+      <b>Bước 2 — tích phân theo <span class="m">σ²</span>.</b> Đặt <span class="m">u = σ²</span>; tích
+      phân <span class="m">∫<sub>0</sub><sup>∞</sup> u<sup>−n/2−1</sup> exp(−S/2u) du</span> là hạt nhân
+      nghịch-gamma, bằng <span class="m">Γ(n/2) (S/2)<sup>−n/2</sup></span>. Kết hợp với (9):
+    </p>
+    <div class="eq"><span class="body"><i>p</i>(<b>y</b> | <b>X</b>) = π<sup>−n/2</sup> <i>λ</i><sup>p/2</sup> |<b>A</b>|<sup>−1/2</sup> Γ(<i>n</i>/2) <i>S</i><sup>−n/2</sup></span><span class="tag">(11)</span></div>
+    <p>Lấy log:</p>
+    <div class="eq"><span class="body">log <i>p</i>(<b>y</b> | <b>X</b>) = −<span class="frac"><span><i>n</i></span><span>2</span></span> log π + <span class="frac"><span><i>p</i></span><span>2</span></span> log <i>λ</i> − <span class="frac"><span>1</span><span>2</span></span> log |<b>A</b>| + log Γ(<i>n</i>/2) − <span class="frac"><span><i>n</i></span><span>2</span></span> log <i>S</i></span><span class="tag">(12)</span></div>
+    <p>
+      Đây chính là evidence của hồi quy ridge Bayes trong khuôn khổ của MacKay [5], với phương sai nhiễu
+      được tích phân thay vì ước lượng. Ba yếu tố đọc được trực tiếp: <span class="m">S<sup>−n/2</sup></span>
+      thưởng mô hình khớp dữ liệu; <span class="m">λ<sup>p/2</sup>|<b>A</b>|<sup>−1/2</sup></span> là Occam
+      factor phạt số tham số và sự "co" mà dữ liệu áp lên tiên nghiệm; <span class="m">Γ(n/2)π<sup>−n/2</sup></span>
+      là hằng số chỉ phụ thuộc <span class="m">n</span>.
+    </p>
+
+    <h3>4.4 Log Bayes factor theo kênh</h3>
+    <p>
+      Điểm số của lớp <span class="m">c</span> trên phổ <span class="m"><b>y</b></span> là log Bayes factor
+      [6] của <span class="m">H<sub>c</sub></span> so với <span class="m">H<sub>0</sub></span>, tính trên cùng
+      mask <span class="m">𝓜<sub>∩</sub></span> và chia cho số kênh:
+    </p>
+    <div class="eq"><span class="body"><span class="ln">BF(<b>y</b>, <b>t</b><sub>c</sub>) = <span class="frac"><span>1</span><span><i>n</i></span></span> [ log <i>p</i>(<b>y</b> | <b>X</b><sub>c</sub>) − log <i>p</i>(<b>y</b> | <b>X</b><sub>0</sub>) ]</span><span class="ln">= <span class="frac"><span>1</span><span><i>n</i></span></span> [ <span class="frac"><span>1</span><span>2</span></span> log <i>λ</i> − <span class="frac"><span>1</span><span>2</span></span> log <span class="frac"><span>|<b>A</b><sub>c</sub>|</span><span>|<b>A</b><sub>0</sub>|</span></span> ] + <span class="frac"><span>1</span><span>2</span></span> log <span class="frac"><span><i>S</i><sub>0</sub></span><span><i>S</i><sub>c</sub></span></span></span></span><span class="tag">(13)</span></div>
+    <p>
+      Các số hạng <span class="m">Γ(n/2)</span> và <span class="m">π<sup>−n/2</sup></span> triệt tiêu vì hai
+      mô hình được so trên cùng <span class="m"><b>y</b></span>; cài đặt vì thế bỏ qua chúng ngay từ (12).
+      Số hạng trong ngoặc vuông có bậc <span class="m">O(log n / n)</span> và gần như không đổi giữa các
+      lớp, nên về bản chất
+    </p>
+    <div class="eq"><span class="body">BF ≈ <span class="frac"><span>1</span><span>2</span></span> log <span class="frac"><span><i>S</i><sub>0</sub></span><span><i>S</i><sub>c</sub></span></span> = −<span class="frac"><span>1</span><span>2</span></span> log ( 1 − <i>R</i><sup>2</sup><sub>c|0</sub> )</span><span class="tag">(14)</span></div>
+    <p>
+      tức <em>một nửa log của tỉ lệ phương sai phần dư</em> mà phổ mẫu giải thích được <em>thêm</em> so với
+      nền. BF = 0 nghĩa là phổ mẫu không giải thích được gì; BF = 0.659 (ngưỡng τ, §6.3) tương ứng phần
+      dư giảm ≈ 3.7 lần; các phổ khớp tốt trong cùng máy đo thường đạt BF &gt; 1.5 (phần dư giảm hơn 20
+      lần). Cách chuẩn hoá theo <span class="m">n</span> là cần thiết để so được các cặp có độ phủ khác
+      nhau và để κ, τ có ý nghĩa độc lập với độ phủ.
+    </p>
+
+    <div class="note">
+      <b>Vì sao Bayes factor thay vì cosine?</b> Cosine giữa <span class="m"><b>y</b></span> và
+      <span class="m"><b>t</b><sub>c</sub></span> bằng <span class="m">√(1 − S<sub>c</sub>/‖<b>y</b>‖²)</span>
+      khi không có nền — tức là một hàm đơn điệu của cùng đại lượng phần dư. Điểm khác biệt nằm ở (i) nền
+      Legendre được <em>khớp đồng thời</em> với phổ mẫu thay vì phải trừ trước; (ii) số hạng Occam tự
+      động phạt mô hình phức tạp hơn (quan trọng khi thêm PCA ở §5 và thành phần thứ hai ở §6.5); (iii)
+      log BF là đại lượng có thang ý nghĩa xác suất, cho phép chuyển thành hậu nghiệm và ngưỡng open-set
+      một cách có nguyên tắc.
+    </div>
+
+    <div class="algo">
+      <div class="title">Thuật toán 2 <span>— log-evidence rút gọn của một ma trận thiết kế</span></div>
+      <div class="io"><b>Vào:</b> cột thiết kế X = [x<sub>1</sub>, …, x<sub>p</sub>] (mỗi cột dài n), vector y. <b>Ra:</b> ℓ(X, y) = ½p·log λ − ½ log|A| − (n/2) log S.</div>
+      <ol>
+        <li>A ← X<sup>⊤</sup>X + λI<sub>p</sub>;  b ← X<sup>⊤</sup>y                              ▷ O(n p²)</li>
+        <li>L ← Cholesky(A)  (A = L L<sup>⊤</sup>)                              ▷ O(p³), p ≤ 12</li>
+        <li>log|A| ← 2 Σ<sub>r</sub> log L<sub>rr</sub></li>
+        <li>giải L u = b, rồi L<sup>⊤</sup> ŵ = u                                   ▷ ŵ = A<sup>−1</sup>b</li>
+        <li>S ← max( y<sup>⊤</sup>y − b<sup>⊤</sup>ŵ,  10<sup>−12</sup> )                        ▷ pt. (10)</li>
+        <li><span class="kw">trả về</span> ½ p log λ − ½ log|A| − (n/2) log S</li>
+      </ol>
+    </div>
+    <p>
+      Log Bayes factor theo kênh của một cặp là
+      <span class="m">[ℓ(<b>X</b><sub>c</sub>, <b>y</b>) − ℓ(<b>X</b><sub>0</sub>, <b>y</b>)] / n</span>. Cận dưới
+      <span class="m">10<sup>−12</sup></span> cho <span class="m">S</span> chỉ để tránh log 0 khi phổ đo trùng
+      hoàn toàn với phổ mẫu.
+    </p>
+  </div>
+
+  <!-- ============================================================ 5 -->
+  <div class="sec" id="s5">
+    <h2><span class="num">5</span>Mô hình biến thiên trong lớp</h2>
+
+    <h3>5.1 Động lực</h3>
+    <p>
+      Với mô hình (5), mỗi lớp được đại diện bởi <em>một</em> phổ mẫu; nếu lớp có nhiều phổ thì điểm lớp
+      là max qua các phổ. Cách này bỏ qua thông tin về <em>cách</em> phổ trong lớp biến thiên — khác laser,
+      khác vật kính, khác định hướng tinh thể, mức nền còn sót khác nhau. Phân tích đánh giá của các
+      phiên bản trước cho thấy đây chính là nguồn chính của sự "quá tự tin" (overconfidence) trong hậu
+      nghiệm: thay nhiễu Gaussian iid bằng nhiễu AR(1) với hệ số tự tương quan đo được ρ = 0.824 chỉ
+      giải thích được một phần nhỏ độ làm mềm cần thiết, trong khi mô hình hoá biến thiên trong lớp
+      cải thiện đồng thời cả độ chính xác và hiệu chuẩn (§8).
+    </p>
+
+    <h3>5.2 Xây dựng mô hình lớp</h3>
+    <p>
+      Với mỗi lớp <span class="m">c</span> có <span class="m">m<sub>c</sub> ≥ 3</span> phổ
+      <span class="m"><b>s</b><sub>1..m<sub>c</sub></sub></span>, trên mask chung
+      <span class="m">𝓜<sub>c</sub> = ∩<sub>j</sub> 𝓜(<b>s</b><sub>j</sub>)</span> (yêu cầu ≥ 413 kênh):
+    </p>
+    <div class="eq"><span class="body"><b>m</b><sub>c</sub> = <span class="frac"><span>1</span><span><i>m</i><sub>c</sub></span></span> Σ<sub>j</sub> <b>s</b><sub>j</sub>,&nbsp;&nbsp; <b>R</b> = [ <b>s</b><sub>1</sub> − <b>m</b><sub>c</sub>; … ; <b>s</b><sub>m<sub>c</sub></sub> − <b>m</b><sub>c</sub> ] = <b>U</b> <b>Σ</b> <b>V</b><sup>⊤</sup></span><span class="tag">(15)</span></div>
+    <p>
+      Các hàng của <span class="m"><b>V</b><sup>⊤</sup></span> là thành phần chính (PC) của phần dư trong
+      lớp. Giữ lại <span class="m">K<sub>c</sub></span> thành phần đầu, với
+    </p>
+    <div class="eq"><span class="body"><i>K</i><sub>c</sub> = min { <i>k</i> : Σ<sub>l≤k</sub> <i>σ</i><sub>l</sub><sup>2</sup> / Σ<sub>l</sub> <i>σ</i><sub>l</sub><sup>2</sup> ≥ 0.90 },&nbsp;&nbsp; 1 ≤ <i>K</i><sub>c</sub> ≤ min(5, <i>m</i><sub>c</sub> − 1)</span><span class="tag">(16)</span></div>
+    <p>
+      Ngưỡng 90% phương sai và trần 5 thành phần ngăn mô hình lớp hấp thụ nhiễu đo (overfit) — nếu cho
+      phép đủ nhiều PC, bất kỳ phổ nào cũng có thể được biểu diễn tốt bởi bất kỳ lớp nào, và Occam factor
+      trong (12) chỉ phạt tuyến tính theo <span class="m">p</span>. Với thư viện hiện tại, 516 lớp có
+      mô hình trong lớp; 1 991 lớp còn lại (≤ 2 phổ) dùng phổ mẫu đơn như §4.
+    </p>
+
+    <h3>5.3 Ma trận thiết kế mở rộng</h3>
+    <p>Giả thuyết lớp trở thành</p>
+    <div class="eq"><span class="body"><span class="ln"><b>y</b> = <i>α</i> <b>m</b><sub>c</sub> + Σ<sub>k=1</sub><sup>K<sub>c</sub></sup> <i>γ</i><sub>k</sub> <b>u</b><sub>c,k</sub> + Σ<sub>k=0</sub><sup>5</sup> <i>β</i><sub>k</sub> <b>P</b><sub>k</sub> + <b>ε</b></span><span class="ln"><b>X</b><sub>c</sub> = [ <b>m</b><sub>c</sub> | <b>u</b><sub>c,1</sub> … <b>u</b><sub>c,K<sub>c</sub></sub> | <b>P</b><sub>0</sub> … <b>P</b><sub>5</sub> ]</span></span><span class="tag">(17)</span></div>
+    <p>
+      với tiên nghiệm (7) áp lên toàn bộ vector hệ số <span class="m">(α, γ, β)</span>. Mô hình null
+      <span class="m">H<sub>0</sub></span> giữ nguyên. Mask so khớp bây giờ là giao của mask phổ đo với mask
+      của trung bình và tất cả PC. Về mặt hình học, (17) nói rằng phổ đo nằm gần một <em>không gian con
+      affine</em> chiều <span class="m">K<sub>c</sub></span> đi qua <span class="m"><b>m</b><sub>c</sub></span> —
+      thay vì gần một điểm — và evidence đo khoảng cách tới không gian con đó có tính đến nền và Occam.
+    </p>
+
+    <div class="algo">
+      <div class="title">Thuật toán 3 <span>— Xây dựng mô hình trong lớp (chạy một lần khi dựng thư viện)</span></div>
+      <div class="io"><b>Vào:</b> thư viện {(s<sub>j</sub>, c<sub>j</sub>)}. <b>Ra:</b> với mỗi lớp c: (m<sub>c</sub>, {u<sub>c,k</sub>}) hoặc ∅.</div>
+      <ol>
+        <li><span class="kw">với mỗi</span> lớp c:</li>
+        <li class="i1">G ← {s<sub>j</sub> : c<sub>j</sub> = c};  <span class="kw">nếu</span> |G| &lt; 3 → model[c] ← ∅; <span class="kw">tiếp</span></li>
+        <li class="i1">𝓜<sub>c</sub> ← giao mask của G;  <span class="kw">nếu</span> |𝓜<sub>c</sub>| &lt; 413 → model[c] ← ∅; <span class="kw">tiếp</span></li>
+        <li class="i1">m<sub>c</sub> ← trung bình G trên 𝓜<sub>c</sub>;  R ← G − m<sub>c</sub></li>
+        <li class="i1">(U, Σ, V<sup>⊤</sup>) ← SVD(R);  K<sub>c</sub> ← theo pt. (16)</li>
+        <li class="i1">model[c] ← ( m<sub>c</sub>, hàng 1..K<sub>c</sub> của V<sup>⊤</sup> ), NaN ngoài 𝓜<sub>c</sub></li>
+        <li><span class="kw">trả về</span> model</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ============================================================ 6 -->
+  <div class="sec" id="s6">
+    <h2><span class="num">6</span>Suy luận và quyết định</h2>
+
+    <h3>6.1 Điểm lớp</h3>
+    <p>Điểm của lớp <span class="m">c</span> là</p>
+    <div class="eq"><span class="body"><i>B</i><sub>c</sub> = <span class="cases"><span>BF<sub>wc</sub>(<b>y</b>, <b>m</b><sub>c</sub>, {<b>u</b><sub>c,k</sub>})</span><span>nếu lớp có mô hình trong lớp</span><span>max<sub>j : c<sub>j</sub> = c</sub> BF(<b>y</b>, <b>s</b><sub>j</sub>)</span><span>ngược lại</span></span></span><span class="tag">(18)</span></div>
+    <p>
+      Lớp không có cặp nào đạt độ phủ tối thiểu bị loại khỏi tập ứng viên. Lấy max (thay vì tổng hay
+      trung bình) cho lớp không có mô hình trong lớp là lựa chọn có chủ ý: nó tương ứng với giả thuyết
+      "phổ đo được sinh từ <em>một trong</em> các phổ mẫu", và tránh phạt lớp chỉ vì có thêm phổ mẫu
+      kém chất lượng.
+    </p>
+
+    <h3>6.2 Hậu nghiệm giữa các lớp</h3>
+    <p>
+      Nếu lấy (11) theo nghĩa đen với tiên nghiệm đều trên các lớp, hậu nghiệm là
+      <span class="m">P(c | <b>y</b>) ∝ exp(n B<sub>c</sub>)</span>. Với <span class="m">n ≈ 1376</span>,
+      hậu nghiệm này gần như luôn là 1 cho lớp dẫn đầu — quá tự tin, vì các giả định nhiễu độc lập, đồng
+      phương sai và phổ mẫu "đúng tuyệt đối" đều không đúng. Thay vào đó dùng softmax có làm mềm
+      (tempered softmax, tương đương temperature scaling [7]):
+    </p>
+    <div class="eq"><span class="body"><i>P</i>(<i>c</i> | <b>y</b>) = <span class="frac"><span>exp( <i>B</i><sub>c</sub> / <i>κ</i> )</span><span>Σ<sub>c′</sub> exp( <i>B</i><sub>c′</sub> / <i>κ</i> )</span></span>,&nbsp;&nbsp; <i>κ</i> = 0.06</span><span class="tag">(19)</span></div>
+    <p>
+      Tham số <span class="m">κ</span> không được chọn tay mà hiệu chuẩn bằng leave-one-out để cực tiểu sai số
+      hiệu chuẩn kỳ vọng ECE (§8.2). Một cách diễn giải: (19) trùng với hậu nghiệm Bayes đúng nếu số kênh
+      độc lập hiệu dụng là <span class="m">n<sub>eff</sub> = 1/κ ≈ 17</span> thay vì 1376 — nghĩa là các
+      kênh sau làm mượt, tương quan phần dư và bất định của phổ mẫu làm mỗi phổ chỉ "đáng" khoảng 17 quan
+      sát độc lập. Cài đặt trừ max trước khi lấy exp để tránh tràn số.
+    </p>
+
+    <h3>6.3 Quyết định open-set</h3>
+    <p>
+      Hậu nghiệm (19) chỉ phân bố xác suất <em>giữa các lớp trong thư viện</em>; nó không thể nói "không
+      có lớp nào phù hợp" vì luôn có tổng bằng 1. Vì vậy RamanID tách quyết định thứ hai, dựa trên bằng
+      chứng tuyệt đối thay vì tương đối:
+    </p>
+    <div class="eq"><span class="body">unknown(<b>y</b>) = 𝟙[ max<sub>c</sub> <i>B</i><sub>c</sub> &lt; <i>τ</i> ],&nbsp;&nbsp; <i>τ</i> = 0.659</span><span class="tag">(20)</span></div>
+    <p>
+      Nếu ngay cả lớp tốt nhất cũng không giải thích phổ tốt hơn mô hình chỉ-nền quá một mức
+      <span class="m">τ</span> (tương đương giảm phần dư ≈ 3.7 lần theo (14)), kết quả được gắn cờ "có thể
+      không có trong thư viện" nhưng bảng xếp hạng vẫn hiển thị để người dùng tự đánh giá. Ngưỡng
+      <span class="m">τ</span> được hiệu chuẩn sao cho tỉ lệ từ chối nhầm (phổ có trong thư viện bị gắn cờ)
+      là 10% trên LOO (§8.3). Vì <span class="m">B<sub>c</sub></span> là bằng chứng theo kênh và bất biến
+      thang cường độ, ngưỡng này có thể áp dụng cho mọi phổ bất kể độ phủ.
+    </p>
+
+    <h3>6.4 Giải thích bằng peak</h3>
+    <p>
+      Để kết quả đọc được như bằng chứng hoá học, thuật toán tìm cực đại địa phương của phổ đo (sau tiền
+      xử lý) có độ nổi (prominence) ≥ 0.03 — tính trên thang L2 nên tương đương "cao hơn thung lũng lân
+      cận ít nhất 3% chuẩn phổ" — và ghép với peak của phổ mẫu lớp dẫn đầu trong dung sai ±6 cm⁻¹ (3 kênh
+      lưới, bằng sai số hiệu chuẩn trục điển hình giữa các máy). Peak khớp/không khớp được hiển thị dưới
+      dạng chip; peak mạnh của phổ đo mà phổ mẫu không có là dấu hiệu của tạp chất, hỗn hợp, hoặc nhận
+      diện sai.
+    </p>
+
+    <h3>6.5 Chế độ hỗn hợp hai thành phần</h3>
+    <p>
+      Khi được yêu cầu (giao diện dòng lệnh <code>identify2.py --mix</code>), thuật toán kiểm tra tham lam
+      xem thêm một phổ mẫu thứ hai có làm tăng evidence hay không: với <span class="m"><b>t</b><sub>1</sub></span>
+      là phổ mẫu tốt nhất của lớp dẫn đầu, tính
+    </p>
+    <div class="eq"><span class="body"><span class="ln">Δ(<i>c′</i>) = <span class="frac"><span>1</span><span><i>n</i></span></span> [ ℓ([<b>t</b><sub>1</sub> | <b>t</b><sub>c′</sub> | <b>P</b>], <b>y</b>) − ℓ([<b>t</b><sub>1</sub> | <b>P</b>], <b>y</b>) ]</span><span class="ln">chấp nhận <i>c′</i>* = argmax<sub>c′</sub> Δ(<i>c′</i>) nếu Δ(<i>c′</i>*) ≥ 0.05</span></span><span class="tag">(21)</span></div>
+    <p>
+      Nhờ Occam factor trong (12), việc thêm một cột chỉ được "trả công" khi nó thực sự giảm phần dư đủ
+      nhiều; ngưỡng 0.05/kênh thêm một biên an toàn. Chế độ này giới hạn ở hai thành phần và chưa được
+      kiểm chứng định lượng trên hỗn hợp có kiểm soát (§10).
+    </p>
+
+    <div class="algo">
+      <div class="title">Thuật toán 4 <span>— Nhận diện một phổ Raman</span></div>
+      <div class="io"><b>Vào:</b> phổ đo ỹ (Thuật toán 1), thư viện 𝓛, mô hình lớp model (Thuật toán 3). <b>Ra:</b> danh sách (c, B<sub>c</sub>, P(c|y)) giảm dần, cờ unknown, peak khớp.</div>
+      <ol>
+        <li>best ← ∅</li>
+        <li><span class="kw">với mỗi</span> lớp c có model[c] ≠ ∅:</li>
+        <li class="i1">B ← BF<sub>wc</sub>(ỹ, model[c]) trên mask giao (bỏ nếu &lt; 413 kênh)     ▷ pt. (17), (13)</li>
+        <li class="i1">best[c] ← B</li>
+        <li><span class="kw">với mỗi</span> (s<sub>j</sub>, c<sub>j</sub>) ∈ 𝓛 mà c<sub>j</sub> chưa có trong best qua mô hình lớp:</li>
+        <li class="i1">B ← BF(ỹ, s<sub>j</sub>) (bỏ nếu mask giao &lt; 413 kênh)                ▷ pt. (13)</li>
+        <li class="i1">best[c<sub>j</sub>] ← max(best[c<sub>j</sub>], B)</li>
+        <li><span class="kw">nếu</span> best = ∅ → <span class="kw">trả về</span> ([], unknown = đúng)</li>
+        <li>B<sub>max</sub> ← max best;  P(c) ← exp((best[c] − B<sub>max</sub>)/κ) / Σ exp(…)         ▷ pt. (19)</li>
+        <li>unknown ← B<sub>max</sub> &lt; τ                                                      ▷ pt. (20)</li>
+        <li>peaks ← cực đại địa phương của ỹ có prominence ≥ 0.03; ghép ±6 cm⁻¹ với phổ mẫu lớp đầu</li>
+        <li><span class="kw">trả về</span> sắp xếp best giảm dần, P, unknown, peaks</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ============================================================ 7 -->
+  <div class="sec" id="s7">
+    <h2><span class="num">7</span>Hợp nhất đa phương thức</h2>
+    <p>
+      Kim loại, mẫu cháy đen hay mẫu huỳnh quang mạnh không có vân tay Raman: với chúng, mọi lớp đều cho
+      <span class="m">B<sub>c</sub> ≈ 0</span> và (20) đúng đắn trả về unknown. Phiên bản 3 bổ sung hai kênh
+      đo trên cùng mẫu vật — đường huỳnh quang (ở 4 bước sóng kích thích 532/633/785/808 nm) và phổ hấp
+      thụ — và hợp nhất bằng chứng ở mức log Bayes factor. Nhãn ở tầng này là <em>vật liệu</em>
+      (Plastic, Glass, Paper, Metal, …): các lớp hoá chất PS/PE/PP/PVP/PDMS/PMMA của kênh Raman được
+      ánh xạ về Plastic, thuỷ tinh borosilicate về Glass; hoá chất khác giữ nguyên lớp.
+    </p>
+
+    <h3>7.1 Biểu diễn đường cong theo bước sóng</h3>
+    <p>
+      Huỳnh quang được nội suy lên lưới 400–1100 nm (bước 1 nm), hấp thụ lên 300–1200 nm. Khác với Raman,
+      đường cong thô của các lớp vật liệu trông rất giống nhau (đều là một bướu rộng), nên bằng chứng được
+      tính trên <em>đạo hàm bậc nhất Savitzky–Golay</em> (cửa sổ 15, bậc 3) đã chuẩn hoá L2 — làm nổi vị trí
+      sườn và điểm uốn thay vì độ cao tuyệt đối. Không trừ nền ALS (đường cong chính là "nền"); nền Legendre
+      trong mô hình evidence chỉ dùng bậc 0–2. Độ phủ tối thiểu là 80 nm.
+    </p>
+
+    <h3>7.2 Bằng chứng theo phương thức</h3>
+    <p>
+      Cùng máy evidence (12)–(13) được áp dụng cho mỗi cặp (đường cong đo, đường cong thư viện) cùng phương
+      thức và — với huỳnh quang — cùng bước sóng kích thích. Điểm lớp huỳnh quang là trung bình qua các
+      bước sóng có sẵn của max qua đường cong trong lớp; điểm lớp hấp thụ là max qua đường cong. Cả hai
+      trừ đi một hiệu chỉnh số lượng:
+    </p>
+    <div class="eq"><span class="body"><span class="ln"><i>B</i><sup>fl</sup><sub>c</sub> = <span class="frac"><span>1</span><span>|<i>E</i><sub>c</sub>|</span></span> Σ<sub>e∈E<sub>c</sub></sub> max<sub>j : c<sub>j</sub>=c, e<sub>j</sub>=e</sub> BF<sub>nm</sub>(<b>y</b><sub>e</sub>, <b>s</b><sub>j</sub>) − 0.02 log <i>n</i><sub>c</sub></span><span class="ln"><i>B</i><sup>abs</sup><sub>c</sub> = max<sub>j : c<sub>j</sub>=c</sub> BF<sub>nm</sub>(<b>y</b>, <b>s</b><sub>j</sub>) − 0.02 log <i>n</i><sub>c</sub></span></span><span class="tag">(22)</span></div>
+    <p>
+      với <span class="m">n<sub>c</sub></span> là số đường cong của lớp <span class="m">c</span> trong thư viện
+      phương thức đó. Số hạng phạt <span class="m">0.02 log n<sub>c</sub></span> sửa thiên lệch chọn lọc của
+      phép max: lớp có nhiều đường cong hơn có kỳ vọng max lớn hơn ngay cả khi không liên quan (hiện tượng
+      Plastic với 28 mẫu vật "nuốt" mọi lớp khác trước khi có hiệu chỉnh). Dạng log tương ứng với tốc độ
+      tăng của kỳ vọng cực trị theo cỡ mẫu.
+    </p>
+
+    <h3>7.3 Hợp nhất muộn</h3>
+    <div class="eq"><span class="body"><i>S</i><sub>c</sub> = <i>w</i><sub>R</sub> <i>B</i><sup>R</sup><sub>c</sub> + <i>w</i><sub>fl</sub> <i>B</i><sup>fl</sup><sub>c</sub> + <i>w</i><sub>abs</sub> <i>B</i><sup>abs</sup><sub>c</sub>,&nbsp;&nbsp; (<i>w</i><sub>R</sub>, <i>w</i><sub>fl</sub>, <i>w</i><sub>abs</sub>) = (1, 0.25, 1)</span><span class="tag">(23)</span></div>
+    <p>
+      Số hạng của phương thức không có dữ liệu (hoặc lớp không có trong thư viện phương thức đó) được bỏ
+      qua — đầu vào là tuỳ ý: hoá chất chỉ có Raman, kim loại chỉ có huỳnh quang + hấp thụ. Nếu các kênh
+      độc lập có điều kiện theo lớp, tổng log Bayes factor với trọng số 1 chính là log Bayes factor hợp;
+      trọng số 0.25 cho huỳnh quang là hiệu chỉnh thực nghiệm (chọn bằng leave-one-specimen-out, bền
+      vững ở 41/49 fold trong kiểm định lồng nhau) phản ánh việc kênh này chồng lấn mạnh giữa các lớp và
+      mang ít thông tin định danh. Hậu nghiệm hợp nhất dùng softmax (19) với
+      <span class="m">κ<sub>mm</sub> = 0.12</span>; giá trị này thừa kế từ phiên bản 2 và chưa hiệu chuẩn
+      riêng, nên chỉ nên dùng để xếp hạng.
+    </p>
+
+    <h3>7.4 Suy luận mù bước sóng kích thích</h3>
+    <p>
+      Đường huỳnh quang chỉ so được với thư viện đo cùng bước sóng kích thích
+      <span class="m">e</span>. Khi tệp không mang thông tin này, thuật toán suy luận đồng thời
+      (<span class="m">e</span>, lớp) theo MAP:
+    </p>
+    <div class="eq"><span class="body"><i>ê</i> = argmax<sub>e ∈ {532, 633, 785, 808}</sub> max<sub>c</sub> <i>B</i><sup>fl</sup><sub>c</sub>(<b>y</b> | <i>e</i>)</span><span class="tag">(24)</span></div>
+    <p>
+      tức thử cả bốn giả thuyết bước sóng bằng đúng máy tính điểm (22) và chọn giả thuyết cho lớp mạnh
+      nhất. Trên 141 đường cong VAST, (24) đoán đúng bước sóng 136/141 (96.5%) và độ chính xác phân loại
+      khi ẩn bước sóng bằng đúng khi biết bước sóng — không mất thông tin. Khi tên tệp hoặc tham số dòng
+      lệnh có bước sóng, thông tin đó được ưu tiên.
+    </p>
+
+    <div class="algo">
+      <div class="title">Thuật toán 5 <span>— Nhận diện đa phương thức một mẫu vật</span></div>
+      <div class="io"><b>Vào:</b> tập tệp của một mẫu vật (Raman .txt, huỳnh quang .csv, hấp thụ .txt), thư viện 3 phương thức. <b>Ra:</b> xếp hạng vật liệu (c, S<sub>c</sub>, thành phần, P).</div>
+      <ol>
+        <li>phân loại tệp: .csv → huỳnh quang; .txt có x<sub>max</sub> &lt; 1500 → hấp thụ; còn lại → Raman</li>
+        <li>B<sup>R</sup> ← Thuật toán 4 trên tệp Raman (nếu có), ánh xạ lớp → vật liệu, lấy max mỗi vật liệu</li>
+        <li><span class="kw">với mỗi</span> tệp huỳnh quang: e ← bước sóng từ tên tệp, hoặc suy luận theo pt. (24)</li>
+        <li>B<sup>fl</sup> ← pt. (22) trên các đường huỳnh quang (đạo hàm SG, lưới nm)</li>
+        <li>B<sup>abs</sup> ← pt. (22) trên các đường hấp thụ</li>
+        <li>S<sub>c</sub> ← pt. (23) cho mọi c xuất hiện ở ít nhất một phương thức</li>
+        <li>P(c) ← softmax(S / κ<sub>mm</sub>)</li>
+        <li><span class="kw">trả về</span> top-5 theo S<sub>c</sub>, kèm B<sup>R</sup>, B<sup>fl</sup>, B<sup>abs</sup> từng lớp</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ============================================================ 8 -->
+  <div class="sec" id="s8">
+    <h2><span class="num">8</span>Hiệu chuẩn và đánh giá</h2>
+
+    <h3>8.1 Giao thức leave-one-out</h3>
+    <p>
+      Tập kiểm định là 209 phổ Raman đo tại VAST (LabRAM HR Evolution, 532 nm), 34 lớp; 202 phổ thuộc 27
+      lớp có ≥ 3 phổ được chấm điểm (lớp đơn phổ không thể kiểm định). Với mỗi phổ: rút nó khỏi thư viện
+      đầy đủ (16 024 phổ), <em>dựng lại</em> mô hình trong lớp không có nó (Thuật toán 3), nhận diện, so với
+      nhãn. Điều quan trọng là thư viện đối chứng chứa cả 15 800 phổ từ RRUFF, ROD, dược phẩm — nghĩa là
+      mỗi phổ VAST phải thắng ~2 500 lớp "gây nhiễu", không chỉ 26 lớp còn lại của VAST.
+    </p>
+
+    <h3>8.2 Hiệu chuẩn κ bằng ECE</h3>
+    <p>
+      Sai số hiệu chuẩn kỳ vọng (expected calibration error [7]) đo khoảng cách giữa xác suất mô hình báo
+      và tần suất đúng thực tế, gộp theo <span class="m">M</span> = 10 khoảng độ tin cậy:
+    </p>
+    <div class="eq"><span class="body">ECE = Σ<sub>b=1</sub><sup>M</sup> <span class="frac"><span>|<i>D</i><sub>b</sub>|</span><span><i>D</i></span></span> | acc(<i>D</i><sub>b</sub>) − conf(<i>D</i><sub>b</sub>) |</span><span class="tag">(25)</span></div>
+    <p>
+      Vì các <span class="m">B<sub>c</sub></span> của LOO không phụ thuộc κ, quét κ chỉ cần tính lại (19):
+    </p>
+    <table class="data-table">
+      <thead><tr><th>κ</th><th class="r">0.0075</th><th class="r">0.015</th><th class="r">0.03</th><th class="r"><b>0.06</b></th><th class="r">0.12</th><th class="r">0.2</th><th class="r">0.3</th></tr></thead>
+      <tbody><tr><td>ECE</td><td class="mono r">0.082</td><td class="mono r">0.077</td><td class="mono r">0.069</td><td class="mono r"><b>0.038</b></td><td class="mono r">0.044</td><td class="mono r">0.118</td><td class="mono r">0.220</td></tr></tbody>
+    </table>
+    <p class="caption"><b>Bảng 1.</b> ECE theo κ trên LOO 202 phổ với mô hình trong lớp. κ nhỏ → quá tự tin; κ lớn → quá bi quan. Phiên bản không có mô hình trong lớp cần κ = 0.12 và chỉ đạt ECE 0.069.</p>
+
+    <h3>8.3 Hiệu chuẩn τ theo tỉ lệ từ chối nhầm</h3>
+    <p>
+      τ là phân vị 10% của phân bố <span class="m">max<sub>c</sub> B<sub>c</sub></span> trên các phổ LOO (giá trị
+      trung bình 1.313): τ = 0.659 cho tỉ lệ từ chối nhầm 21/202 = 10.4%. Khả năng từ chối chất lạ thật
+      được đo bằng cách loại <em>toàn bộ</em> lớp thật khỏi thư viện rồi nhận diện: 63.5% chất lạ bị từ chối
+      đúng ở FRR 10% (kiểm định trên phiên bản 2); phần còn lại chủ yếu là các chất có họ hàng hoá học
+      trong thư viện (loại Ethanol thì Isopropyl/Methanol vẫn khớp tương đối tốt) — giới hạn thật của bài
+      toán, không phải lỗi ngẫu nhiên.
+    </p>
+
+    <h3>8.4 Kết quả</h3>
+    <table class="data-table">
+      <thead><tr><th>Phiên bản</th><th>Mô hình</th><th class="r">Top-1, toàn bộ</th><th class="r">Top-1, hoá chất</th><th class="r">ECE</th></tr></thead>
+      <tbody>
+        <tr><td>v1</td><td>Cosine (HQI), max theo phổ trong lớp</td><td class="mono r">79.7%</td><td class="mono r">85.7%</td><td class="mono r">—</td></tr>
+        <tr><td>v2</td><td>Bayes factor, phổ mẫu đơn + nền Legendre</td><td class="mono r">83.7%</td><td class="mono r">92.8%</td><td class="mono r">0.069</td></tr>
+        <tr><td>v2.1 / v3</td><td>+ mô hình trong lớp (PCA), thư viện 16 k</td><td class="mono r"><b>90.1%</b> (182/202)</td><td class="mono r"><b>95.9%</b> (93/97)</td><td class="mono r"><b>0.038</b></td></tr>
+      </tbody>
+    </table>
+    <p class="caption"><b>Bảng 2.</b> Leave-one-out trên 202 phổ VAST, 27 lớp. "Hoá chất" = 97 phổ thuộc lớp chất tinh khiết (dung môi, muối, đường, polymer đã gán nhãn PE/PP/PS); phần còn lại là danh mục vật liệu (Paper, Glass, Plastic chưa phân loại, Other, Vỏ hoa quả) vốn không thuần chất.</p>
+    <p>
+      Theo lớp: 21/27 lớp đạt 100%; Paper 25/26, PE 20/22, Glass 16/18, Other 12/13. Hai lớp kéo điểm
+      xuống là Plastic 25/37 (37 phổ bao bì SNR thấp chưa đủ bằng chứng để gán nhãn polymer cụ thể) và PVP
+      0/2 (2 phổ, trùng lặp thật với vỏ nang trong Other). Mô hình trong lớp cải thiện đồng thời độ chính
+      xác (+6.4 điểm) và hiệu chuẩn (ECE 0.069 → 0.038) — đúng như phân tích ở §5.1.
+    </p>
+    <table class="data-table">
+      <thead><tr><th>Kiểm định</th><th>Giao thức</th><th class="r">Kết quả</th></tr></thead>
+      <tbody>
+        <tr><td>Hợp nhất đa phương thức</td><td>Leave-one-specimen-out, 49 mẫu vật bao bì (Raman + huỳnh quang 4λ + hấp thụ)</td><td class="mono r">71.4% (nested CV: 69.4%)</td></tr>
+        <tr><td>— chỉ Raman / huỳnh quang / hấp thụ</td><td>Cùng giao thức, từng kênh riêng</td><td class="mono r">81.8% (22 mẫu) / 42.9% / 71.1%</td></tr>
+        <tr><td>— mẫu không có tín hiệu Raman</td><td>27 mẫu (kim loại, cháy, huỳnh quang mạnh); trước v3: 0/27</td><td class="mono r">15/27</td></tr>
+        <tr><td>Suy luận bước sóng kích thích</td><td>141 đường huỳnh quang, pt. (24)</td><td class="mono r">136/141 = 96.5%</td></tr>
+        <tr><td>Tổng quát hoá xuyên máy</td><td>Phổ FT-Raman NICODOM (máy khác, laser khác) so với thư viện</td><td class="mono r">4/4 chất có trong thư viện đúng; 12/13 chất lạ bị từ chối</td></tr>
+      </tbody>
+    </table>
+    <p class="caption"><b>Bảng 3.</b> Các kiểm định bổ sung. Nested CV: trọng số (23) được chọn lại trong vòng trong, không nhìn mẫu đang chấm — chênh 2 điểm so với giá trị lạc quan cho thấy thiên lệch chọn lọc nhỏ.</p>
+  </div>
+
+  <!-- ============================================================ 9 -->
+  <div class="sec" id="s9">
+    <h2><span class="num">9</span>Cài đặt và độ phức tạp</h2>
+    <p>
+      Thuật toán được cài đặt hai lần: bản tham chiếu Python (NumPy/SciPy — <code>ramanlib.py</code>,
+      <code>bayes.py</code>, <code>multimodal.py</code>) dùng để dựng thư viện, hiệu chuẩn và đánh giá; và
+      bản JavaScript thuần (<code>core.js</code>, không phụ thuộc thư viện ngoài) chạy trong trình duyệt.
+      Hai bản được kiểm tra tương đương (parity test) trên cùng bộ phổ: 17/17 trường hợp cho log BF trùng
+      trong sai số làm tròn float32 — điều này quan trọng vì κ và τ được hiệu chuẩn trên bản Python và
+      áp dụng trên bản JS.
+    </p>
+    <table class="data-table">
+      <thead><tr><th>Thành phần</th><th>Chi phí</th><th>Ghi chú</th></tr></thead>
+      <tbody>
+        <tr><td>Tiền xử lý một phổ</td><td class="mono">O(n<sub>g</sub>)</td><td>SG là tích chập 9 điểm; ALS 10 vòng Cholesky dải</td></tr>
+        <tr><td>Evidence một cặp</td><td class="mono">O(n p²) + O(p³)</td><td>n ≤ 1376, p ≤ 12 (1 mẫu + ≤5 PC + 6 nền); Gram matrix chiếm đa số</td></tr>
+        <tr><td>Một truy vấn toàn thư viện</td><td class="mono">O(N n p²)</td><td>N = 16 024 phổ, 516 lớp qua mô hình trong lớp; vài giây trên trình duyệt</td></tr>
+        <tr><td>Mô hình trong lớp</td><td class="mono">O(m<sub>c</sub> n<sub>g</sub> min(m<sub>c</sub>, n<sub>g</sub>))</td><td>SVD một lần khi dựng thư viện, không lặp lại lúc truy vấn</td></tr>
+        <tr><td>Dữ liệu tải về</td><td class="mono">16.7 MB (gzip ≈ 5 MB)</td><td>Mỗi phổ mã hoá float32 base64 chỉ trên đoạn kênh hợp lệ, kèm i<sub>0</sub></td></tr>
+      </tbody>
+    </table>
+    <p>
+      Hằng số hiệu chuẩn (λ, N<sub>base</sub>, κ, τ, trọng số fusion, penalty) được khai báo ở đầu cả hai
+      bản với ghi chú đồng bộ; tái hiệu chuẩn phải cập nhật cả hai. Phổ đo không rời khỏi máy người dùng —
+      thư viện được tải về trình duyệt một lần và mọi phép tính diễn ra cục bộ.
+    </p>
+  </div>
+
+  <!-- ============================================================ 10 -->
+  <div class="sec" id="s10">
+    <h2><span class="num">10</span>Hạn chế và hướng phát triển</h2>
+    <table class="data-table">
+      <thead><tr><th>Hạn chế</th><th>Hệ quả</th><th>Hướng xử lý</th></tr></thead>
+      <tbody>
+        <tr><td>Nhiễu giả định iid Gaussian</td><td>Cần κ để bù; hậu nghiệm là "được hiệu chuẩn" chứ không phải "đúng theo mô hình"</td><td>Đã thử AR(1): không đủ; hướng đúng là mô hình trong lớp (đã làm) và mô hình nhiễu phụ thuộc cường độ</td></tr>
+        <tr><td>Không mô hình dịch trục x</td><td>Lệch hiệu chuẩn máy &gt; 6 cm⁻¹ làm giảm BF, có thể gây từ chối nhầm</td><td>Thêm tham số dịch/co giãn trục và tích phân hoặc tối ưu cục bộ; hiệu chuẩn chéo máy bằng chuẩn Si/toluene</td></tr>
+        <tr><td>Peak phát hiện bằng ngưỡng cố định</td><td>Giải thích không mang xác suất</td><td>Suy luận peak theo Bayes (hướng của Härkönen và cộng sự [8])</td></tr>
+        <tr><td>Hỗn hợp tham lam 2 thành phần</td><td>Chưa kiểm chứng định lượng</td><td>Đo hỗn hợp có kiểm soát; suy luận tổ hợp với tiên nghiệm thưa</td></tr>
+        <tr><td>κ<sub>mm</sub> fusion chưa hiệu chuẩn</td><td>Hậu nghiệm đa phương thức chỉ dùng để xếp hạng</td><td>Cần thêm mẫu vật ghép cặp để hiệu chuẩn ECE riêng</td></tr>
+        <tr><td>τ hiệu chuẩn nội máy</td><td>BF xuyên máy thấp hơn (0.7–1.4 so với &gt; 2) → dễ gắn cờ unknown</td><td>Hiệu chuẩn τ theo nguồn/máy, hoặc theo độ phủ và SNR</td></tr>
+        <tr><td>Đa số lớp thư viện 1–2 phổ</td><td>1 991 lớp không có mô hình trong lớp</td><td>Chia sẻ PC giữa các lớp cùng họ (hierarchical prior); bổ sung phổ qua đóng góp cộng đồng</td></tr>
+      </tbody>
+    </table>
+    <p>
+      Về mặt phương pháp, khuôn khổ evidence giải tích là nền tảng thuận tiện để đi tiếp: mọi mở rộng
+      tuyến tính theo tham số (thêm PC, thêm thành phần hỗn hợp, thêm cơ sở nền) đều giữ được công thức
+      đóng, còn các mở rộng phi tuyến (dịch trục, bề rộng peak) có thể xử lý bằng tích phân số một chiều
+      hoặc bằng cách đưa vào tầng tiền xử lý. Hướng học sâu vẫn được giữ như một hướng so sánh: nếu thư
+      viện lớn lên đủ, mạng Bayes (BNN) có thể thay khối evidence mà không thay đổi các khối quyết định
+      §6–7.
+    </p>
+  </div>
+
+  <!-- ============================================================ refs -->
+  <div class="sec" id="refs">
+    <h2>Tài liệu tham khảo</h2>
+    <ol class="refs">
+      <li>Zhong M., Girolami M., Faulds K., Graham D. (2011). Bayesian methods to detect dye-labelled DNA oligonucleotides in multiplexed Raman spectra. <em>Journal of the Royal Statistical Society: Series C</em>, 60(2), 187–206.</li>
+      <li>Moores M. T., Gracie K., Carson J., Faulds K., Graham D., Girolami M. (2016). Bayesian modelling and quantification of Raman spectroscopy. <em>arXiv:1604.07299</em>.</li>
+      <li>Savitzky A., Golay M. J. E. (1964). Smoothing and differentiation of data by simplified least squares procedures. <em>Analytical Chemistry</em>, 36(8), 1627–1639.</li>
+      <li>Eilers P. H. C., Boelens H. F. M. (2005). Baseline correction with asymmetric least squares smoothing. <em>Leiden University Medical Centre report</em>.</li>
+      <li>MacKay D. J. C. (1992). Bayesian interpolation. <em>Neural Computation</em>, 4(3), 415–447.</li>
+      <li>Kass R. E., Raftery A. E. (1995). Bayes factors. <em>Journal of the American Statistical Association</em>, 90(430), 773–795.</li>
+      <li>Guo C., Pleiss G., Sun Y., Weinberger K. Q. (2017). On calibration of modern neural networks. <em>Proceedings of ICML</em>, 1321–1330.</li>
+      <li>Härkönen T., Roininen L., Moores M. T., Vartiainen E. M. (2020). Bayesian quantification for coherent anti-Stokes Raman scattering spectroscopy. <em>The Journal of Physical Chemistry B</em>, 124(32), 7005–7012.</li>
+      <li>Lafuente B., Downs R. T., Yang H., Stone N. (2015). The power of databases: the RRUFF project. In <em>Highlights in Mineralogical Crystallography</em>, 1–30.</li>
+    </ol>
+  </div>
+
+  <div class="footer">
+    RamanID · Viện Vật lý (IOP), VAST · Mã nguồn thuật toán: <code>bayes.py</code>, <code>multimodal.py</code>, <code>web/core.js</code>
+  </div>
+
+</div>
+</div>
