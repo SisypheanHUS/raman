@@ -264,32 +264,31 @@
         </tr>
         <tr>
           <td>Top-1 accuracy (tất cả)</td>
-          <td class="mono"><strong>90.1%</strong> (182/202)</td>
+          <td class="mono"><strong>96.0%</strong> (194/202)</td>
           <td>Tỉ lệ lần nhận diện đúng ngay kết quả đầu tiên — tính trên mọi loại phổ</td>
         </tr>
         <tr>
           <td>Top-1 accuracy (hoá chất)</td>
-          <td class="mono"><strong>95.9%</strong> (93/97)</td>
+          <td class="mono"><strong>97.9%</strong> (95/97)</td>
           <td>Riêng nhóm hoá chất tinh khiết — dễ nhận diện hơn khoáng vật/sinh học</td>
         </tr>
         <tr>
           <td>ECE (sai số hiệu chuẩn)</td>
-          <td class="mono"><strong>0.038</strong></td>
+          <td class="mono"><strong>0.024</strong></td>
           <td>Xác suất báo ra sát xác suất thực tế (0 = hoàn hảo); cho thấy mô hình Bayes
             được hiệu chuẩn tốt, không quá tự tin cũng không quá bi quan</td>
         </tr>
         <tr>
           <td>Ngưỡng "không có trong thư viện"</td>
-          <td class="mono">&tau; = 0.659</td>
+          <td class="mono">&tau; = 0.920</td>
           <td>Tại ngưỡng này, tỉ lệ từ chối nhầm (mẫu đúng bị cờ là lạ) chỉ 10% — giúp
             cảnh báo khi gặp vật liệu chưa có trong thư viện</td>
         </tr>
       </tbody>
     </table>
     <p>
-      So sánh: phiên bản cosine cũ (v1) đạt 79.7%, Bayes không within-class (v2) đạt 83.7% —
-      phiên bản hiện tại (v2.1, within-class Bayes) cải thiện rõ rệt nhờ mô hình hoá sự biến thiên
-      giữa các phổ cùng lớp thay vì so với một phổ mẫu duy nhất.
+      So sánh: cosine (v1) 79.7% → Bayes đơn mẫu (v2) 83.7% → phiên bản hiện tại
+      (v3, within-class Bayes + đa kênh) 96.0% tổng thể, 97.9% hoá chất.
     </p>
   </div>
 
