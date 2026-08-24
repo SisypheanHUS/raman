@@ -1,252 +1,230 @@
-<title>RamanID Library</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Thư viện phổ — RamanID</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
+  /* ---- Industry design system tokens (light) — kept identical to index.html ---- */
   :root {
-    --ground: #F7F9F8;
-    --surface: #FFFFFF;
-    --ink: #16241D;
-    --muted: #5B6B63;
-    --line: #DDE5E0;
-    --accent: #0B9A55;
-    --accent-ink: #067347;
-    --accent-soft: #E2F3EA;
-    --warn: #B7791F;
-    --warn-soft: #F8EFDD;
-    --tmpl: #6B5CD6;
-    --bar-track: #EDF2EF;
+    --color-bg: #f2f2f3;
+    --color-surface: #e9e9ea;
+    --color-text: #1d1f20;
+    --color-accent: #5980a6;
+    --color-divider: color-mix(in srgb, #1d1f20 16%, transparent);
+
+    --color-neutral-100: #f5f5f8;
+    --color-neutral-200: #e7e7ea;
+    --color-neutral-500: #98989b;
+    --color-neutral-700: #5d5d60;
+
+    --color-accent-100: #eef6ff;
+    --color-accent-300: #b5d9fd;
+    --color-accent-500: #749dc4;
+    --color-accent-700: #416180;
+    --color-accent-800: #2c455d;
+    --color-accent-900: #1d2d3d;
+
+    --font-heading: "Barlow Condensed", system-ui, sans-serif;
+    --font-heading-weight: 600;
+    --font-body: "Barlow", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+
+    --space-1: 3.4px; --space-2: 6.8px; --space-3: 10.2px;
+    --space-4: 13.6px; --space-6: 20.4px;
+    --radius-md: 4px;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --ground: #0E1512;
-      --surface: #17211C;
-      --ink: #E5EFE9;
-      --muted: #93A69C;
-      --line: #2A3830;
-      --accent: #34C57F;
-      --accent-ink: #6FDCA8;
-      --accent-soft: #12362A;
-      --warn: #D9A24A;
-      --warn-soft: #35290F;
-      --tmpl: #9D8FEC;
-      --bar-track: #202D26;
+      --color-bg: #1a1c1e; --color-surface: #232527; --color-text: #e7e7ea;
+      --color-divider: rgba(255,255,255,.14);
+      --color-neutral-100: #2b2b2d; --color-neutral-200: #3a3b3d;
+      --color-neutral-500: #98989b; --color-neutral-700: #d4d4d7;
+      --color-accent-100: #1d2d3d; --color-accent-300: #416180;
+      --color-accent-500: #94bce3; --color-accent-700: #b5d9fd; --color-accent-800: #d6ebff;
+      --color-accent-900: #eef6ff;
     }
   }
   :root[data-theme="dark"] {
-    --ground: #0E1512;
-    --surface: #17211C;
-    --ink: #E5EFE9;
-    --muted: #93A69C;
-    --line: #2A3830;
-    --accent: #34C57F;
-    --accent-ink: #6FDCA8;
-    --accent-soft: #12362A;
-    --warn: #D9A24A;
-    --warn-soft: #35290F;
-    --tmpl: #9D8FEC;
-    --bar-track: #202D26;
+    --color-bg: #1a1c1e; --color-surface: #232527; --color-text: #e7e7ea;
+    --color-divider: rgba(255,255,255,.14);
+    --color-neutral-100: #2b2b2d; --color-neutral-200: #3a3b3d;
+    --color-neutral-500: #98989b; --color-neutral-700: #d4d4d7;
+    --color-accent-100: #1d2d3d; --color-accent-300: #416180;
+    --color-accent-500: #94bce3; --color-accent-700: #b5d9fd; --color-accent-800: #d6ebff;
+    --color-accent-900: #eef6ff;
   }
+
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--ground);
-    color: var(--ink);
-    font-family: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
-    font-size: 16px;
-    line-height: 1.55;
-  }
-  .wrap { max-width: 960px; margin: 0 auto; padding: 28px 20px 64px; }
+  body { margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+  h1, h2 { font-family: var(--font-heading); font-weight: var(--font-heading-weight); line-height: 1.12; letter-spacing: -.015em; margin: 0 0 var(--space-2); }
+  a { color: var(--color-accent); text-underline-offset: 3px; }
+  :focus { outline: none; }
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  .blueprint { position: relative; border: 1px solid var(--color-divider); }
+  .blueprint > .corner { position: absolute; width: 11px; height: 11px; color: color-mix(in srgb, var(--color-text) 55%, transparent); }
+  .blueprint > .corner::before, .blueprint > .corner::after { content: ""; position: absolute; background: currentColor; }
+  .blueprint > .corner::before { left: 5px; top: 0; width: 1px; height: 100%; }
+  .blueprint > .corner::after { top: 5px; left: 0; width: 100%; height: 1px; }
+  .blueprint > .corner.tl { top: -6px; left: -6px; }
+  .blueprint > .corner.tr { top: -6px; right: -6px; }
+  .blueprint > .corner.bl { bottom: -6px; left: -6px; }
+  .blueprint > .corner.br { bottom: -6px; right: -6px; }
 
-  header { margin-bottom: 26px; }
-  .spectrum-strip {
-    height: 5px; border-radius: 3px; margin-bottom: 18px;
-    background: linear-gradient(90deg,
-      #7A5FD0 0%, #4D74D8 18%, #3FA8C9 33%,
-      var(--accent) 47%, var(--accent) 52%,
-      #B8B23A 68%, #C9803A 84%, #B8503A 100%);
-    opacity: .85;
-  }
-  h1 {
-    font-family: "Spectral", Georgia, serif;
-    font-weight: 700; font-size: 2.1rem; margin: 0 0 4px;
-    letter-spacing: -0.01em;
-  }
-  .sub { color: var(--muted); margin: 0; max-width: 70ch; }
-  .sub a { color: var(--accent-ink); }
+  .card { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); background: transparent; border: 1px solid var(--color-divider); }
+  .btn { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; text-decoration: none; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 13px; color: var(--color-text); background: transparent; border: 1px solid var(--color-divider); padding: var(--space-2) calc(var(--space-3) * 1.2); border-radius: var(--radius-md); }
+  .btn:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; pointer-events: none; }
 
-  .controls {
-    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
-    margin-bottom: 16px;
-  }
+  .nav { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3) var(--space-6); border-bottom: 1px solid var(--color-divider); max-width: 1080px; margin: 0 auto; }
+  .nav-brand { display: flex; align-items: center; gap: 8px; font-family: var(--font-heading); font-weight: 600; font-size: 18px; margin-right: auto; }
+  .nav .tagline { margin-right: auto; font-size: 12px; opacity: .5; }
+  .nav a { color: inherit; text-decoration: none; font-size: 14px; }
+  .nav a:hover { color: var(--color-accent); }
+
+  .hero { max-width: 1080px; margin: 0 auto; padding: 36px var(--space-6) 4px; }
+  .hero h1 { font-size: 30px; }
+  .hero p { font-size: 14px; opacity: .55; margin: 0; max-width: 72ch; }
+
+  .page { max-width: 1080px; margin: 0 auto; padding: 20px var(--space-6) 40px; }
+
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: var(--space-3); }
   .search-box {
-    flex: 1; min-width: 200px;
-    font: inherit; font-size: .95rem;
-    padding: 10px 14px; border-radius: 8px;
-    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
-    outline: none; transition: border-color .15s;
+    flex: 1; min-width: 200px; min-height: 36px; padding: 6px 12px; font: inherit; font-size: 14px;
+    color: var(--color-text); caret-color: var(--color-accent); background: var(--color-surface);
+    border: 1px solid var(--color-divider); border-radius: var(--radius-md); outline: none;
   }
-  .search-box:focus { border-color: var(--accent); }
-  .search-box::placeholder { color: var(--muted); }
+  .search-box:hover { border-color: color-mix(in srgb, var(--color-text) 45%, transparent); }
+  .search-box:focus-visible { border-color: var(--color-accent); }
+  .search-box::placeholder { color: color-mix(in srgb, var(--color-text) 45%, transparent); }
+  .filter-btn { font-size: 12.5px; padding: 6px 11px; }
+  .filter-btn.active { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
 
-  .filter-btn {
-    font: inherit; font-size: .82rem; font-weight: 500;
-    padding: 8px 14px; border-radius: 6px; cursor: pointer;
-    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
-    transition: background .12s, border-color .12s;
-  }
-  .filter-btn:hover { border-color: var(--accent); }
-  .filter-btn.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .stats { font-size: 12px; opacity: .55; margin-bottom: var(--space-3); }
 
-  .stats {
-    font-size: .82rem; color: var(--muted); margin-bottom: 12px;
-  }
+  .viewer { display: none; padding: var(--space-4); margin-bottom: var(--space-4); }
+  .viewer h2 { font-size: 19px; }
+  .viewer .meta { font-size: 12.5px; opacity: .55; margin: 0 0 var(--space-3); }
+  .chartwrap { overflow-x: auto; }
+  .chartwrap svg text { font-family: var(--font-mono); font-size: 9.5px; fill: var(--color-text); opacity: .5; }
 
-  .card {
-    background: var(--surface); border: 1px solid var(--line);
-    border-radius: 10px; padding: 0; margin-bottom: 18px; overflow: hidden;
-  }
-
+  .table-card { padding: 0; overflow: hidden; }
   .table-scroll { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); }
-  th {
-    font-size: .75rem; text-transform: uppercase; letter-spacing: .06em;
-    color: var(--muted); font-weight: 600; position: sticky; top: 0;
-    background: var(--surface); z-index: 1; cursor: pointer; user-select: none;
-    white-space: nowrap;
+  .table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .table th {
+    text-align: left; font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase;
+    color: color-mix(in srgb, var(--color-text) 60%, transparent);
+    padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--color-divider);
+    position: sticky; top: 0; background: var(--color-bg); cursor: pointer; user-select: none; white-space: nowrap;
   }
-  th:hover { color: var(--ink); }
-  th .sort-arrow { font-size: .7rem; margin-left: 4px; }
-  td { font-size: .9rem; }
-  td.mono { font-family: "IBM Plex Mono", Consolas, monospace; font-size: .82rem; white-space: nowrap; }
-  tr { cursor: pointer; transition: background .1s; }
-  tr:hover { background: var(--accent-soft); }
-  tr.selected { background: var(--accent-soft); }
+  .table th:hover { color: var(--color-text); }
+  .table .sort-arrow { font-size: 9px; margin-left: 3px; opacity: .7; }
+  .table td { padding: var(--space-2) var(--space-3); border-bottom: 1px solid color-mix(in srgb, var(--color-text) 8%, transparent); font-variant-numeric: tabular-nums; }
+  .table td.mono { font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
+  .table tbody tr { cursor: pointer; transition: background .1s; }
+  .table tbody tr:hover, .table tbody tr.selected { background: var(--color-accent-100); }
 
   .source-tag {
-    font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em;
-    padding: 2px 7px; border-radius: 4px; white-space: nowrap;
+    display: inline-flex; align-items: center; font-family: var(--font-mono); font-size: 10px;
+    letter-spacing: .03em; padding: 2px 7px; border-radius: 3px; white-space: nowrap;
+    background: var(--color-neutral-100); color: var(--color-neutral-700);
   }
-  .source-tag.vast { background: #E8F0FE; color: #1A56DB; }
-  .source-tag.rruff { background: #FCE8E8; color: #B91C1C; }
-  .source-tag.rod { background: #FEF3C7; color: #92400E; }
-  .source-tag.pharma { background: #E2F3EA; color: #067347; }
-  .source-tag.nicodom { background: #F0E6F6; color: #7C3AED; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .source-tag.vast { background: #1E3A5F; color: #93C5FD; }
-    :root:not([data-theme="light"]) .source-tag.rruff { background: #4C1D1D; color: #FCA5A5; }
-    :root:not([data-theme="light"]) .source-tag.rod { background: #451A03; color: #FCD34D; }
-    :root:not([data-theme="light"]) .source-tag.pharma { background: #12362A; color: #6FDCA8; }
-    :root:not([data-theme="light"]) .source-tag.nicodom { background: #3B1F5E; color: #C4B5FD; }
-  }
-  :root[data-theme="dark"] .source-tag.vast { background: #1E3A5F; color: #93C5FD; }
-  :root[data-theme="dark"] .source-tag.rruff { background: #4C1D1D; color: #FCA5A5; }
-  :root[data-theme="dark"] .source-tag.rod { background: #451A03; color: #FCD34D; }
-  :root[data-theme="dark"] .source-tag.pharma { background: #12362A; color: #6FDCA8; }
-  :root[data-theme="dark"] .source-tag.nicodom { background: #3B1F5E; color: #C4B5FD; }
 
-  .viewer {
-    background: var(--surface); border: 1px solid var(--line);
-    border-radius: 10px; padding: 20px; margin-bottom: 18px;
-    display: none;
-  }
-  .viewer h2 {
-    font-family: "Spectral", Georgia, serif; font-weight: 600;
-    font-size: 1.15rem; margin: 0 0 4px;
-  }
-  .viewer .meta { font-size: .82rem; color: var(--muted); margin-bottom: 14px; }
-  .chartwrap { overflow-x: auto; }
-  svg text { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 11px; fill: var(--muted); }
+  .pagination { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: var(--space-3); padding: var(--space-3) 0 0; }
+  .page-btn { font-size: 12.5px; padding: 5px 10px; }
+  .page-btn.active { background: var(--color-accent); color: #fff; border-color: var(--color-accent); }
+  .page-info { font-size: 12px; opacity: .5; padding: 0 2px; }
 
-  .pagination {
-    display: flex; justify-content: center; align-items: center;
-    gap: 8px; margin-top: 14px; padding: 10px 0;
-  }
-  .page-btn {
-    font: inherit; font-size: .85rem;
-    padding: 6px 12px; border-radius: 6px; cursor: pointer;
-    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
-  }
-  .page-btn:hover { border-color: var(--accent); }
-  .page-btn:disabled { opacity: .4; cursor: default; }
-  .page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .page-info { font-size: .82rem; color: var(--muted); }
+  .loading-screen { max-width: 640px; margin: 30px auto 0; padding: 40px var(--space-6) 60px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--space-4); }
+  .loading-title { font-family: var(--font-heading); font-size: 16px; font-weight: 600; }
+  .progress-wrap { width: 340px; max-width: 100%; }
+  .progress-track { height: 5px; background: var(--color-neutral-200); overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--color-accent); transition: width .3s; }
+  .progress-track.indeterminate .progress-fill { width: 30% !important; animation: indeterminate 1.2s ease-in-out infinite; }
+  @keyframes indeterminate { 0% { transform: translateX(-120%); } 100% { transform: translateX(420%); } }
+  .loading-sub { font-size: 12.5px; opacity: .55; }
 
-  .loading {
-    text-align: center; padding: 40px 20px; color: var(--muted);
-  }
-  .loading .bar {
-    width: 200px; height: 4px; border-radius: 2px;
-    background: var(--bar-track); margin: 14px auto 0; overflow: hidden;
-  }
-  .loading .bar .fill {
-    height: 100%; border-radius: 2px; background: var(--accent);
-    transition: width .3s;
-  }
-  .loading .bar.indeterminate .fill {
-    width: 30% !important;
-    animation: indeterminate 1.2s ease-in-out infinite;
-  }
-  @keyframes indeterminate {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(433%); }
-  }
-  .loading .status { font-size: .82rem; margin-top: 6px; }
+  footer { max-width: 1080px; margin: 20px auto 0; padding: 0 var(--space-6); }
+  .method { font-size: 12.5px; opacity: .65; max-width: 72ch; border-top: 1px solid var(--color-divider); padding-top: 22px; }
+  .credit-row { display: flex; justify-content: space-between; align-items: flex-end; padding: 30px 0 44px; flex-wrap: wrap; gap: 18px; }
+  .mascot { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .mascot span { font-size: 10px; opacity: .45; font-family: var(--font-heading); letter-spacing: .05em; }
+  .credit-center { text-align: center; }
+  .credit-center .k { font-size: 10.5px; opacity: .3; font-family: var(--font-heading); letter-spacing: .06em; text-transform: uppercase; }
+  .credit-center .v { font-size: 12.5px; opacity: .4; font-family: var(--font-heading); font-weight: 600; }
+  @keyframes chibi-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @keyframes chibi-sway { 0%, 100% { transform: rotate(-2deg) translateY(0); } 25% { transform: rotate(1deg) translateY(-4px); } 75% { transform: rotate(-1deg) translateY(-2px); } }
+  .mascot.prof svg { animation: chibi-float 3s ease-in-out infinite; transform-origin: bottom center; }
+  .mascot.stud svg { animation: chibi-sway 3.5s ease-in-out infinite; transform-origin: bottom center; }
 
-  footer { color: var(--muted); font-size: .82rem; margin-top: 30px; max-width: 68ch; }
-  footer a { color: var(--accent-ink); }
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-  @media (max-width: 600px) {
-    .controls { flex-direction: column; }
+  @media (max-width: 640px) {
+    .nav a { display: none; }
+    .hero h1 { font-size: 23px; }
+    .controls { flex-direction: column; align-items: stretch; }
     .search-box { min-width: 100%; }
+    .nav, .hero, .page, footer { padding-left: var(--space-3); padding-right: var(--space-3); }
   }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 
-<div class="wrap">
-  <header>
-    <div class="spectrum-strip"></div>
-    <h1>Spectral Library</h1>
-    <p class="sub">Browse <span id="totalCount">...</span> Raman reference spectra
-    across <span id="classCount">...</span> substances.
-    Click any row to view the spectrum.
-    <br><a href="index.html">Back to RamanID identifier</a></p>
-  </header>
+<nav class="nav">
+  <div class="nav-brand">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18l3-4 2-6 2 4 2-9 2 9 2-2 3 4 4 4"></path></svg>
+    RamanID
+  </div>
+  <span class="tagline">Thư viện phổ tham chiếu</span>
+  <a href="index.html">Nhận diện</a>
+  <a href="index.html#phuong-phap">Giới thiệu</a>
+</nav>
 
-  <div class="loading" id="loading">
-    <p>Loading spectral library...</p>
-    <div class="bar" id="loadbarwrap"><div class="fill" id="loadbar" style="width:0%"></div></div>
-    <p class="status" id="loadstatus"></p>
+<div class="hero">
+  <h1>Thư viện phổ</h1>
+  <p>Duyệt <span id="totalCount">...</span> phổ Raman tham chiếu trên <span id="classCount">...</span> chất.
+    Nhấn vào một dòng để xem phổ.</p>
+</div>
+
+<div class="page">
+  <div class="loading-screen" id="loading">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 21 19V5"></path><path d="M3 12A9 3 0 0 0 21 12"></path></svg>
+    <div>
+      <div class="loading-title">Đang tải thư viện phổ tham chiếu…</div>
+      <div class="loading-sub" id="loadstatus">Đang kết nối…</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track" id="loadbarwrap"><div class="progress-fill" id="loadbar" style="width:0%"></div></div>
+    </div>
   </div>
 
   <div id="main" style="display:none">
     <div class="controls">
-      <input type="text" class="search-box" id="search" placeholder="Search substance name..." autocomplete="off">
-      <button class="filter-btn active" data-src="all">All</button>
-      <button class="filter-btn" data-src="vast">VAST</button>
-      <button class="filter-btn" data-src="rruff">RRUFF</button>
-      <button class="filter-btn" data-src="rod">ROD</button>
-      <button class="filter-btn" data-src="pharma">Pharma</button>
-      <button class="filter-btn" data-src="nicodom">NICODOM</button>
+      <input type="text" class="search-box" id="search" placeholder="Tìm theo tên chất..." autocomplete="off">
+      <button class="btn filter-btn active" data-src="all">Tất cả</button>
+      <button class="btn filter-btn" data-src="vast">VAST</button>
+      <button class="btn filter-btn" data-src="rruff">RRUFF</button>
+      <button class="btn filter-btn" data-src="rod">ROD</button>
+      <button class="btn filter-btn" data-src="pharma">Dược phẩm</button>
+      <button class="btn filter-btn" data-src="nicodom">NICODOM</button>
     </div>
 
     <div class="stats" id="stats"></div>
 
-    <div class="viewer" id="viewer">
+    <div class="card blueprint viewer" id="viewer">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
       <h2 id="viewerTitle"></h2>
       <p class="meta" id="viewerMeta"></p>
-      <div class="chartwrap"><svg id="chart" viewBox="0 0 900 280" width="100%" role="img" aria-label="Spectrum chart"></svg></div>
+      <div class="chartwrap"><svg id="chart" viewBox="0 0 900 280" width="100%" role="img" aria-label="Biểu đồ phổ"></svg></div>
     </div>
 
-    <div class="card">
+    <div class="card blueprint table-card">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
       <div class="table-scroll">
-        <table>
+        <table class="table">
           <thead>
             <tr>
-              <th data-col="idx"># <span class="sort-arrow"></span></th>
-              <th data-col="label">Substance <span class="sort-arrow"></span></th>
-              <th data-col="source">Source <span class="sort-arrow"></span></th>
-              <th data-col="range">Range (cm⁻¹) <span class="sort-arrow"></span></th>
-              <th data-col="nch">Channels <span class="sort-arrow"></span></th>
+              <th data-col="idx">#<span class="sort-arrow"></span></th>
+              <th data-col="label">Chất<span class="sort-arrow"></span></th>
+              <th data-col="source">Nguồn<span class="sort-arrow"></span></th>
+              <th data-col="range">Khoảng (cm⁻¹)<span class="sort-arrow"></span></th>
+              <th data-col="nch">Kênh<span class="sort-arrow"></span></th>
             </tr>
           </thead>
           <tbody id="tbody"></tbody>
@@ -257,18 +235,77 @@
   </div>
 
   <footer>
-    <strong>Sources.</strong> VAST lab collection · <a href="https://rruff.info">RRUFF</a> minerals ·
-    <a href="https://solsa.crystallography.net/rod/">ROD</a> ·
-    Pharma (figshare) · <a href="https://www.nicodom.cz">NICODOM</a> demo.
-    All spectra preprocessed to 450–3200 cm⁻¹ common grid (step 2 cm⁻¹), Savitzky-Golay smoothed,
-    ALS baseline removed, L2-normalized.
-    <br><br>
-    <a href="index.html">RamanID identifier</a> ·
-    Source code: <a href="https://github.com/SisypheanHUS/VAST/tree/main/raman_id">GitHub</a>
+    <p class="method">
+      <strong>Nguồn dữ liệu.</strong> Bộ sưu tập VAST · <a href="https://rruff.info">RRUFF</a> (khoáng vật) ·
+      <a href="https://solsa.crystallography.net/rod/">ROD</a> · Dược phẩm (figshare) ·
+      <a href="https://www.nicodom.cz">NICODOM</a> demo.
+      Toàn bộ phổ đã tiền xử lý về lưới chung 450–3200 cm⁻¹ (bước 2 cm⁻¹), làm mượt Savitzky-Golay,
+      trừ nền ALS, chuẩn hoá L2.
+      <br><br>
+      <a href="index.html">Công cụ nhận diện RamanID</a> ·
+      Mã nguồn: <a href="https://github.com/SisypheanHUS/VAST/tree/main/raman_id">GitHub</a>
+    </p>
+    <div class="credit-row">
+      <div class="mascot prof" id="profMascot"><span>Dr Vũ Dương</span></div>
+      <div class="credit-center">
+        <div class="k">Được xây dựng bởi</div>
+        <div class="v">VAST &times; HUS</div>
+      </div>
+      <div class="mascot stud" id="studMascot"><span>Đinh Thái Tuấn</span></div>
+    </div>
   </footer>
 </div>
 
 <script>
+(function initMascots() {
+  const px = 5;
+  const colors = {
+    O: '#1d1f20', S: '#fcd5b0', D: '#d4a574', W: '#ffffff', E: '#1d1f20',
+    M: '#d4766a', P: '#424244', p: '#2b2b2d',
+    h: '#8B7355', H: '#6B5335', G: '#98989b', g: '#787878',
+    k: '#2b2b2d', K: '#555557', B: '#5980a6', b: '#416180', R: '#ffb4b4'
+  };
+  function mkSprite(grid, label, labelColor) {
+    let rects = "";
+    for (let y = 0; y < grid.length; y++) {
+      let x = 0;
+      while (x < grid[y].length) {
+        const c = grid[y][x];
+        if (c !== "." && colors[c]) {
+          let run = 1;
+          while (x + run < grid[y].length && grid[y][x + run] === c) run++;
+          rects += '<rect x="' + (x * px) + '" y="' + (y * px) + '" width="' + (run * px) + '" height="' + px + '" fill="' + colors[c] + '"/>';
+          x += run;
+        } else { x++; }
+      }
+    }
+    const w = Math.max.apply(null, grid.map(r => r.length));
+    const ht = grid.length;
+    const shirtY = grid.findIndex(r => r.indexOf("G") >= 0 || r.indexOf("B") >= 0);
+    const labelY = (shirtY + 2) * px + px * 0.7;
+    rects += '<text x="' + (w * px / 2) + '" y="' + labelY + '" text-anchor="middle" font-size="8" font-weight="bold" font-family="Barlow Condensed,monospace" fill="' + labelColor + '">' + label + '</text>';
+    return '<svg viewBox="0 0 ' + (w * px) + ' ' + (ht * px) + '" width="' + (w * px * 1.4) + '" height="' + (ht * px * 1.4) + '" style="image-rendering:pixelated;display:block">' + rects + '</svg>';
+  }
+  const profGrid = [
+    "....OOOOOO....", "...OhHSSHhO...", "..OhSSSSSShO..", "..OSSSSSSSSO..",
+    "..OSSSSSSSSO..", "..OWESSSEWSO..", "..OSSSOSSSSO..", "..OSSMMMMSSO..",
+    "..OSSSSSSSSO..", "..OSSSSSSSSO..", "...OSSSSSSOO..", "....OSSSO.....",
+    "...OgGGGGgO...", "..OgGGGGGGgO..", "..OgGGGGGGgO..", "..OgGGGGGGgO..",
+    ".DDOgGGGGgODD.", ".DD.OgGGgO.DD.", ".....OPPO.....", ".....OPPO.....",
+    "....OP..PO....", "....OP..PO....", "...Opp..ppO..."
+  ];
+  const studGrid = [
+    "...OkkkkkO....", "..OkkkkkkkkO..", "..OkKkkkkKkO..", "..OkkSSSSSkkO.",
+    "..OkSSSSSSSkO.", "..OSSSSSSSSO..", "..OWESSSEWSO..", "..ORSSSSSSRO..",
+    "..OSSSMMMSSSO.", "..OSSSSSSSSO..", "...OSSSSSSO...", "....OSSSO.....",
+    "...ObBBBBbO...", "..ObBBBBBBbO..", "..ObBBBBBBbO..", "..ObBBBBBBbO..",
+    ".DDObBBBBbODD.", ".DD.ObBBbO.DD.", ".....OPPO.....", ".....OPPO.....",
+    "....OP..PO....", "....OP..PO....", "...Opp..ppO..."
+  ];
+  document.getElementById("profMascot").insertAdjacentHTML("afterbegin", mkSprite(profGrid, "VAST", "#1d1f20"));
+  document.getElementById("studMascot").insertAdjacentHTML("afterbegin", mkSprite(studGrid, "HUS", "#ffffff"));
+})();
+
 const GRID_START = 450.0, GRID_STEP = 2.0, GRID_N = 1376;
 function gridWn(i) { return GRID_START + GRID_STEP * i; }
 
@@ -312,16 +349,15 @@ var $ = function(id) { return document.getElementById(id); };
       chunks.push(r.value);
       loaded += r.value.length;
       if (total) $("loadbar").style.width = Math.min(100, loaded / total * 100).toFixed(0) + "%";
-      $("loadstatus").textContent = (loaded / 1e6).toFixed(1) + " MB loaded";
+      $("loadstatus").textContent = (loaded / 1e6).toFixed(1) + " MB đã tải";
     }
     $("loadbarwrap").classList.remove("indeterminate");
     $("loadbar").style.width = "100%";
-    $("loadstatus").textContent = "";
+    $("loadstatus").textContent = "Hoàn tất";
     var blob = new Blob(chunks);
     var data = JSON.parse(await blob.text());
   } catch (e) {
-    $("loading").innerHTML = "<p style='color:var(--warn)'>Failed to load library: " +
-      e.message + "</p><p>Try refreshing.</p>";
+    $("loading").innerHTML = "<p>Không tải được thư viện phổ: " + e.message + "</p><p>Hãy thử tải lại trang.</p>";
     return;
   }
 
@@ -414,9 +450,9 @@ function renderTable() {
   filtered.forEach(function(e) { var k = e.source.replace(/_.*/, ""); sourceCounts[k] = (sourceCounts[k] || 0) + 1; });
   var parts = [];
   for (var s in sourceCounts) parts.push(s.toUpperCase() + " " + sourceCounts[s].toLocaleString());
-  $("stats").textContent = filtered.length.toLocaleString() + " spectra" +
+  $("stats").textContent = filtered.length.toLocaleString() + " phổ" +
     (parts.length > 1 ? " (" + parts.join(", ") + ")" : "") +
-    " · page " + (currentPage + 1) + " of " + totalPages;
+    " · trang " + (currentPage + 1) + "/" + totalPages;
 
   var tbody = $("tbody");
   tbody.innerHTML = "";
@@ -432,7 +468,7 @@ function renderTable() {
     tr.children[1].textContent = e.label;
     var tag = document.createElement("span");
     var srcShort = e.source.replace(/_.*/, "");
-    tag.className = "source-tag " + srcShort;
+    tag.className = "source-tag";
     tag.textContent = srcShort.toUpperCase();
     tr.children[2].textContent = "";
     tr.children[2].appendChild(tag);
@@ -450,7 +486,7 @@ function renderPagination(totalPages) {
 
   function addBtn(label, page, disabled, active) {
     var b = document.createElement("button");
-    b.className = "page-btn" + (active ? " active" : "");
+    b.className = "btn page-btn" + (active ? " active" : "");
     b.textContent = label;
     b.disabled = disabled;
     b.addEventListener("click", function() { currentPage = page; renderTable(); scrollToTable(); });
@@ -486,12 +522,12 @@ function scrollToTable() {
 function selectSpectrum(e) {
   selectedIdx = e.idx;
   var viewer = $("viewer");
-  viewer.style.display = "block";
+  viewer.style.display = "flex";
   $("viewerTitle").textContent = e.label;
   $("viewerMeta").textContent =
-    "Source: " + e.source.toUpperCase() +
-    " · Range: " + e.rangeMin.toFixed(0) + "–" + e.rangeMax.toFixed(0) + " cm⁻¹" +
-    " · " + e.nch + " valid channels";
+    "Nguồn: " + e.source.toUpperCase() +
+    " · Khoảng: " + e.rangeMin.toFixed(0) + "–" + e.rangeMax.toFixed(0) + " cm⁻¹" +
+    " · " + e.nch + " kênh hợp lệ";
   var decoded = decodeSegment(RAW_ENTRIES[e.idx - 1]);
   drawChart({ i0: decoded.i0, i1: decoded.i1, v: decoded.v, rangeMin: e.rangeMin, rangeMax: e.rangeMax });
   viewer.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -516,10 +552,10 @@ function drawChart(e) {
   var t0 = Math.ceil(xMin / step) * step;
   for (var t = t0; t <= xMax; t += step) {
     var px = x2px(t);
-    s += '<line x1="' + px + '" y1="' + T + '" x2="' + px + '" y2="' + (T + ph) + '" stroke="var(--line)" stroke-width="1"/>';
+    s += '<line x1="' + px + '" y1="' + T + '" x2="' + px + '" y2="' + (T + ph) + '" stroke="var(--color-divider)" stroke-width="1"/>';
     s += '<text x="' + px + '" y="' + (H - 10) + '" text-anchor="middle">' + t + '</text>';
   }
-  s += '<text x="' + (L + pw / 2) + '" y="' + (H - 0.5) + '" text-anchor="middle">Raman shift (cm⁻¹)</text>';
+  s += '<text x="' + (L + pw / 2) + '" y="' + (H - 0.5) + '" text-anchor="middle">Dịch chuyển Raman (cm⁻¹)</text>';
 
   var d = "";
   for (var i = e.i0; i <= e.i1; i++) {
@@ -527,7 +563,7 @@ function drawChart(e) {
     var wn = gridWn(i);
     d += (d ? "L" : "M") + x2px(wn).toFixed(1) + " " + y2px(e.v[i]).toFixed(1);
   }
-  s += '<path d="' + d + '" fill="none" stroke="var(--accent)" stroke-width="1.6"/>';
+  s += '<path d="' + d + '" fill="none" stroke="var(--color-accent)" stroke-width="1.6"/>';
 
   svg.innerHTML = s;
 }
