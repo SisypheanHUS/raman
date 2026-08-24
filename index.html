@@ -977,8 +977,10 @@ function submitContribution() {
       if (done) break;
       chunks.push(value);
       loaded += value.length;
-      if (total) $("loadbar").style.width = Math.min(100, loaded / total * 100).toFixed(0) + "%";
-      $("loadstatus").textContent = (loaded / 1e6).toFixed(1) + " MB đã tải" + (total ? " / " + (total / 1e6).toFixed(1) + " MB" : "");
+      var pct = total ? Math.min(100, loaded / total * 100) : 0;
+      if (total) $("loadbar").style.width = pct.toFixed(0) + "%";
+      var suf = (total && loaded <= total) ? " / " + (total / 1e6).toFixed(1) + " MB" : "";
+      $("loadstatus").textContent = (loaded / 1e6).toFixed(1) + " MB đã tải" + suf;
     }
     $("loadbarwrap").classList.remove("indeterminate");
     $("loadbar").style.width = "100%";
