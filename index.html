@@ -324,14 +324,13 @@
     <strong>Phương pháp.</strong> So khớp phổ theo Bayes (hợp lý biên phân tích kiểu Zhong/Girolami):
     <code>y = &alpha;&middot;mẫu tham chiếu + nền Legendre + nhiễu</code>, tiên nghiệm Jeffreys,
     tích phân giải tích &alpha;/&beta;/&sigma;&sup2;. Điểm số = log Bayes factor mỗi kênh so với mô hình
-    chỉ-nền (null). Hậu nghiệm softmax có làm mềm (<code>&kappa;=0.12</code>, ECE 0.069 trên LOO của VAST),
-    ngưỡng open-set <code>&tau;=0.552</code>. Kết hợp đa kênh (v3): tổng có trọng số của log BF từng kênh
+    chỉ-nền (null). Hậu nghiệm softmax có làm mềm (<code>&kappa;=0.06</code>, ECE 0.038 trên LOO của VAST),
+    ngưỡng open-set <code>&tau;=0.659</code>. Kết hợp đa kênh (v3): tổng có trọng số của log BF từng kênh
     (Raman 1.0, huỳnh quang 0.25, hấp thụ 1.0). Toàn bộ tính toán chạy trong trình duyệt của bạn — tệp phổ
     không rời khỏi máy.
     <br><br>
     Thư viện: VAST (210 phổ, 34 lớp) + khoáng vật RRUFF + ROD + dược phẩm (figshare) + NICODOM demo.
     <a href="catalog.html">Xem toàn bộ thư viện phổ</a>.
-    Mã nguồn: <a href="https://github.com/SisypheanHUS/VAST/tree/main/raman_id">github.com/SisypheanHUS/VAST</a>
   </p>
   <div class="credit-row">
     <div class="mascot prof" id="profMascot"><span>Dr Vũ Dương</span></div>
@@ -351,7 +350,7 @@ const GRID_START = 450.0, GRID_STEP = 2.0, GRID_N = 1376;
 const GRID_END = GRID_START + GRID_STEP * (GRID_N - 1);
 const MIN_OVERLAP = Math.floor(0.30 * GRID_N);
 // Calibrated constants — keep in sync with bayes.py (see evaluate_bayes.py output).
-const LAMBDA = 0.01, N_BASE = 6, KAPPA = 0.12, NULL_TAU = 0.552;
+const LAMBDA = 0.01, N_BASE = 6, KAPPA = 0.06, NULL_TAU = 0.659;
 const ALS_LAM = 1e5, ALS_P = 0.01, ALS_ITER = 10;
 
 function gridWavenumber(i) { return GRID_START + GRID_STEP * i; }
