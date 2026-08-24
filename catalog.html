@@ -80,6 +80,7 @@
   .nav .tagline { margin-right: auto; font-size: 12px; opacity: .5; }
   .nav a { color: inherit; text-decoration: none; font-size: 14px; }
   .nav a:hover { color: var(--color-accent); }
+  .nav a.active { color: var(--color-accent); border-bottom: 2px solid var(--color-accent); padding-bottom: 2px; }
 
   .hero { max-width: 1080px; margin: 0 auto; padding: 36px var(--space-6) 4px; }
   .hero h1 { font-size: 30px; }
@@ -173,7 +174,8 @@
   </div>
   <span class="tagline">Thư viện phổ tham chiếu</span>
   <a href="index.html">Nhận diện</a>
-  <a href="index.html#phuong-phap">Giới thiệu</a>
+  <a href="catalog.html" class="active">Thư viện</a>
+  <a href="about.html">Giới thiệu</a>
 </nav>
 
 <div class="hero">
@@ -236,13 +238,8 @@
 
   <footer>
     <p class="method">
-      <strong>Nguồn dữ liệu.</strong> Bộ sưu tập VAST · <a href="https://rruff.info">RRUFF</a> (khoáng vật) ·
-      <a href="https://solsa.crystallography.net/rod/">ROD</a> · Dược phẩm (figshare) ·
-      <a href="https://www.nicodom.cz">NICODOM</a> demo.
-      Toàn bộ phổ đã tiền xử lý về lưới chung 450–3200 cm⁻¹ (bước 2 cm⁻¹), làm mượt Savitzky-Golay,
-      trừ nền ALS, chuẩn hoá L2.
-      <br><br>
-      <a href="index.html">Công cụ nhận diện RamanID</a>
+      Phổ từ 5 nguồn: VAST, RRUFF, ROD, dược phẩm (figshare), NICODOM demo — tiền xử lý lưới chung 450–3200 cm⁻¹.
+      <a href="about.html">Xem chi tiết nguồn dữ liệu &amp; thuật toán</a>.
     </p>
     <div class="credit-row">
       <div class="mascot prof" id="profMascot"><span>Dr Vũ Dương</span></div>

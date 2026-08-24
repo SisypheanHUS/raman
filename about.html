@@ -1,0 +1,302 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Giới thiệu — RamanID</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* ---- Industry design system tokens (light) — kept identical to index.html ---- */
+  :root {
+    --color-bg: #f2f2f3;
+    --color-surface: #e9e9ea;
+    --color-text: #1d1f20;
+    --color-accent: #5980a6;
+    --color-divider: color-mix(in srgb, #1d1f20 16%, transparent);
+
+    --color-neutral-100: #f5f5f8;
+    --color-neutral-200: #e7e7ea;
+    --color-neutral-500: #98989b;
+    --color-neutral-700: #5d5d60;
+
+    --color-accent-100: #eef6ff;
+    --color-accent-300: #b5d9fd;
+    --color-accent-500: #749dc4;
+    --color-accent-700: #416180;
+    --color-accent-800: #2c455d;
+    --color-accent-900: #1d2d3d;
+
+    --font-heading: "Barlow Condensed", system-ui, sans-serif;
+    --font-heading-weight: 600;
+    --font-body: "Barlow", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+
+    --space-1: 3.4px; --space-2: 6.8px; --space-3: 10.2px;
+    --space-4: 13.6px; --space-6: 20.4px;
+    --radius-md: 4px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --color-bg: #1a1c1e; --color-surface: #232527; --color-text: #e7e7ea;
+      --color-divider: rgba(255,255,255,.14);
+      --color-neutral-100: #2b2b2d; --color-neutral-200: #3a3b3d;
+      --color-neutral-500: #98989b; --color-neutral-700: #d4d4d7;
+      --color-accent-100: #1d2d3d; --color-accent-300: #416180;
+      --color-accent-500: #94bce3; --color-accent-700: #b5d9fd; --color-accent-800: #d6ebff;
+      --color-accent-900: #eef6ff;
+    }
+  }
+  :root[data-theme="dark"] {
+    --color-bg: #1a1c1e; --color-surface: #232527; --color-text: #e7e7ea;
+    --color-divider: rgba(255,255,255,.14);
+    --color-neutral-100: #2b2b2d; --color-neutral-200: #3a3b3d;
+    --color-neutral-500: #98989b; --color-neutral-700: #d4d4d7;
+    --color-accent-100: #1d2d3d; --color-accent-300: #416180;
+    --color-accent-500: #94bce3; --color-accent-700: #b5d9fd; --color-accent-800: #d6ebff;
+    --color-accent-900: #eef6ff;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+  h1, h2, h3 { font-family: var(--font-heading); font-weight: var(--font-heading-weight); line-height: 1.12; letter-spacing: -.015em; margin: 0 0 var(--space-2); }
+  a { color: var(--color-accent); text-underline-offset: 3px; }
+  code { font-family: var(--font-mono); font-size: 13px; }
+  :focus { outline: none; }
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+  /* ---- blueprint frame ---- */
+  .blueprint { position: relative; border: 1px solid var(--color-divider); }
+  .blueprint > .corner { position: absolute; width: 11px; height: 11px; color: color-mix(in srgb, var(--color-text) 55%, transparent); }
+  .blueprint > .corner::before, .blueprint > .corner::after { content: ""; position: absolute; background: currentColor; }
+  .blueprint > .corner::before { left: 5px; top: 0; width: 1px; height: 100%; }
+  .blueprint > .corner::after { top: 5px; left: 0; width: 100%; height: 1px; }
+  .blueprint > .corner.tl { top: -6px; left: -6px; }
+  .blueprint > .corner.tr { top: -6px; right: -6px; }
+  .blueprint > .corner.bl { bottom: -6px; left: -6px; }
+  .blueprint > .corner.br { bottom: -6px; right: -6px; }
+
+  /* ---- nav ---- */
+  .nav { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3) var(--space-6); border-bottom: 1px solid var(--color-divider); max-width: 960px; margin: 0 auto; }
+  .nav-brand { display: flex; align-items: center; gap: 8px; font-family: var(--font-heading); font-weight: 600; font-size: 18px; margin-right: auto; }
+  .nav .tagline { margin-right: auto; font-size: 12px; opacity: .5; }
+  .nav a { color: inherit; text-decoration: none; font-size: 14px; }
+  .nav a:hover { color: var(--color-accent); }
+  .nav a.active { color: var(--color-accent); border-bottom: 2px solid var(--color-accent); padding-bottom: 2px; }
+
+  /* ---- content ---- */
+  .page { max-width: 960px; margin: 0 auto; padding: 40px var(--space-6) 20px; }
+  .page h1 { font-size: 30px; margin-bottom: 8px; }
+  .page .subtitle { font-size: 14px; opacity: .55; margin: 0 0 32px; max-width: 62ch; }
+
+  .section { margin-bottom: 36px; }
+  .section h2 { font-size: 18px; color: var(--color-accent); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+  .section h2 svg { flex: none; }
+  .section p { font-size: 14px; line-height: 1.65; margin: 0 0 10px; max-width: 72ch; }
+
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 12px 0; }
+  .data-table th, .data-table td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--color-divider); }
+  .data-table th { font-family: var(--font-heading); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; opacity: .55; }
+  .data-table td:first-child { font-weight: 500; }
+  .data-table .mono { font-family: var(--font-mono); font-size: 12px; }
+  .data-table a { font-size: 12.5px; }
+
+  .algo-formula { background: var(--color-neutral-100); border: 1px solid var(--color-divider); padding: 14px 18px; font-family: var(--font-mono); font-size: 13px; line-height: 1.7; margin: 12px 0; max-width: 72ch; }
+
+  /* ---- credit ---- */
+  .credit-row { display: flex; justify-content: space-between; align-items: flex-end; padding: 30px 0 44px; flex-wrap: wrap; gap: 18px; border-top: 1px solid var(--color-divider); margin-top: 20px; }
+  .mascot { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .mascot span { font-size: 10px; opacity: .45; font-family: var(--font-heading); letter-spacing: .05em; }
+  .credit-center { text-align: center; }
+  .credit-center .k { font-size: 10.5px; opacity: .3; font-family: var(--font-heading); letter-spacing: .06em; text-transform: uppercase; }
+  .credit-center .v { font-size: 12.5px; opacity: .4; font-family: var(--font-heading); font-weight: 600; }
+  @keyframes chibi-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @keyframes chibi-sway { 0%, 100% { transform: rotate(-2deg) translateY(0); } 25% { transform: rotate(1deg) translateY(-4px); } 75% { transform: rotate(-1deg) translateY(-2px); } }
+  .mascot.prof svg { animation: chibi-float 3s ease-in-out infinite; transform-origin: bottom center; }
+  .mascot.stud svg { animation: chibi-sway 3.5s ease-in-out infinite; transform-origin: bottom center; }
+
+  @media (max-width: 640px) {
+    .nav a { display: none; }
+    .page h1 { font-size: 22px; }
+    .page { padding-left: var(--space-3); padding-right: var(--space-3); }
+    .data-table { font-size: 12px; }
+    .data-table th, .data-table td { padding: 6px 8px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<nav class="nav">
+  <div class="nav-brand">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18l3-4 2-6 2 4 2-9 2 9 2-2 3 4 4 4"></path></svg>
+    RamanID
+  </div>
+  <span class="tagline">Nhận diện phổ trên trình duyệt</span>
+  <a href="index.html">Nhận diện</a>
+  <a href="catalog.html">Thư viện</a>
+  <a href="about.html" class="active">Giới thiệu</a>
+</nav>
+
+<div class="page">
+  <h1>Giới thiệu</h1>
+  <p class="subtitle">RamanID là công cụ nhận diện vật liệu qua phổ quang học, chạy hoàn toàn trên trình duyệt — không cần cài đặt phần mềm, không gửi dữ liệu lên máy chủ.</p>
+
+  <div class="section">
+    <h2>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+      Ứng dụng dùng để làm gì
+    </h2>
+    <p>
+      Tải lên phổ Raman, huỳnh quang, hoặc hấp thụ (định dạng .txt / .csv) — ứng dụng sẽ so khớp với
+      thư viện tham chiếu và đưa ra kết quả nhận diện kèm xác suất hậu nghiệm.
+      Hỗ trợ kết hợp đa kênh (Raman + huỳnh quang + hấp thụ cùng một mẫu vật) để tăng độ tin cậy.
+    </p>
+    <p>
+      Toàn bộ tính toán chạy trong trình duyệt bằng JavaScript — tệp phổ không rời khỏi máy của bạn.
+      Phù hợp cho nghiên cứu, giảng dạy, và kiểm tra nhanh tại hiện trường.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 21 19V5"></path><path d="M3 12A9 3 0 0 0 21 12"></path></svg>
+      Nguồn dữ liệu
+    </h2>
+    <p>Thư viện phổ tham chiếu được tổng hợp từ nhiều nguồn:</p>
+    <table class="data-table">
+      <thead>
+        <tr><th>Nguồn</th><th>Nội dung</th><th>Số lượng (web)</th><th>Tham chiếu</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>VAST</td>
+          <td>Phổ Raman, huỳnh quang, hấp thụ — đo tại phòng thí nghiệm VAST bằng máy LabRAM HR Evolution 532 nm</td>
+          <td class="mono">~210 phổ, 34 lớp</td>
+          <td>Dữ liệu nội bộ</td>
+        </tr>
+        <tr>
+          <td>RRUFF</td>
+          <td>Phổ Raman khoáng vật chuẩn (1 phổ/khoáng vật, coverage tốt nhất)</td>
+          <td class="mono">~1 200 phổ</td>
+          <td><a href="https://rruff.info" target="_blank" rel="noopener">rruff.info</a></td>
+        </tr>
+        <tr>
+          <td>ROD</td>
+          <td>Raman Open Database — phổ đóng góp cộng đồng</td>
+          <td class="mono">~600 phổ</td>
+          <td><a href="https://solsa.crystallography.net/rod/" target="_blank" rel="noopener">crystallography.net/rod</a></td>
+        </tr>
+        <tr>
+          <td>Dược phẩm</td>
+          <td>Phổ Raman dược phẩm (figshare, Springer)</td>
+          <td class="mono">~1 700 phổ</td>
+          <td><a href="https://figshare.com" target="_blank" rel="noopener">figshare.com</a></td>
+        </tr>
+        <tr>
+          <td>NICODOM</td>
+          <td>Bộ demo phổ Raman polymer/hoá chất</td>
+          <td class="mono">~20 phổ</td>
+          <td><a href="https://www.nicodom.cz" target="_blank" rel="noopener">nicodom.cz</a></td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      Toàn bộ phổ được tiền xử lý về lưới chung 450–3200 cm⁻¹ (bước 2 cm⁻¹),
+      làm mượt Savitzky-Golay, trừ nền ALS, chuẩn hoá L2.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.855z"></path></svg>
+      Thuật toán
+    </h2>
+    <p>
+      So khớp phổ theo phương pháp Bayes (hợp lý biên phân tích, theo Zhong &amp; Girolami).
+      Mô hình tín hiệu cho mỗi phổ tham chiếu:
+    </p>
+    <div class="algo-formula">
+      y = &alpha; &middot; phổ tham chiếu + nền Legendre + nhiễu Gaussian
+    </div>
+    <p>
+      Tiên nghiệm Jeffreys cho các tham số, tích phân giải tích &alpha;/&beta;/&sigma;&sup2;.
+      Điểm số = log Bayes factor mỗi kênh so với mô hình chỉ-nền (null model).
+    </p>
+    <p>
+      Hậu nghiệm softmax với hệ số làm mềm &kappa; = 0.06 (ECE 0.038 trên LOO của VAST).
+      Ngưỡng open-set &tau; = 0.659 — mẫu có log BF dưới ngưỡng được gắn cờ
+      "có thể không có trong thư viện".
+    </p>
+    <p>
+      Kết hợp đa kênh (v3): tổng có trọng số log BF từng kênh
+      (Raman 1.0, huỳnh quang 0.25, hấp thụ 1.0).
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      Phát triển bởi
+    </h2>
+    <p>
+      Dự án được phát triển bởi nhóm nghiên cứu tại <strong>Viện Hàn lâm Khoa học và Công nghệ Việt Nam (VAST)</strong>
+      phối hợp với <strong>Trường Đại học Khoa học Tự nhiên — Đại học Quốc gia Hà Nội (HUS)</strong>.
+    </p>
+  </div>
+
+  <div class="credit-row">
+    <div class="mascot prof" id="profMascot"><span>Dr Vũ Dương</span></div>
+    <div class="credit-center">
+      <div class="k">Được xây dựng bởi</div>
+      <div class="v">VAST &times; HUS</div>
+    </div>
+    <div class="mascot stud" id="studMascot"><span>Đinh Thái Tuấn</span></div>
+  </div>
+</div>
+
+<script>
+(function initMascots() {
+  var px = 5;
+  var colors = {
+    O: '#1d1f20', S: '#fcd5b0', D: '#d4a574', W: '#ffffff', E: '#1d1f20',
+    M: '#d4766a', P: '#424244', p: '#2b2b2d',
+    h: '#8B7355', H: '#6B5335', G: '#98989b', g: '#787878',
+    k: '#2b2b2d', K: '#555557', B: '#5980a6', b: '#416180', R: '#ffb4b4'
+  };
+  function mkSprite(grid, label, labelColor) {
+    var rects = "";
+    for (var y = 0; y < grid.length; y++) {
+      var x = 0;
+      while (x < grid[y].length) {
+        var c = grid[y][x];
+        if (c !== "." && colors[c]) {
+          var run = 1;
+          while (x + run < grid[y].length && grid[y][x + run] === c) run++;
+          rects += '<rect x="' + (x * px) + '" y="' + (y * px) + '" width="' + (run * px) + '" height="' + px + '" fill="' + colors[c] + '"/>';
+          x += run;
+        } else { x++; }
+      }
+    }
+    var w = Math.max.apply(null, grid.map(function(r) { return r.length; }));
+    var ht = grid.length;
+    var shirtY = grid.findIndex(function(r) { return r.indexOf("G") >= 0 || r.indexOf("B") >= 0; });
+    var labelY = (shirtY + 2) * px + px * 0.7;
+    rects += '<text x="' + (w * px / 2) + '" y="' + labelY + '" text-anchor="middle" font-size="8" font-weight="bold" font-family="Barlow Condensed,monospace" fill="' + labelColor + '">' + label + '</text>';
+    return '<svg viewBox="0 0 ' + (w * px) + ' ' + (ht * px) + '" width="' + (w * px * 1.4) + '" height="' + (ht * px * 1.4) + '" style="image-rendering:pixelated;display:block">' + rects + '</svg>';
+  }
+  var profGrid = [
+    "....OOOOOO....", "...OhHSSHhO...", "..OhSSSSSShO..", "..OSSSSSSSSO..",
+    "..OSSSSSSSSO..", "..OWESSSEWSO..", "..OSSSOSSSSO..", "..OSSMMMMSSO..",
+    "..OSSSSSSSSO..", "..OSSSSSSSSO..", "...OSSSSSSOO..", "....OSSSO.....",
+    "...OgGGGGgO...", "..OgGGGGGGgO..", "..OgGGGGGGgO..", "..OgGGGGGGgO..",
+    ".DDOgGGGGgODD.", ".DD.OgGGgO.DD.", ".....OPPO.....", ".....OPPO.....",
+    "....OP..PO....", "....OP..PO....", "...Opp..ppO..."
+  ];
+  var studGrid = [
+    "...OkkkkkO....", "..OkkkkkkkkO..", "..OkKkkkkKkO..", "..OkkSSSSSkkO.",
+    "..OkSSSSSSSkO.", "..OSSSSSSSSO..", "..OWESSSEWSO..", "..ORSSSSSSRO..",
+    "..OSSSMMMSSSO.", "..OSSSSSSSSO..", "...OSSSSSSO...", "....OSSSO.....",
+    "...ObBBBBbO...", "..ObBBBBBBbO..", "..ObBBBBBBbO..", "..ObBBBBBBbO..",
+    ".DDObBBBBbODD.", ".DD.ObBBbO.DD.", ".....OPPO.....", ".....OPPO.....",
+    "....OP..PO....", "....OP..PO....", "...Opp..ppO..."
+  ];
+  document.getElementById("profMascot").insertAdjacentHTML("afterbegin", mkSprite(profGrid, "VAST", "#1d1f20"));
+  document.getElementById("studMascot").insertAdjacentHTML("afterbegin", mkSprite(studGrid, "HUS", "#ffffff"));
+})();
+</script>
