@@ -271,7 +271,7 @@
       <div class="dz-hint">hoặc nhấn để chọn · .txt Raman (cm⁻¹) · .csv huỳnh quang (nm, tên tệp chứa bước sóng kích thích 532/633/785/808) · .txt hấp thụ (nm)</div>
       <div class="dz-privacy">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-        Dữ liệu không rời khỏi trình duyệt của bạn
+        Dữ liệu không rời khỏi trình duyệt, trừ khi bạn chủ động bấm "Lưu vào thư viện"
       </div>
     </div>
     <input type="file" id="fileinput" accept=".txt,.csv,.dat" multiple hidden>
@@ -1054,7 +1054,7 @@ function renderTray() {
     const c = document.createElement("span");
     c.className = "tag" + (t.peakless ? " tag-neutral" : " tag-accent");
     const label = MOD_VN[t.kind] + (t.kind === "fluor" ? " " + t.ex + "nm" : "")
-      + (t.peakless ? " · không có đỉnh" : "");
+      + (t.peakless ? " · không có đỉnh" : "") + (t.demo ? " · mẫu" : "");
     c.textContent = t.name + " [" + label + "] ✕";
     c.title = "Nhấn để xoá";
     c.addEventListener("click", function() { tray = tray.filter(u => u !== t); renderAll(); });
