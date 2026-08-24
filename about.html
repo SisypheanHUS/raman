@@ -280,8 +280,61 @@
       </tbody>
     </table>
     <p>
-      So sánh: cosine (v1) 79.7% → Bayes đơn mẫu (v2) 83.7% → phiên bản hiện tại
-      (v3, within-class Bayes + đa kênh) 90.1% tổng thể, 95.9% hoá chất.
+      Tiến trình theo phiên bản: cosine (v1) 79.7% → Bayes đơn mẫu (v2) 83.7% → phiên bản hiện tại
+      (v3) 90.1% tổng thể, 95.9% hoá chất — chi tiết ở mục dưới.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      Các phiên bản phát triển
+    </h2>
+    <p>
+      Ba phiên bản nối tiếp nhau, mỗi bản giữ nguyên quy trình đánh giá LOO trên 202 phổ VAST
+      để so sánh công bằng. Hai bản đầu tóm tắt ngắn; bản v3 là bản đang chạy trên trang này.
+    </p>
+    <table class="data-table">
+      <thead>
+        <tr><th>Phiên bản</th><th>Cách làm</th><th>Kết quả LOO</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>v1 — Cosine</td>
+          <td>So khớp cosine (chuẩn HQI) giữa phổ đo và từng phổ tham chiếu sau tiền xử lý;
+            điểm lớp = phổ khớp nhất trong lớp. Thư viện VAST 209 phổ, 34 lớp.
+            Độ tin cậy chỉ là softmax trên điểm cosine — chưa phải xác suất hiệu chuẩn.</td>
+          <td class="mono">79.7% tổng thể<br>85.7% hoá chất</td>
+        </tr>
+        <tr>
+          <td>v2 — Bayes đơn mẫu</td>
+          <td>Thay cosine bằng log Bayes factor với mô hình
+            <em>y = &alpha;&middot;phổ tham chiếu + nền Legendre + nhiễu</em> (tích phân giải tích,
+            theo Zhong &amp; Girolami). Thêm posterior hiệu chuẩn (&kappa; = 0.12), ngưỡng open-set
+            &tau; = 0.552, giải thích theo peak và tách hỗn hợp 2 thành phần.
+            <br>v2.1: gán lại nhãn 34/71 phổ "Plastic" thành PE/PP/PS bằng peak diagnostic,
+            thêm thư viện ngoài (RRUFF, ROD, dược phẩm, NICODOM), đưa web lên GitHub Pages.</td>
+          <td class="mono">83.7% tổng thể<br>88.9% → 92.8% hoá chất (v2.1)<br>ECE 0.082 → 0.069<br>Từ chối chất lạ 54.3% → 63.5%</td>
+        </tr>
+        <tr>
+          <td><strong>v3 — hiện tại</strong></td>
+          <td>
+            <strong>Within-class Bayes:</strong> lớp có ≥3 phổ được mô hình hoá bằng phổ trung bình
+            + các thành phần chính của phần dư (516/2 507 lớp), thay vì so với một phổ mẫu duy nhất —
+            khắc phục nguyên nhân gốc của việc quá tự tin ở v2. Thư viện đầy đủ 16 024 phổ.
+            <br><strong>Đa kênh:</strong> kết hợp Raman + huỳnh quang + hấp thụ cùng một mẫu vật bằng
+            tổng có trọng số log BF (1.0 / 0.25 / 1.0); tự suy bước sóng kích thích huỳnh quang
+            (đúng 96.5%) nên không cần khai báo.
+            <br><strong>Hiệu chuẩn lại:</strong> &kappa; = 0.06, &tau; = 0.659, đồng bộ Python và JavaScript
+            (17/17 kiểm tra parity).
+          </td>
+          <td class="mono"><strong>90.1%</strong> tổng thể<br><strong>95.9%</strong> hoá chất<br>ECE <strong>0.038</strong><br>Đa kênh: 71.4% (49 mẫu vật), nhận được 15/27 mẫu không có tín hiệu Raman<br>Xuyên máy (NICODOM): 4/4 đúng, 12/13 chất lạ bị từ chối</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      Còn dở: 37 phổ bao bì nhựa nhiễu cao chưa gán được nhãn polymer; trọng số đa kênh mới được
+      xác nhận bằng nested CV (69.4%) trên cùng 49 mẫu vật, cần mẫu mới để hiệu chuẩn posterior fusion.
     </p>
   </div>
 
