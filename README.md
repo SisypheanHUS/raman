@@ -9,7 +9,7 @@ Kéo thả một file phổ Raman (`.txt` / `.csv`) và nhận kết quả nhậ
 vật liệu kèm xác suất hậu nghiệm — **toàn bộ tính toán chạy trong trình
 duyệt**, không có server, không upload dữ liệu.
 
-> 🔗 **Demo:** <https://sisypheanhus.github.io/raman/>
+> 🔗 **Website:** <https://sisypheanhus.github.io/raman/>
 
 ## Repo này chứa gì
 
