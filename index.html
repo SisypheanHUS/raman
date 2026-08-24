@@ -235,7 +235,7 @@
       <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 21 19V5"></path><path d="M3 12A9 3 0 0 0 21 12"></path></svg>
       <div class="stat-num" id="statlib">...</div>
-      <div class="stat-label">Phổ tham chiếu</div>
+      <div class="stat-label">Phổ tham chiếu (đã trừ nền)</div>
     </div>
     <div class="card blueprint stat-tile">
       <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
@@ -268,7 +268,7 @@
       <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
       <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="m16 16-4-4-4 4"></path></svg>
       <div class="dz-title">Kéo thả một hoặc nhiều tệp phổ cùng mẫu vật vào đây</div>
-      <div class="dz-hint">hoặc nhấn để chọn · .txt Raman (cm⁻¹) · .csv huỳnh quang (nm — bước sóng kích thích lấy từ tên tệp nếu có, không thì tự suy luận) · .txt hấp thụ (nm)</div>
+      <div class="dz-hint">hoặc nhấn để chọn · .txt Raman (cm⁻¹) · .csv huỳnh quang (nm, tên tệp chứa bước sóng kích thích 532/633/785/808) · .txt hấp thụ (nm)</div>
       <div class="dz-privacy">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
         Dữ liệu không rời khỏi trình duyệt, trừ khi bạn chủ động bấm "Lưu vào thư viện"
@@ -767,24 +767,6 @@ function fluorClassBFs(queries, fluorLib) {
   return out;
 }
 
-// Excitation wavelength for a fluorescence curve whose ex is unknown: score it
-// at every library ex with fluorClassBFs (same evidence + count penalty the
-// classifier uses) and keep the strongest. Returns {ex, bf, runnerEx, runnerBf}
-// (runner fields null if only one ex has coverage) or null if the curve matches
-// nothing at any ex. Mirrors multimodal.infer_fluor_ex.
-function inferFluorEx(q, fluorLib) {
-  const scored = [];
-  for (const ex of EX_WAVELENGTHS) {
-    const bfs = fluorClassBFs([{ ex, q }], fluorLib);
-    if (bfs.size) scored.push({ ex, bf: Math.max(...bfs.values()) });
-  }
-  if (!scored.length) return null;
-  scored.sort((a, b) => b.bf - a.bf);
-  const [best, runner] = scored;
-  return { ex: best.ex, bf: best.bf,
-           runnerEx: runner ? runner.ex : null, runnerBf: runner ? runner.bf : null };
-}
-
 // queries: [q] — best per class over curves, - penalty.
 function absClassBFs(queries, absLib) {
   const best = new Map();
@@ -874,7 +856,7 @@ if (typeof module !== "undefined") {
   module.exports = { parseSpectrum, preprocess, classify, findPeaks, decodeLibrary,
                      pairBF, pairBfWc, gridWavenumber, GRID_N, NULL_TAU, KAPPA,
                      decodeLibraryMm, decodeWcModels, preprocessNm, pairBFNm,
-                     fluorClassBFs, inferFluorEx, absClassBFs, ramanCategoryBFs, fuse, parseEx,
+                     fluorClassBFs, absClassBFs, ramanCategoryBFs, fuse, parseEx,
                      FLUOR_GRID, ABS_GRID, MIN_XMAX, CATEGORY_MAP };
 }
 
@@ -920,7 +902,7 @@ function submitContribution() {
       label: guessLabel,
       confidence: guessConf ? "tự động (posterior " + guessConf + ")" : "",
       kind: MOD_VN[t.kind],
-      ex: t.kind === "fluor" ? t.ex + (t.exInferred ? " (tự suy)" : "") : "",
+      ex: t.kind === "fluor" ? t.ex : "",
       fileName: t.name,
       rawText: t.raw
     })
@@ -983,7 +965,7 @@ function submitContribution() {
 
 (async function init() {
   try {
-    var DATA_SIZE = 16744796;
+    var DATA_SIZE = 64701533;
     const resp = await fetch("data.json");
     if (!resp.ok) throw new Error("Không tải được thư viện (" + resp.status + ")");
     const total = DATA_SIZE || 0;
@@ -1015,7 +997,7 @@ function submitContribution() {
   WC_MODELS = decodeWcModels(DATA);
   LIBMM = decodeLibraryMm(DATA);
 
-  const libCount = DATA.full_lib_count || LIBRARY.length;
+  const libCount = LIBRARY.length;
   const classCount = new Set(LIBRARY.map(e => e.label)).size;
   const libCountMm = LIBMM.fluor.length + LIBMM.abs.length;
   $("libcount").textContent = libCount.toLocaleString("vi-VN");
@@ -1054,16 +1036,10 @@ function addFile(text, name, isDemo) {
   const { x, y } = parseSpectrum(text);
   let item;
   if (/\.csv$/i.test(name)) {
-    const q = preprocessNm(x, y, FLUOR_GRID);
-    let ex = parseEx(name), exInferred = false;
-    if (ex === null) {
-      const inf = inferFluorEx(q, LIBMM.fluor);
-      if (inf === null)
-        throw new Error(name + ": không suy ra được bước sóng kích thích (đường huỳnh quang không khớp thư viện ở bước sóng nào).");
-      ex = inf.ex;
-      exInferred = true;
-    }
-    item = { name, kind: "fluor", ex, exInferred, q, raw: text, demo: !!isDemo };
+    const ex = parseEx(name);
+    if (ex === null)
+      throw new Error(name + ": tên tệp .csv huỳnh quang phải chứa bước sóng kích thích (532/633/785/808).");
+    item = { name, kind: "fluor", ex, q: preprocessNm(x, y, FLUOR_GRID), raw: text, demo: !!isDemo };
   } else if (x[x.length - 1] >= MIN_XMAX) {
     const q = preprocess(x, y);
     item = { name, kind: "raman", q, peakless: findPeaks(q).length === 0, raw: text, demo: !!isDemo };
@@ -1080,7 +1056,7 @@ function renderTray() {
   for (const t of tray) {
     const c = document.createElement("span");
     c.className = "tag" + (t.peakless ? " tag-neutral" : " tag-accent");
-    const label = MOD_VN[t.kind] + (t.kind === "fluor" ? " " + t.ex + "nm" + (t.exInferred ? " (tự suy)" : "") : "")
+    const label = MOD_VN[t.kind] + (t.kind === "fluor" ? " " + t.ex + "nm" : "")
       + (t.peakless ? " · không có đỉnh" : "") + (t.demo ? " · mẫu" : "");
     c.textContent = t.name + " [" + label + "] ✕";
     c.title = "Nhấn để xoá";
