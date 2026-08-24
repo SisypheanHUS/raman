@@ -965,9 +965,10 @@ function submitContribution() {
 
 (async function init() {
   try {
+    var DATA_SIZE = 16744796;
     const resp = await fetch("data.json");
     if (!resp.ok) throw new Error("Không tải được thư viện (" + resp.status + ")");
-    const total = +resp.headers.get("content-length") || 0;
+    const total = DATA_SIZE || 0;
     const reader = resp.body.getReader();
     const chunks = [];
     let loaded = 0;
@@ -979,7 +980,7 @@ function submitContribution() {
       loaded += value.length;
       var pct = total ? Math.min(100, loaded / total * 100) : 0;
       if (total) $("loadbar").style.width = pct.toFixed(0) + "%";
-      var suf = (total && loaded <= total) ? " / " + (total / 1e6).toFixed(1) + " MB" : "";
+      var suf = total ? " / " + (total / 1e6).toFixed(1) + " MB" : "";
       $("loadstatus").textContent = (loaded / 1e6).toFixed(1) + " MB đã tải" + suf;
     }
     $("loadbarwrap").classList.remove("indeterminate");
@@ -996,14 +997,14 @@ function submitContribution() {
   WC_MODELS = decodeWcModels(DATA);
   LIBMM = decodeLibraryMm(DATA);
 
-  const libCount = LIBRARY.length;
+  const libCount = DATA.full_lib_count || LIBRARY.length;
   const classCount = new Set(LIBRARY.map(e => e.label)).size;
   const libCountMm = LIBMM.fluor.length + LIBMM.abs.length;
-  $("libcount").textContent = libCount;
-  $("classcount").textContent = classCount;
+  $("libcount").textContent = libCount.toLocaleString("vi-VN");
+  $("classcount").textContent = classCount.toLocaleString("vi-VN");
   $("libcountmm").textContent = libCountMm;
-  $("statlib").textContent = libCount;
-  $("statclass").textContent = classCount;
+  $("statlib").textContent = libCount.toLocaleString("vi-VN");
+  $("statclass").textContent = classCount.toLocaleString("vi-VN");
   $("loading").style.display = "none";
   $("dropwrap").style.display = "block";
   wireEvents();
