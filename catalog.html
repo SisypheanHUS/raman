@@ -332,9 +332,10 @@ var $ = function(id) { return document.getElementById(id); };
 
 (async function init() {
   try {
+    var DATA_SIZE = 16744796;
     var resp = await fetch("data.json");
     if (!resp.ok) throw new Error("HTTP " + resp.status);
-    var total = +resp.headers.get("content-length") || 0;
+    var total = DATA_SIZE || 0;
     var reader = resp.body.getReader();
     var chunks = [];
     var loaded = 0;
