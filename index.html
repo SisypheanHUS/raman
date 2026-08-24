@@ -158,6 +158,9 @@
   .cand-card.top .cand-fill { background: var(--color-accent); }
   .cand-parts { display: flex; gap: var(--space-3); font-size: 11px; opacity: .55; margin-top: 6px; }
 
+  .contribute-row { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; max-width: 960px; margin: 0 auto; padding: var(--space-3) var(--space-6); border-bottom: 1px solid var(--color-divider); }
+  .contribute-note { flex: 1; min-width: 200px; font-size: 12px; opacity: .55; }
+
   .fusion-card { padding: var(--space-3); }
   .fusion-row { display: flex; align-items: center; gap: var(--space-2); font-size: 12px; }
   .fusion-ch { width: 92px; flex: none; font-family: var(--font-heading); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; opacity: .55; }
@@ -287,6 +290,13 @@
 
 <div id="results">
   <div class="verdict-banner" id="banner"></div>
+  <div class="contribute-row">
+    <span class="contribute-note">Đóng góp phổ này để mở rộng thư viện? Gửi ẩn danh, nhóm nghiên cứu xem xét trước khi thêm vào — không kèm thông tin cá nhân.</span>
+    <button class="btn blueprint" id="contributeBtn">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <span id="contributeBtnLabel">Lưu vào thư viện</span>
+    </button>
+  </div>
   <div class="results-grid">
     <div class="col-left">
       <div id="fusedcard" style="display:none">
@@ -323,7 +333,8 @@
 
 <footer>
   <p class="method">
-    So khớp phổ theo Bayes — toàn bộ tính toán chạy trong trình duyệt, tệp phổ không rời khỏi máy.
+    So khớp phổ theo Bayes — toàn bộ tính toán chạy trong trình duyệt, tệp phổ không rời khỏi máy
+    trừ khi bạn chủ động bấm "Lưu vào thư viện" để đóng góp ẩn danh.
     <a href="about.html">Xem chi tiết thuật toán, nguồn dữ liệu &amp; nhóm phát triển</a>.
   </p>
   <div class="credit-row">
@@ -929,19 +940,19 @@ function appendCandCard(list, i, name, post, partsHtml) {
   list.appendChild(card);
 }
 
-function addFile(text, name) {
+function addFile(text, name, isDemo) {
   const { x, y } = parseSpectrum(text);
   let item;
   if (/\.csv$/i.test(name)) {
     const ex = parseEx(name);
     if (ex === null)
       throw new Error(name + ": tên tệp .csv huỳnh quang phải chứa bước sóng kích thích (532/633/785/808).");
-    item = { name, kind: "fluor", ex, q: preprocessNm(x, y, FLUOR_GRID) };
+    item = { name, kind: "fluor", ex, q: preprocessNm(x, y, FLUOR_GRID), raw: text, demo: !!isDemo };
   } else if (x[x.length - 1] >= MIN_XMAX) {
     const q = preprocess(x, y);
-    item = { name, kind: "raman", q, peakless: findPeaks(q).length === 0 };
+    item = { name, kind: "raman", q, peakless: findPeaks(q).length === 0, raw: text, demo: !!isDemo };
   } else {
-    item = { name, kind: "abs", q: preprocessNm(x, y, ABS_GRID) };
+    item = { name, kind: "abs", q: preprocessNm(x, y, ABS_GRID), raw: text, demo: !!isDemo };
   }
   tray = tray.filter(t => t.name !== name);
   tray.push(item);
