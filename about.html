@@ -231,6 +231,57 @@
 
   <div class="section">
     <h2>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+      Độ chính xác
+    </h2>
+    <p>
+      Đánh giá bằng phương pháp leave-one-out (LOO) trên 202 phổ VAST (27 lớp có ≥3 phổ mỗi lớp):
+      lần lượt bỏ ra 1 phổ, dùng phổ còn lại làm tham chiếu, rồi nhận diện phổ bị bỏ — lặp lại cho
+      tất cả 202 phổ.
+    </p>
+    <table class="data-table">
+      <thead>
+        <tr><th>Chỉ số</th><th>Giá trị</th><th>Ý nghĩa</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Thư viện tham chiếu</td>
+          <td class="mono">~16 000 phổ, ~2 500 lớp</td>
+          <td>Tổng phổ trong thư viện mở rộng (VAST + RRUFF + ROD + dược phẩm + NICODOM)</td>
+        </tr>
+        <tr>
+          <td>Top-1 accuracy (tất cả)</td>
+          <td class="mono"><strong>90.1%</strong> (182/202)</td>
+          <td>Tỉ lệ lần nhận diện đúng ngay kết quả đầu tiên — tính trên mọi loại phổ</td>
+        </tr>
+        <tr>
+          <td>Top-1 accuracy (hoá chất)</td>
+          <td class="mono"><strong>95.9%</strong> (93/97)</td>
+          <td>Riêng nhóm hoá chất tinh khiết — dễ nhận diện hơn khoáng vật/sinh học</td>
+        </tr>
+        <tr>
+          <td>ECE (sai số hiệu chuẩn)</td>
+          <td class="mono"><strong>0.038</strong></td>
+          <td>Xác suất báo ra sát xác suất thực tế (0 = hoàn hảo); cho thấy mô hình Bayes
+            được hiệu chuẩn tốt, không quá tự tin cũng không quá bi quan</td>
+        </tr>
+        <tr>
+          <td>Ngưỡng "không có trong thư viện"</td>
+          <td class="mono">&tau; = 0.659</td>
+          <td>Tại ngưỡng này, tỉ lệ từ chối nhầm (mẫu đúng bị cờ là lạ) chỉ 10% — giúp
+            cảnh báo khi gặp vật liệu chưa có trong thư viện</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      So sánh: phiên bản cosine cũ (v1) đạt 79.7%, Bayes không within-class (v2) đạt 83.7% —
+      phiên bản hiện tại (v2.1, within-class Bayes) cải thiện rõ rệt nhờ mô hình hoá sự biến thiên
+      giữa các phổ cùng lớp thay vì so với một phổ mẫu duy nhất.
+    </p>
+  </div>
+
+  <div class="section">
+    <h2>
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
       Phát triển bởi
     </h2>
