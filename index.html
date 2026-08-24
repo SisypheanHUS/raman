@@ -160,6 +160,15 @@
     height: 100%; border-radius: 2px; background: var(--accent);
     transition: width .3s;
   }
+  .loading .bar.indeterminate .fill {
+    width: 30% !important;
+    animation: indeterminate 1.2s ease-in-out infinite;
+  }
+  @keyframes indeterminate {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(433%); }
+  }
+  .loading .status { font-size: .82rem; margin-top: 6px; }
 
   footer { color: var(--muted); font-size: .82rem; margin-top: 30px; max-width: 68ch; }
   footer code { font-family: "IBM Plex Mono", Consolas, monospace; font-size: .78rem; }
@@ -180,7 +189,8 @@
   <div class="card">
     <div class="loading" id="loading">
       <p>Loading spectral library...</p>
-      <div class="bar"><div class="fill" id="loadbar" style="width:0%"></div></div>
+      <div class="bar" id="loadbarwrap"><div class="fill" id="loadbar" style="width:0%"></div></div>
+      <p class="status" id="loadstatus"></p>
     </div>
     <div id="dropwrap" style="display:none">
       <div class="drop" id="drop" tabindex="0" role="button" aria-label="Select or drop spectrum files">
@@ -743,14 +753,20 @@ let tray = [];
     const reader = resp.body.getReader();
     const chunks = [];
     let loaded = 0;
+    if (!total) $("loadbarwrap").classList.add("indeterminate");
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
       chunks.push(value);
       loaded += value.length;
-      if (total) $("loadbar").style.width = Math.min(100, loaded / total * 100).toFixed(0) + "%";
+      if (total) {
+        $("loadbar").style.width = Math.min(100, loaded / total * 100).toFixed(0) + "%";
+      }
+      $("loadstatus").textContent = (loaded / 1e6).toFixed(1) + " MB loaded";
     }
+    $("loadbarwrap").classList.remove("indeterminate");
     $("loadbar").style.width = "100%";
+    $("loadstatus").textContent = "";
     const blob = new Blob(chunks);
     DATA = JSON.parse(await blob.text());
   } catch (e) {
@@ -916,7 +932,7 @@ function renderRaman(q, results, name) {
   $("fname").textContent = name;
   var tbody = $("tbody");
   tbody.innerHTML = "";
-  results.slice(0, 10).forEach(function(r, i) {
+  results.slice(0, 5).forEach(function(r, i) {
     var tr = document.createElement("tr");
     if (i === 0) tr.className = "top";
     tr.innerHTML =
