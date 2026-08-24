@@ -1,272 +1,347 @@
-<title>RamanID</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RamanID — Nhận diện phổ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
+  /* ---- Industry design system tokens (light) ---- */
   :root {
-    --ground: #F7F9F8;
-    --surface: #FFFFFF;
-    --ink: #16241D;
-    --muted: #5B6B63;
-    --line: #DDE5E0;
-    --accent: #0B9A55;
-    --accent-ink: #067347;
-    --accent-soft: #E2F3EA;
-    --warn: #B7791F;
-    --warn-soft: #F8EFDD;
-    --tmpl: #6B5CD6;
-    --bar-track: #EDF2EF;
+    --color-bg: #f2f2f3;
+    --color-surface: #e9e9ea;
+    --color-text: #1d1f20;
+    --color-accent: #5980a6;
+    --color-divider: color-mix(in srgb, #1d1f20 16%, transparent);
+
+    --color-neutral-100: #f5f5f8;
+    --color-neutral-200: #e7e7ea;
+    --color-neutral-500: #98989b;
+    --color-neutral-700: #5d5d60;
+
+    --color-accent-100: #eef6ff;
+    --color-accent-300: #b5d9fd;
+    --color-accent-500: #749dc4;
+    --color-accent-700: #416180;
+    --color-accent-800: #2c455d;
+    --color-accent-900: #1d2d3d;
+
+    --font-heading: "Barlow Condensed", system-ui, sans-serif;
+    --font-heading-weight: 600;
+    --font-body: "Barlow", system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+
+    --space-1: 3.4px; --space-2: 6.8px; --space-3: 10.2px;
+    --space-4: 13.6px; --space-6: 20.4px;
+    --radius-md: 4px;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --ground: #0E1512;
-      --surface: #17211C;
-      --ink: #E5EFE9;
-      --muted: #93A69C;
-      --line: #2A3830;
-      --accent: #34C57F;
-      --accent-ink: #6FDCA8;
-      --accent-soft: #12362A;
-      --warn: #D9A24A;
-      --warn-soft: #35290F;
-      --tmpl: #9D8FEC;
-      --bar-track: #202D26;
+      --color-bg: #1a1c1e; --color-surface: #232527; --color-text: #e7e7ea;
+      --color-divider: rgba(255,255,255,.14);
+      --color-neutral-100: #2b2b2d; --color-neutral-200: #3a3b3d;
+      --color-neutral-500: #98989b; --color-neutral-700: #d4d4d7;
+      --color-accent-100: #1d2d3d; --color-accent-300: #416180;
+      --color-accent-500: #94bce3; --color-accent-700: #b5d9fd; --color-accent-800: #d6ebff;
+      --color-accent-900: #eef6ff;
     }
+    :root:not([data-theme="light"]) .verdict-banner.positive { background: var(--color-accent); color: #fff; }
   }
   :root[data-theme="dark"] {
-    --ground: #0E1512;
-    --surface: #17211C;
-    --ink: #E5EFE9;
-    --muted: #93A69C;
-    --line: #2A3830;
-    --accent: #34C57F;
-    --accent-ink: #6FDCA8;
-    --accent-soft: #12362A;
-    --warn: #D9A24A;
-    --warn-soft: #35290F;
-    --tmpl: #9D8FEC;
-    --bar-track: #202D26;
+    --color-bg: #1a1c1e; --color-surface: #232527; --color-text: #e7e7ea;
+    --color-divider: rgba(255,255,255,.14);
+    --color-neutral-100: #2b2b2d; --color-neutral-200: #3a3b3d;
+    --color-neutral-500: #98989b; --color-neutral-700: #d4d4d7;
+    --color-accent-100: #1d2d3d; --color-accent-300: #416180;
+    --color-accent-500: #94bce3; --color-accent-700: #b5d9fd; --color-accent-800: #d6ebff;
+    --color-accent-900: #eef6ff;
   }
+  :root[data-theme="dark"] .verdict-banner.positive { background: var(--color-accent); color: #fff; }
+
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--ground);
-    color: var(--ink);
-    font-family: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
-    font-size: 16px;
-    line-height: 1.55;
-  }
-  .wrap { max-width: 880px; margin: 0 auto; padding: 28px 20px 64px; }
+  body { margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); font-size: 15px; line-height: 1.55; }
+  h1, h2, h3 { font-family: var(--font-heading); font-weight: var(--font-heading-weight); line-height: 1.12; letter-spacing: -.015em; margin: 0 0 var(--space-2); }
+  a { color: var(--color-accent); text-underline-offset: 3px; }
+  :focus { outline: none; }
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  .num { font-family: var(--font-mono); }
 
-  header { margin-bottom: 26px; }
-  .spectrum-strip {
-    height: 5px; border-radius: 3px; margin-bottom: 18px;
-    background: linear-gradient(90deg,
-      #7A5FD0 0%, #4D74D8 18%, #3FA8C9 33%,
-      var(--accent) 47%, var(--accent) 52%,
-      #B8B23A 68%, #C9803A 84%, #B8503A 100%);
-    opacity: .85;
-  }
-  h1 {
-    font-family: "Spectral", Georgia, serif;
-    font-weight: 700; font-size: 2.1rem; margin: 0 0 4px;
-    letter-spacing: -0.01em; text-wrap: balance;
-  }
-  .sub { color: var(--muted); margin: 0; max-width: 60ch; }
+  /* ---- blueprint frame (corner registration marks) ---- */
+  .blueprint { position: relative; border: 1px solid var(--color-divider); }
+  .blueprint > .corner { position: absolute; width: 11px; height: 11px; color: color-mix(in srgb, var(--color-text) 55%, transparent); }
+  .blueprint > .corner::before, .blueprint > .corner::after { content: ""; position: absolute; background: currentColor; }
+  .blueprint > .corner::before { left: 5px; top: 0; width: 1px; height: 100%; }
+  .blueprint > .corner::after { top: 5px; left: 0; width: 100%; height: 1px; }
+  .blueprint > .corner.tl { top: -6px; left: -6px; }
+  .blueprint > .corner.tr { top: -6px; right: -6px; }
+  .blueprint > .corner.bl { bottom: -6px; left: -6px; }
+  .blueprint > .corner.br { bottom: -6px; right: -6px; }
 
-  .card {
-    background: var(--surface); border: 1px solid var(--line);
-    border-radius: 10px; padding: 20px; margin-bottom: 18px;
-  }
-  .drop {
-    border: 1.5px dashed var(--line); border-radius: 8px;
-    padding: 30px 20px; text-align: center; cursor: pointer;
-    transition: border-color .15s, background .15s;
-  }
-  .drop:hover, .drop:focus-visible, .drop.over {
-    border-color: var(--accent); background: var(--accent-soft); outline: none;
-  }
-  .drop.disabled { pointer-events: none; opacity: 0.5; }
-  .drop strong { color: var(--accent-ink); }
-  .drop p { margin: 4px 0; }
-  .drop .hint { color: var(--muted); font-size: .875rem; }
-  .demos { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
-  .demos span { color: var(--muted); font-size: .875rem; }
-  button.demo {
-    font: inherit; font-size: .875rem; font-weight: 500;
-    color: var(--accent-ink); background: none;
-    border: 1px solid var(--line); border-radius: 6px;
-    padding: 6px 12px; cursor: pointer;
-  }
-  button.demo:hover, button.demo:focus-visible { border-color: var(--accent); background: var(--accent-soft); outline: none; }
-  button.demo:disabled { pointer-events: none; opacity: 0.5; }
+  /* ---- base components ---- */
+  .card { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); background: transparent; border: 1px solid var(--color-divider); }
+  .tag { display: inline-flex; align-items: center; font-family: var(--font-mono); font-size: 11px; letter-spacing: .02em; padding: 3px 10px; border-radius: 3px; }
+  .tag-accent { background: var(--color-accent-100); color: var(--color-accent-800); }
+  .tag-neutral { background: var(--color-neutral-100); color: var(--color-neutral-700); }
+  .btn { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; text-decoration: none; font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 13px; color: var(--color-text); background: transparent; border: 1px solid var(--color-divider); padding: var(--space-2) calc(var(--space-3) * 1.2); border-radius: var(--radius-md); }
+  .btn:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; pointer-events: none; }
 
+  /* ---- nav ---- */
+  .nav { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3) var(--space-6); border-bottom: 1px solid var(--color-divider); max-width: 960px; margin: 0 auto; }
+  .nav-brand { display: flex; align-items: center; gap: 8px; font-family: var(--font-heading); font-weight: 600; font-size: 18px; margin-right: auto; }
+  .nav .tagline { margin-right: auto; font-size: 12px; opacity: .5; }
+  .nav a { color: inherit; text-decoration: none; font-size: 14px; }
+  .nav a:hover { color: var(--color-accent); }
+
+  /* ---- hero ---- */
+  .hero { max-width: 960px; margin: 0 auto; padding: 40px var(--space-6) 8px; text-align: center; }
+  .hero h1 { font-size: 34px; }
+  .hero p { font-size: 14px; opacity: .55; margin: 0 auto; max-width: 62ch; }
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); max-width: 620px; margin: 28px auto 0; }
+  .stat-tile { padding: var(--space-4); align-items: center; text-align: center; }
+  .stat-tile svg { margin: 0 auto; }
+  .stat-num { font-family: var(--font-heading); font-size: 26px; font-weight: 600; color: var(--color-accent); margin: var(--space-1) 0; }
+  .stat-label { font-size: 10.5px; opacity: .5; text-transform: uppercase; letter-spacing: .08em; }
+
+  /* ---- upload card ---- */
+  .uploadcard { max-width: 960px; margin: 24px auto 0; padding: 0 var(--space-6); }
+  .dropzone { border: 2px dashed var(--color-accent-300); padding: 36px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--space-3); cursor: pointer; transition: background .15s, border-color .15s; }
+  .dropzone:hover, .dropzone:focus-visible, .dropzone.over { background: var(--color-accent-100); outline: none; }
+  .dz-title { font-family: var(--font-heading); font-size: 17px; font-weight: 600; }
+  .dz-hint { font-size: 12.5px; opacity: .55; max-width: 46ch; }
+  .dz-privacy { font-size: 11px; opacity: .4; display: flex; align-items: center; gap: 6px; }
+  .tray { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .tray .tag { cursor: pointer; font-family: var(--font-body); }
+  .demo-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
+  .demo-row span { font-size: 12.5px; opacity: .5; }
+  .demo-row .btn { font-size: 12px; padding: 5px 10px; }
+
+  /* ---- loading ---- */
+  .loading-screen { max-width: 640px; margin: 40px auto 0; padding: 40px var(--space-6) 60px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: var(--space-4); }
+  .loading-screen svg { color: var(--color-accent); }
+  .loading-title { font-family: var(--font-heading); font-size: 18px; font-weight: 600; }
+  .loading-sub { font-size: 13px; opacity: .5; }
+  .progress-wrap { width: 340px; max-width: 100%; }
+  .progress-track { height: 5px; background: var(--color-neutral-200); overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--color-accent); transition: width .3s; }
+  .progress-track.indeterminate .progress-fill { width: 30% !important; animation: indeterminate 1.2s ease-in-out infinite; }
+  @keyframes indeterminate { 0% { transform: translateX(-120%); } 100% { transform: translateX(420%); } }
+
+  /* ---- error ---- */
+  .errorbox { display: none; max-width: 960px; margin: 14px auto 0; padding: 0 var(--space-6); }
+  .errorbox p { border-left: 3px solid var(--color-accent); background: var(--color-neutral-200); padding: 12px 16px; margin: 0; font-size: 13.5px; }
+
+  /* ---- results ---- */
   #results { display: none; }
-  .banner {
-    display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap;
-    border-radius: 10px; padding: 16px 20px; margin-bottom: 18px;
-    background: var(--accent-soft); border: 1px solid var(--accent);
-  }
-  .banner.unknown { background: var(--warn-soft); border-color: var(--warn); }
-  .banner .verdict { font-family: "Spectral", Georgia, serif; font-size: 1.45rem; font-weight: 700; }
-  .banner.unknown .verdict { color: var(--warn); }
-  .banner .verdict em { font-style: normal; color: var(--accent-ink); }
-  .banner.unknown .verdict em { color: var(--warn); }
-  .banner .detail { color: var(--muted); font-size: .9rem; }
+  .verdict-banner { display: flex; align-items: center; gap: 16px; padding: 20px var(--space-6); max-width: 960px; margin: 20px auto 0; }
+  .verdict-banner.positive { background: var(--color-accent-900); color: var(--color-accent-100); }
+  .verdict-banner.unknown { background: var(--color-neutral-200); color: var(--color-text); border-left: 4px solid var(--color-accent); }
+  .verdict-kicker { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; opacity: .65; margin-bottom: 2px; }
+  .verdict-title { font-family: var(--font-heading); font-size: 26px; font-weight: 600; line-height: 1.15; }
+  .verdict-banner.unknown .verdict-title { font-size: 21px; }
+  .verdict-note { font-size: 12px; opacity: .7; margin-top: 3px; }
+  .verdict-score { text-align: right; flex: none; }
+  .verdict-score .num { font-family: var(--font-heading); font-size: 32px; font-weight: 600; line-height: 1; }
+  .verdict-score .lbl { font-size: 10.5px; opacity: .65; margin-top: 2px; }
 
-  h2 {
-    font-family: "Spectral", Georgia, serif; font-weight: 600;
-    font-size: 1.15rem; margin: 0 0 12px;
-  }
-  .filelabel { font-family: "IBM Plex Mono", Consolas, monospace; font-size: .8rem; color: var(--muted); word-break: break-all; }
+  .results-grid { display: grid; grid-template-columns: 340px 1fr; gap: var(--space-4); max-width: 960px; margin: var(--space-4) auto 0; padding: 0 var(--space-6) 40px; }
+  .section-label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .5; margin: var(--space-4) 0 var(--space-2); }
+  .col-left .section-label:first-child, .col-right .section-label:first-child { margin-top: 0; }
 
-  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
-  th { font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
-  td.num { font-family: "IBM Plex Mono", Consolas, monospace; font-size: .875rem; white-space: nowrap; }
-  .postbar { display: flex; align-items: center; gap: 10px; min-width: 160px; }
-  .track { flex: 1; height: 8px; border-radius: 4px; background: var(--bar-track); overflow: hidden; }
-  .fill { height: 100%; border-radius: 4px; background: var(--accent); }
-  tr.top .fill { background: var(--accent); }
-  tr:not(.top) .fill { opacity: .45; }
-  .tablewrap { overflow-x: auto; }
+  .cand-list { display: flex; flex-direction: column; gap: var(--space-2); }
+  .cand-card { padding: var(--space-3); }
+  .cand-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+  .cand-name { font-family: var(--font-heading); font-size: 15px; font-weight: 600; }
+  .cand-prob { font-size: 13px; }
+  .cand-card.top .cand-prob { color: var(--color-accent); }
+  .cand-track { height: 4px; background: var(--color-neutral-200); }
+  .cand-fill { height: 100%; background: var(--color-neutral-500); }
+  .cand-card.top .cand-fill { background: var(--color-accent); }
+  .cand-parts { display: flex; gap: var(--space-3); font-size: 11px; opacity: .55; margin-top: 6px; }
 
-  .chartwrap { overflow-x: auto; }
-  svg text { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 11px; fill: var(--muted); }
-  .legend { display: flex; gap: 18px; font-size: .875rem; color: var(--muted); margin-top: 8px; flex-wrap: wrap; }
-  .key { display: inline-block; width: 18px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 6px; }
+  .fusion-card { padding: var(--space-3); }
+  .fusion-row { display: flex; align-items: center; gap: var(--space-2); font-size: 12px; }
+  .fusion-ch { width: 92px; flex: none; font-family: var(--font-heading); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; opacity: .55; }
+  .fusion-track { flex: 1; height: 4px; background: var(--color-neutral-200); }
+  .fusion-fill { height: 100%; background: var(--color-accent); }
+  .fusion-val { font-size: 11px; width: 42px; text-align: right; opacity: .65; flex: none; }
+  .fusion-total { border-top: 1px solid var(--color-divider); padding-top: var(--space-2); margin-top: var(--space-1); }
+  .fusion-total .fusion-ch { font-weight: 600; opacity: 1; }
+  .fusion-total .fusion-fill { background: var(--color-accent-700); }
+  .fusion-total .fusion-val { font-weight: 600; opacity: 1; }
 
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip {
-    font-family: "IBM Plex Mono", Consolas, monospace; font-size: .8rem;
-    padding: 3px 10px; border-radius: 999px;
-    background: var(--accent-soft); color: var(--accent-ink); border: 1px solid var(--accent);
-  }
-  .chip.miss { background: var(--bar-track); color: var(--muted); border-color: var(--line); }
-  .chiplabel { font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 12px 0 8px; }
+  .filelabel { font-family: var(--font-mono); font-size: 11.5px; opacity: .5; word-break: break-all; margin: var(--space-2) 0 0; }
 
-  .error {
-    display: none; border: 1px solid var(--warn); background: var(--warn-soft);
-    color: var(--ink); border-radius: 8px; padding: 12px 16px; margin-bottom: 18px;
-  }
+  .chart-card { padding: var(--space-3); }
+  .chart-card svg text { font-family: var(--font-mono); font-size: 9.5px; fill: var(--color-text); opacity: .5; }
+  .chart-legend { display: flex; gap: 16px; font-size: 11.5px; opacity: .65; margin-top: 8px; flex-wrap: wrap; }
+  .chart-legend .key { display: inline-block; width: 16px; height: 2px; vertical-align: middle; margin-right: 5px; }
+  .peak-tags { display: flex; flex-wrap: wrap; gap: 4px; }
 
-  .loading {
-    text-align: center; padding: 40px 20px; color: var(--muted);
-  }
-  .loading .bar {
-    width: 200px; height: 4px; border-radius: 2px;
-    background: var(--bar-track); margin: 14px auto 0; overflow: hidden;
-  }
-  .loading .bar .fill {
-    height: 100%; border-radius: 2px; background: var(--accent);
-    transition: width .3s;
-  }
-  .loading .bar.indeterminate .fill {
-    width: 30% !important;
-    animation: indeterminate 1.2s ease-in-out infinite;
-  }
-  @keyframes indeterminate {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(433%); }
-  }
-  .loading .status { font-size: .82rem; margin-top: 6px; }
+  /* ---- footer ---- */
+  footer { max-width: 960px; margin: 20px auto 0; padding: 0 var(--space-6); }
+  .method { font-size: 12.5px; opacity: .65; max-width: 72ch; border-top: 1px solid var(--color-divider); padding-top: 22px; }
+  .method code { font-family: var(--font-mono); font-size: 11.5px; }
+  .credit-row { display: flex; justify-content: space-between; align-items: flex-end; padding: 30px 0 44px; flex-wrap: wrap; gap: 18px; }
+  .mascot { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .mascot span { font-size: 10px; opacity: .45; font-family: var(--font-heading); letter-spacing: .05em; }
+  .credit-center { text-align: center; }
+  .credit-center .k { font-size: 10.5px; opacity: .3; font-family: var(--font-heading); letter-spacing: .06em; text-transform: uppercase; }
+  .credit-center .v { font-size: 12.5px; opacity: .4; font-family: var(--font-heading); font-weight: 600; }
+  @keyframes chibi-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @keyframes chibi-sway { 0%, 100% { transform: rotate(-2deg) translateY(0); } 25% { transform: rotate(1deg) translateY(-4px); } 75% { transform: rotate(-1deg) translateY(-2px); } }
+  .mascot.prof svg { animation: chibi-float 3s ease-in-out infinite; transform-origin: bottom center; }
+  .mascot.stud svg { animation: chibi-sway 3.5s ease-in-out infinite; transform-origin: bottom center; }
 
-  footer { color: var(--muted); font-size: .82rem; margin-top: 30px; max-width: 68ch; }
-  footer code { font-family: "IBM Plex Mono", Consolas, monospace; font-size: .78rem; }
-  footer a { color: var(--accent-ink); }
-  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  @media (max-width: 720px) { .results-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) {
+    .nav a { display: none; }
+    .hero h1 { font-size: 25px; }
+    .hero p { font-size: 13px; }
+    .stat-num { font-size: 20px; }
+    .verdict-banner { padding: 16px var(--space-3); flex-wrap: wrap; }
+    .verdict-title { font-size: 19px; }
+    .verdict-score .num { font-size: 24px; }
+    .results-grid { padding: 0 var(--space-3) 30px; }
+    .uploadcard, .hero, footer, .errorbox { padding-left: var(--space-3); padding-right: var(--space-3); }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 
-<div class="wrap">
-  <header>
-    <div class="spectrum-strip"></div>
-    <h1>RamanID</h1>
-    <p class="sub">Substance identification from Raman spectra via Bayesian spectral matching
-    — <span id="libcount">...</span> Raman spectra (<span id="classcount">...</span> substances)
-    + <span id="libcountmm">...</span> fluorescence / absorption curves.
-    Drop multiple files from the same specimen for multi-modal fusion (v3).</p>
-  </header>
+<nav class="nav">
+  <div class="nav-brand">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18l3-4 2-6 2 4 2-9 2 9 2-2 3 4 4 4"></path></svg>
+    RamanID
+  </div>
+  <span class="tagline">Nhận diện phổ trên trình duyệt</span>
+  <a href="catalog.html">Thư viện</a>
+  <a href="#phuong-phap">Giới thiệu</a>
+  <button class="btn blueprint" id="rescanBtn" style="display:none">
+    <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    Quét mới
+  </button>
+</nav>
 
-  <div class="card">
-    <div class="loading" id="loading">
-      <p>Loading spectral library...</p>
-      <div class="bar" id="loadbarwrap"><div class="fill" id="loadbar" style="width:0%"></div></div>
-      <p class="status" id="loadstatus"></p>
+<div class="hero">
+  <h1>Nhận diện phổ của bạn</h1>
+  <p>Tải lên phổ Raman, huỳnh quang hoặc hấp thụ. So khớp Bayes với <span id="classcount">...</span> lớp hợp chất
+    từ <span id="libcount">...</span> phổ Raman tham chiếu, kèm <span id="libcountmm">...</span> đường huỳnh quang /
+    hấp thụ cho kết hợp đa kênh.</p>
+  <div class="stat-grid">
+    <div class="card blueprint stat-tile">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 21 19V5"></path><path d="M3 12A9 3 0 0 0 21 12"></path></svg>
+      <div class="stat-num" id="statlib">...</div>
+      <div class="stat-label">Phổ tham chiếu</div>
     </div>
-    <div id="dropwrap" style="display:none">
-      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Select or drop spectrum files">
-        <p><strong>Drop one or more spectrum files from the same specimen</strong> or click to browse</p>
-        <p class="hint">.txt Raman (cm⁻¹) · .csv fluorescence (nm, filename contains 532/633/785/808) · .txt absorption (nm)</p>
-      </div>
-      <input type="file" id="fileinput" accept=".txt,.csv,.dat" multiple hidden>
-      <div class="chips" id="tray" style="margin-top:12px"></div>
-      <div class="demos">
-        <span>No file? Try a sample:</span>
-        <button class="demo" data-demo="0">Toluene 532 nm (Raman)</button>
-        <button class="demo" data-demo="1">Glucose 532 nm (Raman)</button>
-        <button class="demo" id="demomm">Metal can (fluorescence + absorption)</button>
-        <button class="demo" id="clearall" hidden>Clear all</button>
-      </div>
+    <div class="card blueprint stat-tile">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path></svg>
+      <div class="stat-num" id="statclass">...</div>
+      <div class="stat-label">Lớp hợp chất</div>
+    </div>
+    <div class="card blueprint stat-tile">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Xử lý cục bộ</div>
     </div>
   </div>
-
-  <div class="error" id="error"></div>
-
-  <div id="results">
-    <div class="banner" id="banner">
-      <span class="verdict" id="verdict"></span>
-      <span class="detail" id="verdictDetail"></span>
-    </div>
-
-    <div class="card" id="fusedcard" style="display:none">
-      <h2>Multi-modal fused result (v3)</h2>
-      <div class="tablewrap">
-        <table>
-          <thead><tr><th>#</th><th>Material</th><th>Score</th><th>Posterior</th><th>Contribution (log BF)</th></tr></thead>
-          <tbody id="fusedbody"></tbody>
-        </table>
-      </div>
-      <p class="filelabel" id="fusednote"></p>
-    </div>
-
-    <div class="card" id="ramancard">
-      <h2>Class posterior (Raman, v2 Bayes)</h2>
-      <p class="filelabel" id="fname"></p>
-      <div class="tablewrap">
-        <table>
-          <thead><tr><th>#</th><th>Class</th><th>log BF / ch</th><th>Posterior</th></tr></thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card" id="chartcard">
-      <h2>Query spectrum vs best-match template</h2>
-      <div class="chartwrap"><svg id="chart" viewBox="0 0 840 300" width="100%" role="img" aria-label="Spectrum chart"></svg></div>
-      <div class="legend">
-        <span><span class="key" style="background:var(--ink)"></span>Query (preprocessed)</span>
-        <span><span class="key" style="background:var(--tmpl)"></span>Template <span id="tmplname"></span></span>
-        <span><span class="key" style="background:var(--accent)"></span>Matched peak (&plusmn;6 cm⁻¹)</span>
-      </div>
-      <div class="chiplabel">Query peaks</div>
-      <div class="chips" id="peakchips"></div>
-    </div>
-  </div>
-
-  <footer>
-    <strong>Method.</strong> Bayesian spectral matching (Zhong/Girolami-style analytic marginal likelihood):
-    <code>y = &alpha;&middot;template + Legendre baseline + noise</code>, Jeffreys prior, &alpha;/&beta;/&sigma;&sup2;
-    integrated out analytically. Score = per-channel log Bayes factor vs baseline-only null.
-    Tempered softmax posterior (<code>&kappa;=0.12</code>, ECE 0.069 on VAST LOO),
-    open-set threshold <code>&tau;=0.552</code>.
-    Multi-modal fusion (v3): weighted sum of per-modality log BF
-    (Raman 1.0, fluorescence 0.25, absorption 1.0).
-    All computation runs in your browser — spectrum files never leave your machine.
-    <br><br>
-    Library: VAST (210 spectra, 34 classes) + RRUFF minerals + ROD + pharma (figshare) + NICODOM demo.
-    <a href="catalog.html">Browse the full spectral library</a>.
-    Source code: <a href="https://github.com/SisypheanHUS/VAST/tree/main/raman_id">github.com/SisypheanHUS/VAST</a>
-  </footer>
 </div>
+
+<div class="uploadcard">
+  <div class="loading-screen" id="loading">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 21 19V5"></path><path d="M3 12A9 3 0 0 0 21 12"></path></svg>
+    <div>
+      <div class="loading-title">Đang tải thư viện phổ tham chiếu…</div>
+      <div class="loading-sub" id="loadstatus">Đang kết nối…</div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track" id="loadbarwrap"><div class="progress-fill" id="loadbar" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div id="dropwrap" style="display:none">
+    <div class="dropzone blueprint" id="drop" tabindex="0" role="button" aria-label="Chọn hoặc kéo thả tệp phổ">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="m16 16-4-4-4 4"></path></svg>
+      <div class="dz-title">Kéo thả một hoặc nhiều tệp phổ cùng mẫu vật vào đây</div>
+      <div class="dz-hint">hoặc nhấn để chọn · .txt Raman (cm⁻¹) · .csv huỳnh quang (nm, tên tệp chứa bước sóng kích thích 532/633/785/808) · .txt hấp thụ (nm)</div>
+      <div class="dz-privacy">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        Dữ liệu không rời khỏi trình duyệt của bạn
+      </div>
+    </div>
+    <input type="file" id="fileinput" accept=".txt,.csv,.dat" multiple hidden>
+    <div class="tray" id="tray"></div>
+    <div class="demo-row">
+      <span>Chưa có tệp? Thử mẫu có sẵn:</span>
+      <button class="btn" data-demo="0">Toluene 532 nm (Raman)</button>
+      <button class="btn" data-demo="1">Glucose 532 nm (Raman)</button>
+      <button class="btn" id="demomm">Vỏ lon kim loại (huỳnh quang + hấp thụ)</button>
+      <button class="btn" id="clearall" style="display:none">Xoá tất cả</button>
+    </div>
+  </div>
+</div>
+
+<div class="errorbox" id="error"><p id="errortext"></p></div>
+
+<div id="results">
+  <div class="verdict-banner" id="banner"></div>
+  <div class="results-grid">
+    <div class="col-left">
+      <div id="fusedcard" style="display:none">
+        <div class="section-label">Xếp hạng kết hợp đa kênh</div>
+        <div class="cand-list" id="fusedbody"></div>
+        <p class="filelabel" id="fusednote"></p>
+        <div class="section-label">Kết hợp đa kênh — ứng viên #1</div>
+        <div class="card blueprint fusion-card" id="fusionbody"></div>
+      </div>
+      <div id="ramancard">
+        <div class="section-label" id="ramanlabel">Top 5 ứng viên</div>
+        <div class="cand-list" id="tbody"></div>
+        <p class="filelabel" id="fname"></p>
+      </div>
+    </div>
+    <div class="col-right">
+      <div id="chartcard">
+        <div class="section-label">Phổ chồng lấp</div>
+        <div class="card blueprint chart-card">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <svg id="chart" viewBox="0 0 840 300" width="100%" role="img" aria-label="Biểu đồ phổ"></svg>
+        </div>
+        <div class="chart-legend">
+          <span><span class="key" style="background:var(--color-text)"></span>Mẫu (đã xử lý)</span>
+          <span><span class="key" style="background:var(--color-accent-500)"></span>Tham chiếu <span id="tmplname"></span></span>
+          <span><span class="key" style="background:var(--color-accent)"></span>Đỉnh khớp (&plusmn;6 cm⁻¹)</span>
+        </div>
+        <div class="section-label">Đỉnh khớp</div>
+        <div class="peak-tags" id="peakchips"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p class="method" id="phuong-phap">
+    <strong>Phương pháp.</strong> So khớp phổ theo Bayes (hợp lý biên phân tích kiểu Zhong/Girolami):
+    <code>y = &alpha;&middot;mẫu tham chiếu + nền Legendre + nhiễu</code>, tiên nghiệm Jeffreys,
+    tích phân giải tích &alpha;/&beta;/&sigma;&sup2;. Điểm số = log Bayes factor mỗi kênh so với mô hình
+    chỉ-nền (null). Hậu nghiệm softmax có làm mềm (<code>&kappa;=0.12</code>, ECE 0.069 trên LOO của VAST),
+    ngưỡng open-set <code>&tau;=0.552</code>. Kết hợp đa kênh (v3): tổng có trọng số của log BF từng kênh
+    (Raman 1.0, huỳnh quang 0.25, hấp thụ 1.0). Toàn bộ tính toán chạy trong trình duyệt của bạn — tệp phổ
+    không rời khỏi máy.
+    <br><br>
+    Thư viện: VAST (210 phổ, 34 lớp) + khoáng vật RRUFF + ROD + dược phẩm (figshare) + NICODOM demo.
+    <a href="catalog.html">Xem toàn bộ thư viện phổ</a>.
+    Mã nguồn: <a href="https://github.com/SisypheanHUS/VAST/tree/main/raman_id">github.com/SisypheanHUS/VAST</a>
+  </p>
+  <div class="credit-row">
+    <div class="mascot prof" id="profMascot"><span>Dr Vũ Dương</span></div>
+    <div class="credit-center">
+      <div class="k">Được xây dựng bởi</div>
+      <div class="v">VAST &times; HUS</div>
+    </div>
+    <div class="mascot stud" id="studMascot"><span>Đinh Thái Tuấn</span></div>
+  </div>
+</footer>
 
 <script>
 // RamanID core: JS port of ramanlib.py + bayes.py (v2 model).
@@ -742,14 +817,64 @@ if (typeof module !== "undefined") {
 <script>
 let DATA, LIBRARY, LIBMM;
 const PEAK_TOL = 6.0;
-const MOD_VN = { raman: "Raman", fluor: "fluorescence", abs: "absorption" };
+const MOD_VN = { raman: "Raman", fluor: "Huỳnh quang", abs: "Hấp thụ" };
 const $ = id => document.getElementById(id);
 let tray = [];
+
+/* ---- pixel-art mascots (plain SVG, no framework) ---- */
+(function initMascots() {
+  const px = 5;
+  const colors = {
+    O: '#1d1f20', S: '#fcd5b0', D: '#d4a574', W: '#ffffff', E: '#1d1f20',
+    M: '#d4766a', P: '#424244', p: '#2b2b2d',
+    h: '#8B7355', H: '#6B5335', G: '#98989b', g: '#787878',
+    k: '#2b2b2d', K: '#555557', B: '#5980a6', b: '#416180', R: '#ffb4b4'
+  };
+  function mkSprite(grid, label, labelColor) {
+    let rects = "";
+    for (let y = 0; y < grid.length; y++) {
+      let x = 0;
+      while (x < grid[y].length) {
+        const c = grid[y][x];
+        if (c !== "." && colors[c]) {
+          let run = 1;
+          while (x + run < grid[y].length && grid[y][x + run] === c) run++;
+          rects += '<rect x="' + (x * px) + '" y="' + (y * px) + '" width="' + (run * px) + '" height="' + px + '" fill="' + colors[c] + '"/>';
+          x += run;
+        } else { x++; }
+      }
+    }
+    const w = Math.max.apply(null, grid.map(r => r.length));
+    const ht = grid.length;
+    const shirtY = grid.findIndex(r => r.indexOf("G") >= 0 || r.indexOf("B") >= 0);
+    const labelY = (shirtY + 2) * px + px * 0.7;
+    rects += '<text x="' + (w * px / 2) + '" y="' + labelY + '" text-anchor="middle" font-size="8" font-weight="bold" font-family="Barlow Condensed,monospace" fill="' + labelColor + '">' + label + '</text>';
+    return '<svg viewBox="0 0 ' + (w * px) + ' ' + (ht * px) + '" width="' + (w * px * 1.4) + '" height="' + (ht * px * 1.4) + '" style="image-rendering:pixelated;display:block">' + rects + '</svg>';
+  }
+  const profGrid = [
+    "....OOOOOO....", "...OhHSSHhO...", "..OhSSSSSShO..", "..OSSSSSSSSO..",
+    "..OSSSSSSSSO..", "..OWESSSEWSO..", "..OSSSOSSSSO..", "..OSSMMMMSSO..",
+    "..OSSSSSSSSO..", "..OSSSSSSSSO..", "...OSSSSSSOO..", "....OSSSO.....",
+    "...OgGGGGgO...", "..OgGGGGGGgO..", "..OgGGGGGGgO..", "..OgGGGGGGgO..",
+    ".DDOgGGGGgODD.", ".DD.OgGGgO.DD.", ".....OPPO.....", ".....OPPO.....",
+    "....OP..PO....", "....OP..PO....", "...Opp..ppO..."
+  ];
+  const studGrid = [
+    "...OkkkkkO....", "..OkkkkkkkkO..", "..OkKkkkkKkO..", "..OkkSSSSSkkO.",
+    "..OkSSSSSSSkO.", "..OSSSSSSSSO..", "..OWESSSEWSO..", "..ORSSSSSSRO..",
+    "..OSSSMMMSSSO.", "..OSSSSSSSSO..", "...OSSSSSSO...", "....OSSSO.....",
+    "...ObBBBBbO...", "..ObBBBBBBbO..", "..ObBBBBBBbO..", "..ObBBBBBBbO..",
+    ".DDObBBBBbODD.", ".DD.ObBBbO.DD.", ".....OPPO.....", ".....OPPO.....",
+    "....OP..PO....", "....OP..PO....", "...Opp..ppO..."
+  ];
+  $("profMascot").insertAdjacentHTML("afterbegin", mkSprite(profGrid, "VAST", "#1d1f20"));
+  $("studMascot").insertAdjacentHTML("afterbegin", mkSprite(studGrid, "HUS", "#ffffff"));
+})();
 
 (async function init() {
   try {
     const resp = await fetch("data.json");
-    if (!resp.ok) throw new Error("Failed to load library (" + resp.status + ")");
+    if (!resp.ok) throw new Error("Không tải được thư viện (" + resp.status + ")");
     const total = +resp.headers.get("content-length") || 0;
     const reader = resp.body.getReader();
     const chunks = [];
@@ -760,40 +885,55 @@ let tray = [];
       if (done) break;
       chunks.push(value);
       loaded += value.length;
-      if (total) {
-        $("loadbar").style.width = Math.min(100, loaded / total * 100).toFixed(0) + "%";
-      }
-      $("loadstatus").textContent = (loaded / 1e6).toFixed(1) + " MB loaded";
+      if (total) $("loadbar").style.width = Math.min(100, loaded / total * 100).toFixed(0) + "%";
+      $("loadstatus").textContent = (loaded / 1e6).toFixed(1) + " MB đã tải" + (total ? " / " + (total / 1e6).toFixed(1) + " MB" : "");
     }
     $("loadbarwrap").classList.remove("indeterminate");
     $("loadbar").style.width = "100%";
-    $("loadstatus").textContent = "";
+    $("loadstatus").textContent = "Hoàn tất";
     const blob = new Blob(chunks);
     DATA = JSON.parse(await blob.text());
   } catch (e) {
-    $("loading").innerHTML = "<p style='color:var(--warn)'>Failed to load spectral library: " +
-      e.message + "</p><p>Try refreshing the page.</p>";
+    $("loading").innerHTML = "<p>Không tải được thư viện phổ: " + e.message + "</p><p>Hãy thử tải lại trang.</p>";
     return;
   }
 
   LIBRARY = decodeLibrary(DATA);
   LIBMM = decodeLibraryMm(DATA);
 
-  $("libcount").textContent = LIBRARY.length;
-  $("classcount").textContent = new Set(LIBRARY.map(e => e.label)).size;
-  $("libcountmm").textContent = LIBMM.fluor.length + LIBMM.abs.length;
+  const libCount = LIBRARY.length;
+  const classCount = new Set(LIBRARY.map(e => e.label)).size;
+  const libCountMm = LIBMM.fluor.length + LIBMM.abs.length;
+  $("libcount").textContent = libCount;
+  $("classcount").textContent = classCount;
+  $("libcountmm").textContent = libCountMm;
+  $("statlib").textContent = libCount;
+  $("statclass").textContent = classCount;
   $("loading").style.display = "none";
   $("dropwrap").style.display = "block";
   wireEvents();
 })();
 
 function showError(msg) {
-  $("error").textContent = msg;
+  $("errortext").textContent = msg;
   $("error").style.display = "block";
 }
 
 function fmtPct(p) {
   return p >= 0.9995 ? ">99.9%" : p < 0.0005 ? "<0.1%" : (p * 100).toFixed(1) + "%";
+}
+
+function appendCandCard(list, i, name, post, partsHtml) {
+  const card = document.createElement("div");
+  card.className = "card blueprint cand-card" + (i === 0 ? " top" : "");
+  card.innerHTML =
+    '<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>' +
+    '<div class="cand-head"><span class="cand-name"></span><span class="cand-prob num"></span></div>' +
+    '<div class="cand-track"><div class="cand-fill" style="width:' + Math.max(2, post * 100) + '%"></div></div>' +
+    '<div class="cand-parts num">' + partsHtml + '</div>';
+  card.querySelector(".cand-name").textContent = name;
+  card.querySelector(".cand-prob").textContent = fmtPct(post);
+  list.appendChild(card);
 }
 
 function addFile(text, name) {
@@ -802,7 +942,7 @@ function addFile(text, name) {
   if (/\.csv$/i.test(name)) {
     const ex = parseEx(name);
     if (ex === null)
-      throw new Error(name + ": .csv fluorescence filename must contain excitation wavelength (532/633/785/808).");
+      throw new Error(name + ": tên tệp .csv huỳnh quang phải chứa bước sóng kích thích (532/633/785/808).");
     item = { name, kind: "fluor", ex, q: preprocessNm(x, y, FLUOR_GRID) };
   } else if (x[x.length - 1] >= MIN_XMAX) {
     const q = preprocess(x, y);
@@ -819,22 +959,21 @@ function renderTray() {
   el.innerHTML = "";
   for (const t of tray) {
     const c = document.createElement("span");
-    c.className = "chip" + (t.peakless ? " miss" : "");
+    c.className = "tag" + (t.peakless ? " tag-neutral" : " tag-accent");
     const label = MOD_VN[t.kind] + (t.kind === "fluor" ? " " + t.ex + "nm" : "")
-      + (t.peakless ? " · no peaks" : "");
+      + (t.peakless ? " · không có đỉnh" : "");
     c.textContent = t.name + " [" + label + "] ✕";
-    c.style.cursor = "pointer";
-    c.title = "Click to remove";
+    c.title = "Nhấn để xoá";
     c.addEventListener("click", function() { tray = tray.filter(u => u !== t); renderAll(); });
     el.appendChild(c);
   }
-  $("clearall").hidden = !tray.length;
+  $("clearall").style.display = tray.length ? "inline-flex" : "none";
 }
 
 function renderAll() {
   renderTray();
   $("error").style.display = "none";
-  if (!tray.length) { $("results").style.display = "none"; return; }
+  if (!tray.length) { $("results").style.display = "none"; $("rescanBtn").style.display = "none"; return; }
 
   const bfByMod = {};
   const ramanUsable = tray.filter(t => t.kind === "raman" && !t.peakless);
@@ -846,7 +985,7 @@ function renderAll() {
       t.res = r;
       for (const [lab, bf] of ramanCategoryBFs(r.results))
         if (!best.has(lab) || bf > best.get(lab)) best.set(lab, bf);
-      if (!bestRaman || r.results[0].bf > bestRaman.res.results[0].bf) bestRaman = t;
+      if (r.results.length && (!bestRaman || r.results[0].bf > bestRaman.res.results[0].bf)) bestRaman = t;
     }
     if (best.size) bfByMod.raman = best;
   }
@@ -861,7 +1000,7 @@ function renderAll() {
     if (m.size) bfByMod.abs = m;
   }
   if (!Object.keys(bfByMod).length) {
-    showError("Could not extract evidence from the loaded files (peakless Raman or insufficient library overlap).");
+    showError("Không trích xuất được bằng chứng từ tệp đã tải (phổ Raman không có đỉnh, hoặc thư viện không đủ chồng lấp).");
     $("results").style.display = "none";
     return;
   }
@@ -869,182 +1008,211 @@ function renderAll() {
   const mods = Object.keys(bfByMod);
   const multimodal = mods.length > 1 || !bfByMod.raman;
   $("results").style.display = "block";
+  $("rescanBtn").style.display = "inline-flex";
 
   const peaklessNote = tray.some(t => t.peakless)
-    ? " Peakless Raman spectra excluded from evidence (metal / burnt sample?)." : "";
+    ? " Phổ Raman không có đỉnh bị loại khỏi bằng chứng (mẫu kim loại / cháy?)." : "";
+
+  const banner = $("banner");
   if (multimodal) {
     const top = fused[0];
-    $("banner").className = "banner";
-    $("verdict").innerHTML = "Material: <em></em>";
-    $("verdict").querySelector("em").textContent = top.label;
-    $("verdictDetail").textContent =
-      "fusion " + mods.map(m => MOD_VN[m]).join(" + ") + ", score " + top.score.toFixed(3) +
-      " (posterior uncalibrated — ranking only)." + peaklessNote;
+    banner.className = "verdict-banner positive";
+    banner.innerHTML =
+      '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="m9 11 3 3L22 4"></path></svg>' +
+      '<div style="flex:1"><div class="verdict-kicker">Đã nhận diện — kết hợp đa kênh</div>' +
+      '<div class="verdict-title"></div><div class="verdict-note"></div></div>' +
+      '<div class="verdict-score"><div class="num"></div><div class="lbl">chưa hiệu chuẩn — chỉ xếp hạng</div></div>';
+    banner.querySelector(".verdict-title").textContent = top.label;
+    banner.querySelector(".verdict-note").textContent =
+      "kết hợp " + mods.map(m => MOD_VN[m]).join(" + ") + ", điểm " + top.score.toFixed(3) + "." + peaklessNote;
+    banner.querySelector(".verdict-score .num").textContent = fmtPct(top.post);
   } else {
     const { results, unknown } = bestRaman.res;
     const top = results[0];
-    $("banner").className = "banner" + (unknown ? " unknown" : "");
     if (unknown) {
-      $("verdict").textContent = "Possibly NOT in the library";
-      $("verdictDetail").textContent =
-        "best evidence " + top.bf.toFixed(3) + " < τ=" + NULL_TAU +
-        " — closest class: " + top.label + ". " +
-        "Posterior below is only meaningful as a relative ranking among known classes.";
+      banner.className = "verdict-banner unknown";
+      banner.innerHTML =
+        '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>' +
+        '<div style="flex:1"><div class="verdict-kicker">Độ tin cậy thấp</div>' +
+        '<div class="verdict-title">Có thể không có trong thư viện</div><div class="verdict-note"></div></div>' +
+        '<div class="verdict-score"><div class="num"></div><div class="lbl">kết quả tốt nhất</div></div>';
+      banner.querySelector(".verdict-note").textContent =
+        "bằng chứng tốt nhất " + top.bf.toFixed(3) + " < τ=" + NULL_TAU +
+        " — lớp gần nhất: " + top.label + ". Xác suất hậu nghiệm bên dưới chỉ có ý nghĩa xếp hạng tương đối." + peaklessNote;
+      banner.querySelector(".verdict-score .num").textContent = fmtPct(top.post);
     } else {
-      $("verdict").innerHTML = "Identification: <em></em>";
-      $("verdict").querySelector("em").textContent = top.label;
-      $("verdictDetail").textContent =
-        "log BF/ch = " + top.bf.toFixed(3) + ", posterior " + fmtPct(top.post) + peaklessNote;
+      banner.className = "verdict-banner positive";
+      banner.innerHTML =
+        '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="m9 11 3 3L22 4"></path></svg>' +
+        '<div style="flex:1"><div class="verdict-kicker">Đã nhận diện</div>' +
+        '<div class="verdict-title"></div><div class="verdict-note"></div></div>' +
+        '<div class="verdict-score"><div class="num"></div><div class="lbl">xác suất hậu nghiệm</div></div>';
+      banner.querySelector(".verdict-title").textContent = top.label;
+      banner.querySelector(".verdict-note").textContent = "log BF/kênh = " + top.bf.toFixed(3) + peaklessNote;
+      banner.querySelector(".verdict-score .num").textContent = fmtPct(top.post);
     }
   }
 
   $("fusedcard").style.display = multimodal ? "block" : "none";
   if (multimodal) {
-    const tb = $("fusedbody");
-    tb.innerHTML = "";
-    fused.forEach(function(r, i) {
-      var parts = ["raman", "fluor", "abs"]
-        .filter(function(m) { return m in r.parts; })
-        .map(function(m) { return MOD_VN[m] + " " + (r.parts[m] >= 0 ? "+" : "") + r.parts[m].toFixed(2); })
-        .join(", ");
-      var tr = document.createElement("tr");
-      if (i === 0) tr.className = "top";
-      tr.innerHTML =
-        '<td class="num">' + (i + 1) + "</td><td></td>" +
-        '<td class="num">' + r.score.toFixed(3) + "</td>" +
-        '<td><div class="postbar"><div class="track"><div class="fill" style="width:' +
-        Math.max(1, r.post * 100) + '%"></div></div>' +
-        '<span class="num">' + fmtPct(r.post) + "</span></div></td>" +
-        '<td class="num"></td>';
-      tr.children[1].textContent = r.label;
-      tr.children[4].textContent = parts;
-      tb.appendChild(tr);
+    const list = $("fusedbody");
+    list.innerHTML = "";
+    fused.slice(0, 5).forEach(function(r, i) {
+      const parts = ["raman", "fluor", "abs"].map(m =>
+        m in r.parts ? (r.parts[m] >= 0 ? "+" : "") + r.parts[m].toFixed(2) : "–");
+      appendCandCard(list, i, r.label, r.post,
+        '<span>R: ' + parts[0] + '</span><span>F: ' + parts[1] + '</span><span>A: ' + parts[2] + '</span>');
     });
     $("fusednote").textContent =
-      "Specific polymer labels (PS/PE/PP…) are merged to Plastic at the material level — see Raman table below for chemical-level detail.";
+      "Nhãn polymer cụ thể (PS/PE/PP…) được gộp thành \"Nhựa\" ở mức vật liệu — xem danh sách Raman bên dưới để biết chi tiết mức hoá học.";
+
+    const top = fused[0];
+    const chans = [["raman", "Raman"], ["fluor", "Huỳnh quang"], ["abs", "Hấp thụ"]].filter(c => c[0] in top.parts);
+    const maxAbs = Math.max.apply(null, chans.map(c => Math.max(0, top.parts[c[0]])).concat([0.001]));
+    let fh = '<i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>';
+    for (const c of chans) {
+      const v = top.parts[c[0]];
+      fh += '<div class="fusion-row"><span class="fusion-ch">' + c[1] + '</span>' +
+        '<div class="fusion-track"><div class="fusion-fill" style="width:' + Math.max(0, v / maxAbs * 100) + '%"></div></div>' +
+        '<span class="fusion-val num">' + (v >= 0 ? "+" : "") + v.toFixed(2) + '</span></div>';
+    }
+    fh += '<div class="fusion-row fusion-total"><span class="fusion-ch">Tổng hợp</span>' +
+      '<div class="fusion-track"><div class="fusion-fill" style="width:100%"></div></div>' +
+      '<span class="fusion-val num">' + (top.score >= 0 ? "+" : "") + top.score.toFixed(2) + '</span></div>';
+    $("fusionbody").innerHTML = fh;
   }
 
   $("ramancard").style.display = bestRaman ? "block" : "none";
   $("chartcard").style.display = bestRaman ? "block" : "none";
+  $("ramanlabel").textContent = multimodal ? "Hạng Raman (chi tiết)" : "Top 5 ứng viên";
   if (bestRaman) renderRaman(bestRaman.q, bestRaman.res.results, bestRaman.name);
 }
 
 function renderRaman(q, results, name) {
   $("fname").textContent = name;
-  var tbody = $("tbody");
-  tbody.innerHTML = "";
+  const list = $("tbody");
+  list.innerHTML = "";
   results.slice(0, 5).forEach(function(r, i) {
-    var tr = document.createElement("tr");
-    if (i === 0) tr.className = "top";
-    tr.innerHTML =
-      '<td class="num">' + (i + 1) + "</td><td></td>" +
-      '<td class="num">' + r.bf.toFixed(3) + "</td>" +
-      '<td><div class="postbar"><div class="track"><div class="fill" style="width:' +
-      Math.max(1, r.post * 100) + '%"></div></div>' +
-      '<span class="num">' + fmtPct(r.post) + "</span></div></td>";
-    tr.children[1].textContent = r.label;
-    tbody.appendChild(tr);
+    appendCandCard(list, i, r.label, r.post, '<span>log BF/kênh: ' + r.bf.toFixed(3) + '</span>');
   });
 
-  var top = results[0];
+  const top = results[0];
   drawChart(q, top.entry);
   $("tmplname").textContent = "(" + top.label + ")";
 
-  var qp = findPeaks(q);
-  var tp = findPeaks(top.entry);
-  var chips = $("peakchips");
+  const qp = findPeaks(q);
+  const tp = findPeaks(top.entry);
+  const chips = $("peakchips");
   chips.innerHTML = "";
-  if (!qp.length) chips.innerHTML = '<span class="chip miss">no prominent peaks detected</span>';
-  for (var p of qp) {
-    var matched = tp.some(function(t) { return Math.abs(t.pos - p.pos) <= PEAK_TOL; });
-    var c = document.createElement("span");
-    c.className = "chip" + (matched ? "" : " miss");
+  if (!qp.length) chips.innerHTML = '<span class="tag tag-neutral">không phát hiện đỉnh rõ rệt</span>';
+  for (const p of qp) {
+    const matched = tp.some(t => Math.abs(t.pos - p.pos) <= PEAK_TOL);
+    const c = document.createElement("span");
+    c.className = "tag" + (matched ? " tag-accent" : " tag-neutral");
     c.textContent = p.pos.toFixed(0) + " cm⁻¹" + (matched ? "" : " ?");
-    c.title = matched ? "Matches template peak" : "No corresponding template peak";
+    c.title = matched ? "Khớp với đỉnh tham chiếu" : "Không có đỉnh tham chiếu tương ứng";
     chips.appendChild(c);
   }
 }
 
 function drawChart(q, tmpl) {
-  var svg = $("chart");
-  var W = 840, H = 300, L = 46, R = 12, T = 14, B = 34;
-  var pw = W - L - R, ph = H - T - B;
-  var x2px = function(i) { return L + ((gridWavenumber(i) - 450) / (3200 - 450)) * pw; };
+  const svg = $("chart");
+  const W = 840, H = 300, L = 54, R = 14, T = 20, B = 36;
+  const pw = W - L - R, ph = H - T - B;
+  const x2px = i => L + ((gridWavenumber(i) - 450) / (3200 - 450)) * pw;
 
   function pathFor(s, color, width, dash) {
-    var max = 0;
-    for (var i = s.i0; i <= s.i1; i++) max = Math.max(max, s.v[i]);
-    var d = "";
-    for (var i = s.i0; i <= s.i1; i++) {
-      var yv = T + ph - (s.v[i] / max) * ph * 0.95;
+    let max = 0;
+    for (let i = s.i0; i <= s.i1; i++) max = Math.max(max, s.v[i]);
+    let d = "";
+    for (let i = s.i0; i <= s.i1; i++) {
+      const yv = T + ph - (s.v[i] / max) * ph * 0.95;
       d += (d ? "L" : "M") + x2px(i).toFixed(1) + " " + yv.toFixed(1);
     }
     return '<path d="' + d + '" fill="none" stroke="' + color + '" stroke-width="' + width + '"' +
       (dash ? ' stroke-dasharray="' + dash + '"' : "") + '/>';
   }
 
-  var s = "";
-  for (var t = 500; t <= 3200; t += 500) {
-    var px = L + ((t - 450) / (3200 - 450)) * pw;
-    s += '<line x1="' + px + '" y1="' + T + '" x2="' + px + '" y2="' + (T + ph) + '" stroke="var(--line)" stroke-width="1"/>';
-    s += '<text x="' + px + '" y="' + (H - 12) + '" text-anchor="middle">' + t + '</text>';
+  let s = "";
+  for (let v = 0; v <= 1.001; v += 0.25) {
+    const py = T + ph - v * ph * 0.95;
+    s += '<line x1="' + L + '" y1="' + py.toFixed(1) + '" x2="' + (L + pw) + '" y2="' + py.toFixed(1) + '" stroke="var(--color-divider)" stroke-width="1"/>';
+    s += '<text x="' + (L - 8) + '" y="' + (py + 3).toFixed(1) + '" text-anchor="end">' + v.toFixed(2) + '</text>';
   }
-  s += '<text x="' + (L + pw / 2) + '" y="' + (H - 0.5) + '" text-anchor="middle">Raman shift (cm⁻¹)</text>';
-  s += pathFor(tmpl, "var(--tmpl)", 1.4, "5 3");
-  s += pathFor(q, "var(--ink)", 1.6);
+  for (let t = 500; t <= 3200; t += 500) {
+    const px = L + ((t - 450) / (3200 - 450)) * pw;
+    s += '<line x1="' + px + '" y1="' + T + '" x2="' + px + '" y2="' + (T + ph) + '" stroke="var(--color-divider)" stroke-width="1"/>';
+    s += '<text x="' + px + '" y="' + (H - 14) + '" text-anchor="middle">' + t + '</text>';
+  }
+  s += '<line x1="' + L + '" y1="' + T + '" x2="' + L + '" y2="' + (T + ph) + '" stroke="var(--color-text)" stroke-width="1" opacity="0.2"/>';
+  s += '<line x1="' + L + '" y1="' + (T + ph) + '" x2="' + (L + pw) + '" y2="' + (T + ph) + '" stroke="var(--color-text)" stroke-width="1" opacity="0.2"/>';
+  s += '<text x="' + (L + pw / 2) + '" y="' + (H - 1) + '" text-anchor="middle">Dịch chuyển Raman (cm⁻¹)</text>';
+  s += '<text x="12" y="' + (T + ph / 2) + '" text-anchor="middle" transform="rotate(-90 12 ' + (T + ph / 2) + ')">Cường độ (a.u.)</text>';
 
-  var tp = findPeaks(tmpl);
-  var qmax = 0;
-  for (var i = q.i0; i <= q.i1; i++) qmax = Math.max(qmax, q.v[i]);
-  for (var p of findPeaks(q)) {
-    var matched = tp.some(function(t) { return Math.abs(t.pos - p.pos) <= PEAK_TOL; });
-    var py = T + ph - (q.v[p.idx] / qmax) * ph * 0.95 - 8;
-    s += '<path d="M' + x2px(p.idx).toFixed(1) + ' ' + py +
-      ' l -4 -7 l 8 0 z" fill="' + (matched ? "var(--accent)" : "var(--muted)") + '"/>';
+  s += pathFor(tmpl, "var(--color-accent-500)", 1.4, "5 3");
+  s += pathFor(q, "var(--color-text)", 1.6);
+
+  const tp = findPeaks(tmpl);
+  let qmax = 0;
+  for (let i = q.i0; i <= q.i1; i++) qmax = Math.max(qmax, q.v[i]);
+  for (const p of findPeaks(q)) {
+    const matched = tp.some(t => Math.abs(t.pos - p.pos) <= PEAK_TOL);
+    const col = matched ? "var(--color-accent)" : "var(--color-neutral-500)";
+    const py = T + ph - (q.v[p.idx] / qmax) * ph * 0.95 - 8;
+    const lx = x2px(p.idx);
+    s += '<path d="M' + lx.toFixed(1) + ' ' + py.toFixed(1) + ' l -4 -7 l 8 0 z" fill="' + col + '"/>';
+    const ly = py - 9;
+    s += '<rect x="' + (lx - 15).toFixed(1) + '" y="' + (ly - 10).toFixed(1) + '" width="30" height="11" fill="' + (matched ? col : "var(--color-surface)") + '"/>';
+    s += '<text x="' + lx.toFixed(1) + '" y="' + (ly - 2).toFixed(1) + '" text-anchor="middle" style="fill:' +
+      (matched ? "#fff" : "var(--color-text)") + ';opacity:1" font-size="8">' + p.pos.toFixed(0) + '</text>';
   }
   svg.innerHTML = s;
 }
 
 function wireEvents() {
-  var drop = $("drop"), input = $("fileinput");
+  const drop = $("drop"), input = $("fileinput");
 
   function addFiles(files) {
-    Promise.all(Array.from(files).map(function(f) {
-      return f.text().then(function(t) { return { t: t, name: f.name }; });
-    })).then(function(loaded) {
-      var errors = [];
-      for (var item of loaded) {
-        try { addFile(item.t, item.name); } catch (e) { errors.push(e.message || String(e)); }
-      }
-      renderAll();
-      if (errors.length) showError(errors.join(" "));
-    });
+    Promise.all(Array.from(files).map(f => f.text().then(t => ({ t, name: f.name }))))
+      .then(loaded => {
+        const errors = [];
+        for (const item of loaded) {
+          try { addFile(item.t, item.name); } catch (e) { errors.push(e.message || String(e)); }
+        }
+        renderAll();
+        if (errors.length) showError(errors.join(" "));
+      });
   }
 
-  drop.addEventListener("click", function() { input.click(); });
-  drop.addEventListener("keydown", function(e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); input.click(); } });
-  ["dragover", "dragenter"].forEach(function(ev) { drop.addEventListener(ev, function(e) { e.preventDefault(); drop.classList.add("over"); }); });
-  ["dragleave", "drop"].forEach(function(ev) { drop.addEventListener(ev, function(e) { e.preventDefault(); drop.classList.remove("over"); }); });
-  drop.addEventListener("drop", function(e) { addFiles(e.dataTransfer.files); });
-  input.addEventListener("change", function() { addFiles(input.files); input.value = ""; });
+  drop.addEventListener("click", () => input.click());
+  drop.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); input.click(); } });
+  ["dragover", "dragenter"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add("over"); }));
+  ["dragleave", "drop"].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove("over"); }));
+  drop.addEventListener("drop", e => addFiles(e.dataTransfer.files));
+  input.addEventListener("change", () => { addFiles(input.files); input.value = ""; });
 
-  document.querySelectorAll("button.demo[data-demo]").forEach(function(b) {
-    b.addEventListener("click", function() {
-      var d = DATA.demos[Number(b.dataset.demo)];
+  document.querySelectorAll("button[data-demo]").forEach(b => {
+    b.addEventListener("click", () => {
+      const d = DATA.demos[Number(b.dataset.demo)];
       tray = [];
       try { addFile(d.text, d.name); } catch (e) { showError(e.message); }
       renderAll();
     });
   });
-  $("demomm").addEventListener("click", function() {
+  $("demomm").addEventListener("click", () => {
     tray = [];
-    var errors = [];
-    for (var d of DATA.demos_mm) {
+    const errors = [];
+    for (const d of DATA.demos_mm) {
       try { addFile(d.text, d.name); } catch (e) { errors.push(e.message || String(e)); }
     }
     renderAll();
     if (errors.length) showError(errors.join(" "));
   });
-  $("clearall").addEventListener("click", function() { tray = []; renderAll(); });
+  $("clearall").addEventListener("click", () => { tray = []; renderAll(); });
+  $("rescanBtn").addEventListener("click", () => {
+    tray = [];
+    renderAll();
+    $("drop").scrollIntoView({ behavior: "smooth", block: "center" });
+  });
 }
 </script>
