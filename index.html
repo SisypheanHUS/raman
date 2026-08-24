@@ -557,6 +557,29 @@ function evidenceCore(cols, yv) {
   return 0.5 * p * Math.log(LAMBDA) - 0.5 * logdet - (n / 2) * Math.log(S);
 }
 
+// Per-channel log BF using within-class mean + PCA components.
+function pairBfWc(q, model) {
+  let a0 = Math.max(q.i0, model.mean.i0), a1 = Math.min(q.i1, model.mean.i1);
+  for (let k = 0; k < model.pcs.length; k++) {
+    a0 = Math.max(a0, model.pcs[k].i0);
+    a1 = Math.min(a1, model.pcs[k].i1);
+  }
+  const nv = a1 - a0 + 1;
+  if (nv < MIN_OVERLAP) return null;
+  const yv = new Float64Array(nv), tcol = new Float64Array(nv);
+  const pcCols = model.pcs.map(() => new Float64Array(nv));
+  const base = Array.from({ length: N_BASE }, () => new Float64Array(nv));
+  for (let i = 0; i < nv; i++) {
+    const gi = a0 + i;
+    yv[i] = q.v[gi]; tcol[i] = model.mean.v[gi];
+    for (let k = 0; k < model.pcs.length; k++) pcCols[k][i] = model.pcs[k].v[gi];
+    const P = legendreRow(gi);
+    for (let k = 0; k < N_BASE; k++) base[k][i] = P[k];
+  }
+  const cols = [tcol, ...pcCols, ...base];
+  return (evidenceCore(cols, yv) - evidenceCore(base, yv)) / nv;
+}
+
 // Per-channel log Bayes factor of query vs one library spectrum.
 function pairBF(q, spec) {
   const a0 = Math.max(q.i0, spec.i0), a1 = Math.min(q.i1, spec.i1);
@@ -574,10 +597,20 @@ function pairBF(q, spec) {
   return (ev1 - ev0) / nv;
 }
 
-// Match query against the whole library.
-function classify(q, library) {
+// Match query against the whole library (with optional within-class models).
+function classify(q, library, wcModels) {
   const best = new Map();
+  const wcDone = new Set();
+  if (wcModels) {
+    for (const model of wcModels) {
+      const bf = pairBfWc(q, model);
+      if (bf === null) continue;
+      best.set(model.label, { bf, entry: { v: model.mean.v, i0: model.mean.i0, i1: model.mean.i1, label: model.label } });
+      wcDone.add(model.label);
+    }
+  }
   for (const entry of library) {
+    if (wcDone.has(entry.label)) continue;
     const bf = pairBF(q, entry);
     if (bf === null) continue;
     const cur = best.get(entry.label);
@@ -809,21 +842,76 @@ function decodeLibraryMm(data, atob_) {
   };
 }
 
+function decodeWcModels(data, atob_) {
+  const dec = atob_ || (typeof atob !== "undefined" ? atob : null);
+  if (!data.wc_models) return [];
+  return data.wc_models.map(m => ({
+    label: m.label,
+    mean: decodeSegment(m.mean, GRID_N, dec),
+    pcs: m.pcs.map(pc => decodeSegment(pc, GRID_N, dec))
+  }));
+}
+
 if (typeof module !== "undefined") {
   module.exports = { parseSpectrum, preprocess, classify, findPeaks, decodeLibrary,
-                     pairBF, gridWavenumber, GRID_N, NULL_TAU, KAPPA,
-                     decodeLibraryMm, preprocessNm, pairBFNm, fluorClassBFs,
-                     absClassBFs, ramanCategoryBFs, fuse, parseEx,
+                     pairBF, pairBfWc, gridWavenumber, GRID_N, NULL_TAU, KAPPA,
+                     decodeLibraryMm, decodeWcModels, preprocessNm, pairBFNm,
+                     fluorClassBFs, absClassBFs, ramanCategoryBFs, fuse, parseEx,
                      FLUOR_GRID, ABS_GRID, MIN_XMAX, CATEGORY_MAP };
 }
 
 </script>
 <script>
-let DATA, LIBRARY, LIBMM;
+let DATA, LIBRARY, LIBMM, WC_MODELS;
 const PEAK_TOL = 6.0;
 const MOD_VN = { raman: "Raman", fluor: "Huỳnh quang", abs: "Hấp thụ" };
+const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbwMyQla1UuQ6VrET1yMlMunR6AJ5JKp6S4jmEarb8X86QL5q8fxZ1f-HqWDIyq25cUD/exec";
 const $ = id => document.getElementById(id);
 let tray = [];
+
+let renderGen = 0;
+
+function setContributeState(state) {
+  const map = {
+    hidden: ["Dữ liệu mẫu — không cần lưu", true],
+    ready: ["Lưu vào thư viện", false],
+    sending: ["Đang gửi…", true],
+    sent: ["Đã lưu — cảm ơn bạn!", true],
+    error: ["Gửi thất bại — thử lại?", false]
+  };
+  const [text, disabled] = map[state];
+  $("contributeBtnLabel").textContent = text;
+  $("contributeBtn").disabled = disabled;
+}
+
+function submitContribution() {
+  const items = tray.filter(t => !t.demo);
+  if (!items.length) return;
+  const mixed = tray.some(t => t.demo);
+  const gen = renderGen;
+  setContributeState("sending");
+  const banner = $("banner");
+  const titleEl = banner.querySelector(".verdict-title");
+  const scoreEl = banner.querySelector(".verdict-score .num");
+  const guessLabel = mixed ? "" : (titleEl ? titleEl.textContent : "");
+  const guessConf = mixed ? "" : (scoreEl ? scoreEl.textContent : "");
+  const sends = items.map(t => fetch(SUBMIT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    body: JSON.stringify({
+      label: guessLabel,
+      confidence: guessConf ? "tự động (posterior " + guessConf + ")" : "",
+      kind: MOD_VN[t.kind],
+      ex: t.kind === "fluor" ? t.ex : "",
+      fileName: t.name,
+      rawText: t.raw
+    })
+  }));
+  Promise.allSettled(sends).then(results => {
+    if (gen !== renderGen) return; // a newer render already replaced this state
+    setContributeState(results.some(r => r.status === "fulfilled") ? "sent" : "error");
+  });
+}
 
 /* ---- pixel-art mascots (plain SVG, no framework) ---- */
 (function initMascots() {
@@ -903,6 +991,7 @@ let tray = [];
   }
 
   LIBRARY = decodeLibrary(DATA);
+  WC_MODELS = decodeWcModels(DATA);
   LIBMM = decodeLibraryMm(DATA);
 
   const libCount = LIBRARY.length;
@@ -975,6 +1064,7 @@ function renderTray() {
 }
 
 function renderAll() {
+  renderGen++;
   renderTray();
   $("error").style.display = "none";
   if (!tray.length) { $("results").style.display = "none"; $("rescanBtn").style.display = "none"; return; }
@@ -985,7 +1075,7 @@ function renderAll() {
   if (ramanUsable.length) {
     const best = new Map();
     for (const t of ramanUsable) {
-      const r = classify(t.q, LIBRARY);
+      const r = classify(t.q, LIBRARY, WC_MODELS);
       t.res = r;
       for (const [lab, bf] of ramanCategoryBFs(r.results))
         if (!best.has(lab) || bf > best.get(lab)) best.set(lab, bf);
@@ -1013,6 +1103,8 @@ function renderAll() {
   const multimodal = mods.length > 1 || !bfByMod.raman;
   $("results").style.display = "block";
   $("rescanBtn").style.display = "inline-flex";
+
+  setContributeState(tray.every(t => t.demo) ? "hidden" : "ready");
 
   const peaklessNote = tray.some(t => t.peakless)
     ? " Phổ Raman không có đỉnh bị loại khỏi bằng chứng (mẫu kim loại / cháy?)." : "";
@@ -1199,7 +1291,7 @@ function wireEvents() {
     b.addEventListener("click", () => {
       const d = DATA.demos[Number(b.dataset.demo)];
       tray = [];
-      try { addFile(d.text, d.name); } catch (e) { showError(e.message); }
+      try { addFile(d.text, d.name, true); } catch (e) { showError(e.message); }
       renderAll();
     });
   });
@@ -1207,12 +1299,13 @@ function wireEvents() {
     tray = [];
     const errors = [];
     for (const d of DATA.demos_mm) {
-      try { addFile(d.text, d.name); } catch (e) { errors.push(e.message || String(e)); }
+      try { addFile(d.text, d.name, true); } catch (e) { errors.push(e.message || String(e)); }
     }
     renderAll();
     if (errors.length) showError(errors.join(" "));
   });
   $("clearall").addEventListener("click", () => { tray = []; renderAll(); });
+  $("contributeBtn").addEventListener("click", submitContribution);
   $("rescanBtn").addEventListener("click", () => {
     tray = [];
     renderAll();
