@@ -1,0 +1,534 @@
+<title>RamanID Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #F7F9F8;
+    --surface: #FFFFFF;
+    --ink: #16241D;
+    --muted: #5B6B63;
+    --line: #DDE5E0;
+    --accent: #0B9A55;
+    --accent-ink: #067347;
+    --accent-soft: #E2F3EA;
+    --warn: #B7791F;
+    --warn-soft: #F8EFDD;
+    --tmpl: #6B5CD6;
+    --bar-track: #EDF2EF;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0E1512;
+      --surface: #17211C;
+      --ink: #E5EFE9;
+      --muted: #93A69C;
+      --line: #2A3830;
+      --accent: #34C57F;
+      --accent-ink: #6FDCA8;
+      --accent-soft: #12362A;
+      --warn: #D9A24A;
+      --warn-soft: #35290F;
+      --tmpl: #9D8FEC;
+      --bar-track: #202D26;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0E1512;
+    --surface: #17211C;
+    --ink: #E5EFE9;
+    --muted: #93A69C;
+    --line: #2A3830;
+    --accent: #34C57F;
+    --accent-ink: #6FDCA8;
+    --accent-soft: #12362A;
+    --warn: #D9A24A;
+    --warn-soft: #35290F;
+    --tmpl: #9D8FEC;
+    --bar-track: #202D26;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 28px 20px 64px; }
+
+  header { margin-bottom: 26px; }
+  .spectrum-strip {
+    height: 5px; border-radius: 3px; margin-bottom: 18px;
+    background: linear-gradient(90deg,
+      #7A5FD0 0%, #4D74D8 18%, #3FA8C9 33%,
+      var(--accent) 47%, var(--accent) 52%,
+      #B8B23A 68%, #C9803A 84%, #B8503A 100%);
+    opacity: .85;
+  }
+  h1 {
+    font-family: "Spectral", Georgia, serif;
+    font-weight: 700; font-size: 2.1rem; margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .sub { color: var(--muted); margin: 0; max-width: 70ch; }
+  .sub a { color: var(--accent-ink); }
+
+  .controls {
+    display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+    margin-bottom: 16px;
+  }
+  .search-box {
+    flex: 1; min-width: 200px;
+    font: inherit; font-size: .95rem;
+    padding: 10px 14px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    outline: none; transition: border-color .15s;
+  }
+  .search-box:focus { border-color: var(--accent); }
+  .search-box::placeholder { color: var(--muted); }
+
+  .filter-btn {
+    font: inherit; font-size: .82rem; font-weight: 500;
+    padding: 8px 14px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    transition: background .12s, border-color .12s;
+  }
+  .filter-btn:hover { border-color: var(--accent); }
+  .filter-btn.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+
+  .stats {
+    font-size: .82rem; color: var(--muted); margin-bottom: 12px;
+  }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; padding: 0; margin-bottom: 18px; overflow: hidden;
+  }
+
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); }
+  th {
+    font-size: .75rem; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--muted); font-weight: 600; position: sticky; top: 0;
+    background: var(--surface); z-index: 1; cursor: pointer; user-select: none;
+    white-space: nowrap;
+  }
+  th:hover { color: var(--ink); }
+  th .sort-arrow { font-size: .7rem; margin-left: 4px; }
+  td { font-size: .9rem; }
+  td.mono { font-family: "IBM Plex Mono", Consolas, monospace; font-size: .82rem; white-space: nowrap; }
+  tr { cursor: pointer; transition: background .1s; }
+  tr:hover { background: var(--accent-soft); }
+  tr.selected { background: var(--accent-soft); }
+
+  .source-tag {
+    font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em;
+    padding: 2px 7px; border-radius: 4px; white-space: nowrap;
+  }
+  .source-tag.vast { background: #E8F0FE; color: #1A56DB; }
+  .source-tag.rruff { background: #FCE8E8; color: #B91C1C; }
+  .source-tag.rod { background: #FEF3C7; color: #92400E; }
+  .source-tag.pharma { background: #E2F3EA; color: #067347; }
+  .source-tag.nicodom { background: #F0E6F6; color: #7C3AED; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .source-tag.vast { background: #1E3A5F; color: #93C5FD; }
+    :root:not([data-theme="light"]) .source-tag.rruff { background: #4C1D1D; color: #FCA5A5; }
+    :root:not([data-theme="light"]) .source-tag.rod { background: #451A03; color: #FCD34D; }
+    :root:not([data-theme="light"]) .source-tag.pharma { background: #12362A; color: #6FDCA8; }
+    :root:not([data-theme="light"]) .source-tag.nicodom { background: #3B1F5E; color: #C4B5FD; }
+  }
+  :root[data-theme="dark"] .source-tag.vast { background: #1E3A5F; color: #93C5FD; }
+  :root[data-theme="dark"] .source-tag.rruff { background: #4C1D1D; color: #FCA5A5; }
+  :root[data-theme="dark"] .source-tag.rod { background: #451A03; color: #FCD34D; }
+  :root[data-theme="dark"] .source-tag.pharma { background: #12362A; color: #6FDCA8; }
+  :root[data-theme="dark"] .source-tag.nicodom { background: #3B1F5E; color: #C4B5FD; }
+
+  .viewer {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; padding: 20px; margin-bottom: 18px;
+    display: none;
+  }
+  .viewer h2 {
+    font-family: "Spectral", Georgia, serif; font-weight: 600;
+    font-size: 1.15rem; margin: 0 0 4px;
+  }
+  .viewer .meta { font-size: .82rem; color: var(--muted); margin-bottom: 14px; }
+  .chartwrap { overflow-x: auto; }
+  svg text { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 11px; fill: var(--muted); }
+
+  .pagination {
+    display: flex; justify-content: center; align-items: center;
+    gap: 8px; margin-top: 14px; padding: 10px 0;
+  }
+  .page-btn {
+    font: inherit; font-size: .85rem;
+    padding: 6px 12px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  }
+  .page-btn:hover { border-color: var(--accent); }
+  .page-btn:disabled { opacity: .4; cursor: default; }
+  .page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .page-info { font-size: .82rem; color: var(--muted); }
+
+  .loading {
+    text-align: center; padding: 40px 20px; color: var(--muted);
+  }
+  .loading .bar {
+    width: 200px; height: 4px; border-radius: 2px;
+    background: var(--bar-track); margin: 14px auto 0; overflow: hidden;
+  }
+  .loading .bar .fill {
+    height: 100%; border-radius: 2px; background: var(--accent);
+    transition: width .3s;
+  }
+  .loading .bar.indeterminate .fill {
+    width: 30% !important;
+    animation: indeterminate 1.2s ease-in-out infinite;
+  }
+  @keyframes indeterminate {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(433%); }
+  }
+  .loading .status { font-size: .82rem; margin-top: 6px; }
+
+  footer { color: var(--muted); font-size: .82rem; margin-top: 30px; max-width: 68ch; }
+  footer a { color: var(--accent-ink); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  @media (max-width: 600px) {
+    .controls { flex-direction: column; }
+    .search-box { min-width: 100%; }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="spectrum-strip"></div>
+    <h1>Spectral Library</h1>
+    <p class="sub">Browse <span id="totalCount">...</span> Raman reference spectra
+    across <span id="classCount">...</span> substances.
+    Click any row to view the spectrum.
+    <br><a href="index.html">Back to RamanID identifier</a></p>
+  </header>
+
+  <div class="loading" id="loading">
+    <p>Loading spectral library...</p>
+    <div class="bar" id="loadbarwrap"><div class="fill" id="loadbar" style="width:0%"></div></div>
+    <p class="status" id="loadstatus"></p>
+  </div>
+
+  <div id="main" style="display:none">
+    <div class="controls">
+      <input type="text" class="search-box" id="search" placeholder="Search substance name..." autocomplete="off">
+      <button class="filter-btn active" data-src="all">All</button>
+      <button class="filter-btn" data-src="vast">VAST</button>
+      <button class="filter-btn" data-src="rruff">RRUFF</button>
+      <button class="filter-btn" data-src="rod">ROD</button>
+      <button class="filter-btn" data-src="pharma">Pharma</button>
+      <button class="filter-btn" data-src="nicodom">NICODOM</button>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="viewer" id="viewer">
+      <h2 id="viewerTitle"></h2>
+      <p class="meta" id="viewerMeta"></p>
+      <div class="chartwrap"><svg id="chart" viewBox="0 0 900 280" width="100%" role="img" aria-label="Spectrum chart"></svg></div>
+    </div>
+
+    <div class="card">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th data-col="idx"># <span class="sort-arrow"></span></th>
+              <th data-col="label">Substance <span class="sort-arrow"></span></th>
+              <th data-col="source">Source <span class="sort-arrow"></span></th>
+              <th data-col="range">Range (cm⁻¹) <span class="sort-arrow"></span></th>
+              <th data-col="nch">Channels <span class="sort-arrow"></span></th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </div>
+
+  <footer>
+    <strong>Sources.</strong> VAST lab collection · <a href="https://rruff.info">RRUFF</a> minerals ·
+    <a href="https://solsa.crystallography.net/rod/">ROD</a> ·
+    Pharma (figshare) · <a href="https://www.nicodom.cz">NICODOM</a> demo.
+    All spectra preprocessed to 450–3200 cm⁻¹ common grid (step 2 cm⁻¹), Savitzky-Golay smoothed,
+    ALS baseline removed, L2-normalized.
+    <br><br>
+    <a href="index.html">RamanID identifier</a> ·
+    Source code: <a href="https://github.com/SisypheanHUS/VAST/tree/main/raman_id">GitHub</a>
+  </footer>
+</div>
+
+<script>
+const GRID_START = 450.0, GRID_STEP = 2.0, GRID_N = 1376;
+function gridWn(i) { return GRID_START + GRID_STEP * i; }
+
+function decodeSegment(e) {
+  var raw = atob(e.b64);
+  var n = raw.length / 4;
+  var buf = new ArrayBuffer(raw.length);
+  var u8 = new Uint8Array(buf);
+  for (var j = 0; j < raw.length; j++) u8[j] = raw.charCodeAt(j);
+  var seg = new Float32Array(buf);
+  var v = new Float64Array(GRID_N).fill(NaN);
+  for (var j = 0; j < n; j++) v[e.i0 + j] = seg[j];
+  var i0 = e.i0, i1 = e.i0 + n - 1;
+  return { v: v, i0: i0, i1: i1 };
+}
+
+var ALL = [];
+var RAW_ENTRIES = [];
+var filtered = [];
+var PAGE_SIZE = 50;
+var currentPage = 0;
+var sortCol = "idx";
+var sortAsc = true;
+var selectedIdx = -1;
+var activeSource = "all";
+
+var $ = function(id) { return document.getElementById(id); };
+
+(async function init() {
+  try {
+    var resp = await fetch("data.json");
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    var total = +resp.headers.get("content-length") || 0;
+    var reader = resp.body.getReader();
+    var chunks = [];
+    var loaded = 0;
+    if (!total) $("loadbarwrap").classList.add("indeterminate");
+    while (true) {
+      var r = await reader.read();
+      if (r.done) break;
+      chunks.push(r.value);
+      loaded += r.value.length;
+      if (total) $("loadbar").style.width = Math.min(100, loaded / total * 100).toFixed(0) + "%";
+      $("loadstatus").textContent = (loaded / 1e6).toFixed(1) + " MB loaded";
+    }
+    $("loadbarwrap").classList.remove("indeterminate");
+    $("loadbar").style.width = "100%";
+    $("loadstatus").textContent = "";
+    var blob = new Blob(chunks);
+    var data = JSON.parse(await blob.text());
+  } catch (e) {
+    $("loading").innerHTML = "<p style='color:var(--warn)'>Failed to load library: " +
+      e.message + "</p><p>Try refreshing.</p>";
+    return;
+  }
+
+  RAW_ENTRIES = data.entries;
+  data.entries.forEach(function(e, i) {
+    var nch = atob(e.b64).length / 4;
+    var i1 = e.i0 + nch - 1;
+    ALL.push({
+      idx: i + 1,
+      label: e.label,
+      source: e.source || "vast",
+      i0: e.i0,
+      i1: i1,
+      nch: nch,
+      rangeMin: gridWn(e.i0),
+      rangeMax: gridWn(i1)
+    });
+  });
+
+  $("totalCount").textContent = ALL.length.toLocaleString();
+  $("classCount").textContent = new Set(ALL.map(function(e) { return e.label; })).size.toLocaleString();
+  $("loading").style.display = "none";
+  $("main").style.display = "block";
+
+  wireControls();
+  applyFilter();
+})();
+
+function wireControls() {
+  $("search").addEventListener("input", function() { currentPage = 0; applyFilter(); });
+
+  document.querySelectorAll(".filter-btn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      document.querySelectorAll(".filter-btn").forEach(function(b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      activeSource = btn.dataset.src;
+      currentPage = 0;
+      applyFilter();
+    });
+  });
+
+  document.querySelectorAll("th[data-col]").forEach(function(th) {
+    th.addEventListener("click", function() {
+      var col = th.dataset.col;
+      if (sortCol === col) { sortAsc = !sortAsc; }
+      else { sortCol = col; sortAsc = true; }
+      currentPage = 0;
+      renderTable();
+    });
+  });
+}
+
+function sourceMatch(src, filter) {
+  if (filter === "all") return true;
+  return src === filter || src.indexOf(filter) === 0;
+}
+
+function applyFilter() {
+  var q = $("search").value.trim().toLowerCase();
+  filtered = ALL.filter(function(e) {
+    if (!sourceMatch(e.source, activeSource)) return false;
+    if (q && e.label.toLowerCase().indexOf(q) === -1) return false;
+    return true;
+  });
+  renderTable();
+}
+
+function renderTable() {
+  var compare;
+  switch (sortCol) {
+    case "label": compare = function(a, b) { return a.label.localeCompare(b.label); }; break;
+    case "source": compare = function(a, b) { return a.source.localeCompare(b.source); }; break;
+    case "range": compare = function(a, b) { return a.rangeMin - b.rangeMin; }; break;
+    case "nch": compare = function(a, b) { return a.nch - b.nch; }; break;
+    default: compare = function(a, b) { return a.idx - b.idx; };
+  }
+  var sorted = filtered.slice().sort(function(a, b) { return sortAsc ? compare(a, b) : compare(b, a); });
+
+  document.querySelectorAll("th[data-col]").forEach(function(th) {
+    var arrow = th.querySelector(".sort-arrow");
+    arrow.textContent = th.dataset.col === sortCol ? (sortAsc ? "▲" : "▼") : "";
+  });
+
+  var totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  if (currentPage >= totalPages) currentPage = totalPages - 1;
+  var start = currentPage * PAGE_SIZE;
+  var page = sorted.slice(start, start + PAGE_SIZE);
+
+  var sourceCounts = {};
+  filtered.forEach(function(e) { var k = e.source.replace(/_.*/, ""); sourceCounts[k] = (sourceCounts[k] || 0) + 1; });
+  var parts = [];
+  for (var s in sourceCounts) parts.push(s.toUpperCase() + " " + sourceCounts[s].toLocaleString());
+  $("stats").textContent = filtered.length.toLocaleString() + " spectra" +
+    (parts.length > 1 ? " (" + parts.join(", ") + ")" : "") +
+    " · page " + (currentPage + 1) + " of " + totalPages;
+
+  var tbody = $("tbody");
+  tbody.innerHTML = "";
+  page.forEach(function(e) {
+    var tr = document.createElement("tr");
+    if (e.idx === selectedIdx) tr.className = "selected";
+    tr.innerHTML =
+      '<td class="mono">' + e.idx + "</td>" +
+      "<td></td>" +
+      "<td></td>" +
+      '<td class="mono">' + e.rangeMin.toFixed(0) + " – " + e.rangeMax.toFixed(0) + "</td>" +
+      '<td class="mono">' + e.nch + "</td>";
+    tr.children[1].textContent = e.label;
+    var tag = document.createElement("span");
+    var srcShort = e.source.replace(/_.*/, "");
+    tag.className = "source-tag " + srcShort;
+    tag.textContent = srcShort.toUpperCase();
+    tr.children[2].textContent = "";
+    tr.children[2].appendChild(tag);
+    tr.addEventListener("click", function() { selectSpectrum(e); });
+    tbody.appendChild(tr);
+  });
+
+  renderPagination(totalPages);
+}
+
+function renderPagination(totalPages) {
+  var pag = $("pagination");
+  pag.innerHTML = "";
+  if (totalPages <= 1) return;
+
+  function addBtn(label, page, disabled, active) {
+    var b = document.createElement("button");
+    b.className = "page-btn" + (active ? " active" : "");
+    b.textContent = label;
+    b.disabled = disabled;
+    b.addEventListener("click", function() { currentPage = page; renderTable(); scrollToTable(); });
+    pag.appendChild(b);
+  }
+
+  addBtn("◀", currentPage - 1, currentPage === 0, false);
+
+  var start = Math.max(0, currentPage - 3);
+  var end = Math.min(totalPages, start + 7);
+  if (end - start < 7) start = Math.max(0, end - 7);
+
+  if (start > 0) {
+    addBtn("1", 0, false, currentPage === 0);
+    if (start > 1) { var sp = document.createElement("span"); sp.className = "page-info"; sp.textContent = "..."; pag.appendChild(sp); }
+  }
+  for (var i = start; i < end; i++) {
+    addBtn(String(i + 1), i, false, i === currentPage);
+  }
+  if (end < totalPages) {
+    if (end < totalPages - 1) { var sp = document.createElement("span"); sp.className = "page-info"; sp.textContent = "..."; pag.appendChild(sp); }
+    addBtn(String(totalPages), totalPages - 1, false, currentPage === totalPages - 1);
+  }
+
+  addBtn("▶", currentPage + 1, currentPage >= totalPages - 1, false);
+}
+
+function scrollToTable() {
+  var el = $("tbody");
+  if (el) el.parentElement.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function selectSpectrum(e) {
+  selectedIdx = e.idx;
+  var viewer = $("viewer");
+  viewer.style.display = "block";
+  $("viewerTitle").textContent = e.label;
+  $("viewerMeta").textContent =
+    "Source: " + e.source.toUpperCase() +
+    " · Range: " + e.rangeMin.toFixed(0) + "–" + e.rangeMax.toFixed(0) + " cm⁻¹" +
+    " · " + e.nch + " valid channels";
+  var decoded = decodeSegment(RAW_ENTRIES[e.idx - 1]);
+  drawChart({ i0: decoded.i0, i1: decoded.i1, v: decoded.v, rangeMin: e.rangeMin, rangeMax: e.rangeMax });
+  viewer.scrollIntoView({ behavior: "smooth", block: "start" });
+  renderTable();
+}
+
+function drawChart(e) {
+  var svg = $("chart");
+  var W = 900, H = 280, L = 50, R = 14, T = 14, B = 34;
+  var pw = W - L - R, ph = H - T - B;
+
+  var maxY = 0;
+  for (var i = e.i0; i <= e.i1; i++) if (!isNaN(e.v[i]) && e.v[i] > maxY) maxY = e.v[i];
+  if (maxY === 0) maxY = 1;
+
+  var xMin = e.rangeMin, xMax = e.rangeMax;
+  var x2px = function(wn) { return L + ((wn - xMin) / (xMax - xMin)) * pw; };
+  var y2px = function(val) { return T + ph - (val / maxY) * ph * 0.92; };
+
+  var s = "";
+  var step = xMax - xMin > 1500 ? 500 : 200;
+  var t0 = Math.ceil(xMin / step) * step;
+  for (var t = t0; t <= xMax; t += step) {
+    var px = x2px(t);
+    s += '<line x1="' + px + '" y1="' + T + '" x2="' + px + '" y2="' + (T + ph) + '" stroke="var(--line)" stroke-width="1"/>';
+    s += '<text x="' + px + '" y="' + (H - 10) + '" text-anchor="middle">' + t + '</text>';
+  }
+  s += '<text x="' + (L + pw / 2) + '" y="' + (H - 0.5) + '" text-anchor="middle">Raman shift (cm⁻¹)</text>';
+
+  var d = "";
+  for (var i = e.i0; i <= e.i1; i++) {
+    if (isNaN(e.v[i])) continue;
+    var wn = gridWn(i);
+    d += (d ? "L" : "M") + x2px(wn).toFixed(1) + " " + y2px(e.v[i]).toFixed(1);
+  }
+  s += '<path d="' + d + '" fill="none" stroke="var(--accent)" stroke-width="1.6"/>';
+
+  svg.innerHTML = s;
+}
+</script>
