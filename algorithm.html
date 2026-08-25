@@ -725,7 +725,7 @@
       phương sai và phổ mẫu "đúng tuyệt đối" đều không đúng. Thay vào đó dùng softmax có làm mềm
       (tempered softmax, tương đương temperature scaling [19]):
     </p>
-    <div class="eq"><span class="body"><i>P</i>(<i>c</i> | <b>y</b>) = <span class="frac"><span>exp( <i>B</i><sub>c</sub> / <i>κ</i> )</span><span>Σ<sub>c′</sub> exp( <i>B</i><sub>c′</sub> / <i>κ</i> )</span></span>,&nbsp;&nbsp; <i>κ</i> = 0.12</span><span class="tag">(19)</span></div>
+    <div class="eq"><span class="body"><i>P</i>(<i>c</i> | <b>y</b>) = <span class="frac"><span>exp( <i>B</i><sub>c</sub> / <i>κ</i> )</span><span>Σ<sub>c′</sub> exp( <i>B</i><sub>c′</sub> / <i>κ</i> )</span></span>,&nbsp;&nbsp; <i>κ</i> = 0.08</span><span class="tag">(19)</span></div>
     <p>
       Tham số <span class="m">κ</span> không được chọn tay mà hiệu chuẩn bằng leave-one-out để cực tiểu sai số
       hiệu chuẩn kỳ vọng ECE (§9.2). Một cách diễn giải: (19) trùng với hậu nghiệm Bayes đúng nếu số kênh
