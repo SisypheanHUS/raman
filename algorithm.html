@@ -276,7 +276,7 @@
         <tr><td class="m">𝓜<sub>∩</sub></td><td>Phần giao mask của hai phổ đang so; <span class="m">n = |𝓜<sub>∩</sub>|</span></td><td class="mono">yêu cầu n ≥ 413 (30%)</td></tr>
         <tr><td class="m"><b>t</b><sub>c</sub></td><td>Phổ mẫu (template) của lớp <span class="m">c</span></td><td class="mono">vector n<sub>g</sub></td></tr>
         <tr><td class="m">P<sub>k</sub>(x)</td><td>Đa thức Legendre bậc <span class="m">k</span> trên <span class="m">x ∈ [−1, 1]</span></td><td class="mono">k = 0…5</td></tr>
-        <tr><td class="m">λ</td><td>Độ chính xác tiên nghiệm của hệ số hồi quy</td><td class="mono">0.01</td></tr>
+        <tr><td class="m">λ</td><td>Độ chính xác tiên nghiệm của hệ số hồi quy</td><td class="mono">0.003</td></tr>
         <tr><td class="m">κ</td><td>Nhiệt độ softmax (tempering)</td><td class="mono">0.06 (Raman), 0.12 (fusion)</td></tr>
         <tr><td class="m">τ</td><td>Ngưỡng open-set trên log BF/kênh tốt nhất</td><td class="mono">0.920</td></tr>
       </tbody>
@@ -423,7 +423,7 @@
     <p>
       Việc buộc phương sai tiên nghiệm của <span class="m"><b>w</b></span> tỉ lệ với
       <span class="m">σ²</span> là điều làm cho <span class="m">σ²</span> tích phân được giải tích và làm
-      Bayes factor bất biến với thang cường độ. Tham số <span class="m">λ = 0.01</span> nhỏ (tiên nghiệm
+      Bayes factor bất biến với thang cường độ. Tham số <span class="m">λ = 0.003</span> nhỏ (tiên nghiệm
       rộng) vì sau chuẩn hoá L2, <span class="m">α</span> có bậc 1 và các <span class="m">β<sub>k</sub></span>
       có bậc 0.01–0.1; giá trị này chỉ đóng vai trò ổn định số và phạt nhẹ độ phức tạp mô hình (Occam
       factor), không phải tham số hiệu chuẩn.
@@ -475,7 +475,7 @@
     <p>
       tức <em>một nửa log của tỉ lệ phương sai phần dư</em> mà phổ mẫu giải thích được <em>thêm</em> so với
       nền. BF = 0 nghĩa là phổ mẫu không giải thích được gì; BF = 0.920 (ngưỡng τ, §6.3) tương ứng phần
-      dư giảm ≈ 3.7 lần; các phổ khớp tốt trong cùng máy đo thường đạt BF &gt; 1.5 (phần dư giảm hơn 20
+      dư giảm ≈ 6.3 lần; các phổ khớp tốt trong cùng máy đo thường đạt BF &gt; 1.5 (phần dư giảm hơn 20
       lần). Cách chuẩn hoá theo <span class="m">n</span> là cần thiết để so được các cặp có độ phủ khác
       nhau và để κ, τ có ý nghĩa độc lập với độ phủ.
     </p>
@@ -495,7 +495,7 @@
       <div class="io"><b>Vào:</b> cột thiết kế X = [x<sub>1</sub>, …, x<sub>p</sub>] (mỗi cột dài n), vector y. <b>Ra:</b> ℓ(X, y) = ½p·log λ − ½ log|A| − (n/2) log S.</div>
       <ol>
         <li>A ← X<sup>⊤</sup>X + λI<sub>p</sub>;  b ← X<sup>⊤</sup>y                              ▷ O(n p²)</li>
-        <li>L ← Cholesky(A)  (A = L L<sup>⊤</sup>)                              ▷ O(p³), p ≤ 12</li>
+        <li>L ← Cholesky(A)  (A = L L<sup>⊤</sup>)                              ▷ O(p³), p ≤ 14</li>
         <li>log|A| ← 2 Σ<sub>r</sub> log L<sub>rr</sub></li>
         <li>giải L u = b, rồi L<sup>⊤</sup> ŵ = u                                   ▷ ŵ = A<sup>−1</sup>b</li>
         <li>S ← max( y<sup>⊤</sup>y − b<sup>⊤</sup>ŵ,  10<sup>−12</sup> )                        ▷ pt. (10)</li>
@@ -536,9 +536,9 @@
       Các hàng của <span class="m"><b>V</b><sup>⊤</sup></span> là thành phần chính (PC) của phần dư trong
       lớp. Giữ lại <span class="m">K<sub>c</sub></span> thành phần đầu, với
     </p>
-    <div class="eq"><span class="body"><i>K</i><sub>c</sub> = min { <i>k</i> : Σ<sub>l≤k</sub> <i>σ</i><sub>l</sub><sup>2</sup> / Σ<sub>l</sub> <i>σ</i><sub>l</sub><sup>2</sup> ≥ 0.90 },&nbsp;&nbsp; 1 ≤ <i>K</i><sub>c</sub> ≤ min(5, <i>m</i><sub>c</sub> − 1)</span><span class="tag">(16)</span></div>
+    <div class="eq"><span class="body"><i>K</i><sub>c</sub> = min { <i>k</i> : Σ<sub>l≤k</sub> <i>σ</i><sub>l</sub><sup>2</sup> / Σ<sub>l</sub> <i>σ</i><sub>l</sub><sup>2</sup> ≥ 0.95 },&nbsp;&nbsp; 1 ≤ <i>K</i><sub>c</sub> ≤ min(7, <i>m</i><sub>c</sub> − 1)</span><span class="tag">(16)</span></div>
     <p>
-      Ngưỡng 90% phương sai và trần 5 thành phần ngăn mô hình lớp hấp thụ nhiễu đo (overfit) — nếu cho
+      Ngưỡng 95% phương sai và trần 7 thành phần ngăn mô hình lớp hấp thụ nhiễu đo (overfit) — nếu cho
       phép đủ nhiều PC, bất kỳ phổ nào cũng có thể được biểu diễn tốt bởi bất kỳ lớp nào, và Occam factor
       trong (12) chỉ phạt tuyến tính theo <span class="m">p</span>. Với thư viện hiện tại, 516 lớp có
       mô hình trong lớp; 1 991 lớp còn lại (≤ 2 phổ) dùng phổ mẫu đơn như §4.
@@ -610,7 +610,7 @@
     <div class="eq"><span class="body">unknown(<b>y</b>) = 𝟙[ max<sub>c</sub> <i>B</i><sub>c</sub> &lt; <i>τ</i> ],&nbsp;&nbsp; <i>τ</i> = 0.920</span><span class="tag">(20)</span></div>
     <p>
       Nếu ngay cả lớp tốt nhất cũng không giải thích phổ tốt hơn mô hình chỉ-nền quá một mức
-      <span class="m">τ</span> (tương đương giảm phần dư ≈ 3.7 lần theo (14)), kết quả được gắn cờ "có thể
+      <span class="m">τ</span> (tương đương giảm phần dư ≈ 6.3 lần theo (14)), kết quả được gắn cờ "có thể
       không có trong thư viện" nhưng bảng xếp hạng vẫn hiển thị để người dùng tự đánh giá. Ngưỡng
       <span class="m">τ</span> được hiệu chuẩn sao cho tỉ lệ từ chối nhầm (phổ có trong thư viện bị gắn cờ)
       là 10% trên LOO (§8.3). Vì <span class="m">B<sub>c</sub></span> là bằng chứng theo kênh và bất biến
@@ -771,7 +771,7 @@
     <h3>8.3 Hiệu chuẩn τ theo tỉ lệ từ chối nhầm</h3>
     <p>
       τ là phân vị 10% của phân bố <span class="m">max<sub>c</sub> B<sub>c</sub></span> trên các phổ LOO (giá trị
-      trung bình 1.313): τ = 0.920 cho tỉ lệ từ chối nhầm ~10%. Khả năng từ chối chất lạ thật
+      trung bình 1.737): τ = 0.920 cho tỉ lệ từ chối nhầm ~10%. Khả năng từ chối chất lạ thật
       được đo bằng cách loại <em>toàn bộ</em> lớp thật khỏi thư viện rồi nhận diện: 63.5% chất lạ bị từ chối
       đúng ở FRR 10% (kiểm định trên phiên bản 2); phần còn lại chủ yếu là các chất có họ hàng hoá học
       trong thư viện (loại Ethanol thì Isopropyl/Methanol vẫn khớp tương đối tốt) — giới hạn thật của bài
@@ -789,10 +789,11 @@
     </table>
     <p class="caption"><b>Bảng 2.</b> Leave-one-out trên 202 phổ VAST, 27 lớp. "Hoá chất" = 97 phổ thuộc lớp chất tinh khiết (dung môi, muối, đường, polymer đã gán nhãn PE/PP/PS); phần còn lại là danh mục vật liệu (Paper, Glass, Plastic chưa phân loại, Other, Vỏ hoa quả) vốn không thuần chất.</p>
     <p>
-      Theo lớp: 21/27 lớp đạt 100%; Paper 25/26, PE 20/22, Glass 16/18, Other 12/13. Hai lớp kéo điểm
-      xuống là Plastic 25/37 (37 phổ bao bì SNR thấp chưa đủ bằng chứng để gán nhãn polymer cụ thể) và PVP
-      0/2 (2 phổ, trùng lặp thật với vỏ nang trong Other). Mô hình trong lớp cải thiện đồng thời độ chính
-      xác (+6.4 điểm) và hiệu chuẩn (ECE 0.069 → 0.024) — đúng như phân tích ở §5.1.
+      Theo lớp: 25/27 lớp đạt 100% — kể cả các lớp vật liệu không thuần chất Paper 26/26, PE 22/22,
+      Glass 18/18, Other 13/13. Hai lớp còn sai là Plastic 31/37 (bao bì SNR thấp, nhãn nhiễu PE/PP/Paper
+      chưa đủ bằng chứng để gán polymer cụ thể) và PVP 0/2 (2 phổ, trùng lặp thật với vỏ nang trong
+      Other). Mô hình trong lớp cải thiện đồng thời độ chính xác (+12.3 điểm so với v2) và hiệu chuẩn
+      (ECE 0.069 → 0.024) — đúng như phân tích ở §5.1.
     </p>
     <table class="data-table">
       <thead><tr><th>Kiểm định</th><th>Giao thức</th><th class="r">Kết quả</th></tr></thead>
@@ -822,7 +823,7 @@
       <thead><tr><th>Thành phần</th><th>Chi phí</th><th>Ghi chú</th></tr></thead>
       <tbody>
         <tr><td>Tiền xử lý một phổ</td><td class="mono">O(n<sub>g</sub>)</td><td>SG là tích chập 9 điểm; ALS 10 vòng Cholesky dải</td></tr>
-        <tr><td>Evidence một cặp</td><td class="mono">O(n p²) + O(p³)</td><td>n ≤ 1376, p ≤ 12 (1 mẫu + ≤5 PC + 6 nền); Gram matrix chiếm đa số</td></tr>
+        <tr><td>Evidence một cặp</td><td class="mono">O(n p²) + O(p³)</td><td>n ≤ 1376, p ≤ 14 (1 mẫu + ≤7 PC + 6 nền); Gram matrix chiếm đa số</td></tr>
         <tr><td>Một truy vấn toàn thư viện</td><td class="mono">O(N n p²)</td><td>N = 16 024 phổ, 516 lớp qua mô hình trong lớp; vài giây trên trình duyệt</td></tr>
         <tr><td>Mô hình trong lớp</td><td class="mono">O(m<sub>c</sub> n<sub>g</sub> min(m<sub>c</sub>, n<sub>g</sub>))</td><td>SVD một lần khi dựng thư viện, không lặp lại lúc truy vấn</td></tr>
         <tr><td>Dữ liệu tải về</td><td class="mono">16.7 MB (gzip ≈ 5 MB)</td><td>Mỗi phổ mã hoá float32 base64 chỉ trên đoạn kênh hợp lệ, kèm i<sub>0</sub></td></tr>
