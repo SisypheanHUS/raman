@@ -306,15 +306,19 @@
 const GRID_START = 450.0, GRID_STEP = 2.0, GRID_N = 1376;
 function gridWn(i) { return GRID_START + GRID_STEP * i; }
 
+// Segments are uint16-quantized (2 bytes/channel) with per-segment lo/hi — keep in sync with core.js decodeSegment.
+function segmentLength(e) { return atob(e.b64).length / 2; }
+
 function decodeSegment(e) {
   var raw = atob(e.b64);
-  var n = raw.length / 4;
+  var n = raw.length / 2;
   var buf = new ArrayBuffer(raw.length);
   var u8 = new Uint8Array(buf);
   for (var j = 0; j < raw.length; j++) u8[j] = raw.charCodeAt(j);
-  var seg = new Float32Array(buf);
+  var seg = new Uint16Array(buf);
+  var lo = e.lo, rng = e.hi - e.lo;
   var v = new Float64Array(GRID_N).fill(NaN);
-  for (var j = 0; j < n; j++) v[e.i0 + j] = seg[j];
+  for (var j = 0; j < n; j++) v[e.i0 + j] = rng ? seg[j] / 65535 * rng + lo : lo;
   var i0 = e.i0, i1 = e.i0 + n - 1;
   return { v: v, i0: i0, i1: i1 };
 }
@@ -361,7 +365,7 @@ var $ = function(id) { return document.getElementById(id); };
 
   RAW_ENTRIES = data.entries;
   data.entries.forEach(function(e, i) {
-    var nch = atob(e.b64).length / 4;
+    var nch = segmentLength(e);
     var i1 = e.i0 + nch - 1;
     ALL.push({
       idx: i + 1,
