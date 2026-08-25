@@ -159,7 +159,7 @@
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 21 19V5"></path><path d="M3 12A9 3 0 0 0 21 12"></path></svg>
       Nguồn dữ liệu
     </h2>
-    <p>Thư viện gồm <strong>16 070 phổ</strong> thuộc <strong>2 507 lớp hợp chất</strong>, tổng hợp từ nhiều nguồn:</p>
+    <p>Thư viện gồm <strong>16 070 phổ</strong> thuộc <strong>2 495 lớp hợp chất</strong>, tổng hợp từ nhiều nguồn:</p>
     <table class="data-table">
       <thead>
         <tr><th>Nguồn</th><th>Nội dung</th><th>Số phổ</th><th>Tham chiếu</th></tr>
@@ -228,9 +228,15 @@
       Điểm số = log Bayes factor mỗi kênh so với mô hình chỉ-nền (null model).
     </p>
     <p>
-      Hậu nghiệm softmax với hệ số làm mềm &kappa; = 0.08 (ECE 0.078 trên LOO nghiêm ngặt của VAST).
-      Ngưỡng open-set &tau; = 0.684 — mẫu có log BF dưới ngưỡng được gắn cờ
-      "có thể không có trong thư viện".
+      Hậu nghiệm softmax với hệ số làm mềm &kappa; = 0.04 (ECE 0.064 trên LOO nghiêm ngặt của VAST, softmax trên toàn bộ lớp).
+      Ngưỡng open-set &tau; = 0.657 — mẫu có log BF dưới ngưỡng được gắn cờ
+      "có thể không có trong thư viện"; bằng chứng không nền (&tau;<sub>0</sub> = 1.084) hiển thị kèm như chỉ báo phụ.
+    </p>
+    <p>
+      Đánh giá ngoài đóng băng (26/08/2026): 1 165 phổ chưa từng vào thư viện từ 5 nguồn công khai đo trên
+      máy khác (RRUFF held-out, RaSPI, Miller 2022, Bērziņš FT-Raman 1064 nm, Wasatch cầm tay 785 nm) —
+      nhận diện đúng 58–77% với phổ chất lượng tham chiếu, từ chối nhầm 9–23% ở ngưỡng trên; chất lạ bị
+      từ chối 45–47% ở cùng 10% từ chối nhầm dù dùng bằng chứng nào (chi tiết: trang Thuật toán §9.5).
     </p>
     <p>
       Kết hợp đa kênh (v3): tổng có trọng số log BF từng kênh
@@ -264,32 +270,32 @@
         </tr>
         <tr>
           <td>Top-1 accuracy (tất cả)</td>
-          <td class="mono"><strong>87.1%</strong> (216/248)</td>
+          <td class="mono"><strong>90.3%</strong> (224/248)</td>
           <td>Tỉ lệ lần nhận diện đúng ngay kết quả đầu tiên — mọi loại phổ, LOO nghiêm ngặt (mô hình lớp dựng lại không có phổ đang chấm), gộp đồng nghĩa xuyên nguồn</td>
         </tr>
         <tr>
           <td>Top-1 accuracy (hoá chất)</td>
-          <td class="mono"><strong>90.0%</strong> (162/180)</td>
+          <td class="mono"><strong>93.9%</strong> (169/180)</td>
           <td>Riêng nhóm hoá chất tinh khiết — dễ nhận diện hơn vật liệu bao bì/danh mục</td>
         </tr>
         <tr>
           <td>ECE (sai số hiệu chuẩn)</td>
-          <td class="mono"><strong>0.069</strong></td>
-          <td>Xác suất báo ra sát xác suất thực tế (0 = hoàn hảo); ngang cosine (0.055) khi cả hai
+          <td class="mono"><strong>0.064</strong></td>
+          <td>Xác suất báo ra sát xác suất thực tế (0 = hoàn hảo); ngang cosine (0.054) khi cả hai
             được hiệu chuẩn tốt nhất — lợi thế của Bayes là xếp hạng đúng hơn, không phải hiệu chuẩn tốt hơn</td>
         </tr>
         <tr>
           <td>Ngưỡng "không có trong thư viện"</td>
-          <td class="mono">&tau; = 0.684</td>
-          <td>Tại ngưỡng này, tỉ lệ từ chối nhầm (mẫu đúng bị cờ là lạ) là 10%; từ chối được 35.6% chất
+          <td class="mono">&tau; = 0.657</td>
+          <td>Tại ngưỡng này, tỉ lệ từ chối nhầm (mẫu đúng bị cờ là lạ) là 10%; từ chối được 30.0% chất
             lạ trong thử loại-lớp — điểm yếu đã biết, xem trang Thuật toán §9.3</td>
         </tr>
       </tbody>
     </table>
     <p>
       So sánh: cosine (v1) 79.7% → Bayes đơn mẫu (v2) 83.7% → phiên bản hiện tại
-      (v3, within-class Bayes + đa kênh) 87.1% tổng thể, 90.0% hoá chất trên LOO nghiêm ngặt — chi tiết ở mục dưới;
-      cùng giao thức, cosine đạt 81.9% và không gian con kiểu SIMCA 82.3%.
+      (v3, within-class Bayes + đa kênh) 90.3% tổng thể, 93.9% hoá chất trên LOO nghiêm ngặt — chi tiết ở mục dưới;
+      cùng giao thức, cosine đạt 81.9% và không gian con kiểu SIMCA 83.5%.
     </p>
   </div>
 
@@ -328,23 +334,24 @@
           <td><strong>v3 — hiện tại</strong></td>
           <td>
             <strong>Within-class Bayes:</strong> lớp có ≥3 phổ được mô hình hoá bằng phổ trung bình
-            + các thành phần chính của phần dư (517/2 507 lớp), thay vì so với một phổ mẫu duy nhất —
+            + các thành phần chính của phần dư (515/2 495 lớp), thay vì so với một phổ mẫu duy nhất —
             khắc phục nguyên nhân gốc của việc quá tự tin ở v2. Thư viện đầy đủ 16 070 phổ.
             <br><strong>Đa kênh:</strong> kết hợp Raman + huỳnh quang + hấp thụ cùng một mẫu vật bằng
             tổng có trọng số log BF (1.0 / 0.25 / 1.0); tự suy bước sóng kích thích huỳnh quang
             (đúng 96.5%) nên không cần khai báo.
-            <br><strong>Tối ưu siêu tham số:</strong> &lambda; = 0.003, tối đa 7 thành phần chính,
-            giữ 95% phương sai. Sau khi gán lại nhãn toàn bộ "Plastic" thành PE/PP/PS/PET, bỏ PVP (248 phổ)
-            và chuyển sang LOO nghiêm ngặt (25/08): hiệu chuẩn lại &kappa; = 0.08, &tau; = 0.684,
+            <br><strong>Tối ưu siêu tham số:</strong> &lambda; = 0.01, tối đa 7 thành phần chính,
+            giữ 99% phương sai (grid trên LOO nghiêm ngặt, chọn bằng nested CV). Sau khi gán lại nhãn toàn bộ "Plastic" thành PE/PP/PS/PET, bỏ PVP (248 phổ),
+            gộp nhãn đồng nghĩa xuyên nguồn trong thư viện và chuyển sang LOO nghiêm ngặt (25/08): hiệu chuẩn lại &kappa; = 0.10, &tau; = 0.657;
+            thêm lượt chấm thứ hai cho 20 lớp dẫn đầu (dịch trục &plusmn;1 kênh, so từng phổ riêng, +1.6 điểm),
             đồng bộ Python và JavaScript; benchmark cùng giao thức với cosine, SIMCA, χ² (trang Thuật toán §9.4).
           </td>
-          <td class="mono"><strong>87.1%</strong> tổng thể<br><strong>90.0%</strong> hoá chất<br>ECE <strong>0.069</strong><br>Đa kênh: 71.4% (49 mẫu vật), nhận được 15/27 mẫu không có tín hiệu Raman<br>Xuyên máy (NICODOM): 4/4 đúng, 12/13 chất lạ bị từ chối</td>
+          <td class="mono"><strong>90.3%</strong> tổng thể<br><strong>93.9%</strong> hoá chất<br>ECE <strong>0.064</strong><br>Đa kênh: 71.4% (49 mẫu vật), nhận được 15/27 mẫu không có tín hiệu Raman<br>Xuyên máy (NICODOM): 4/4 đúng, 12/13 chất lạ bị từ chối</td>
         </tr>
       </tbody>
     </table>
     <p>
-      Còn dở: 32 lỗi LOO nghiêm ngặt tập trung ở bao bì (Paper/PE/PP nhầm nhau, SNR thấp) và Ethanol-Water (6/51, khớp về Ethanol);
-      khả năng từ chối chất lạ còn thấp (35.6%) do số hạng nền — hướng sửa đã xác định;
+      Còn dở: 24 lỗi LOO nghiêm ngặt tập trung ở bao bì (Paper/PE/PP/Other nhầm nhau, SNR thấp), Ethanol-Water (3/51) và 7 phổ yếu bị khoáng/dược ngoài "cướp";
+      khả năng từ chối chất lạ còn thấp (30.0%) do số hạng nền — hướng sửa đã xác định;
       trọng số đa kênh mới được xác nhận bằng nested CV trên cùng 49 mẫu vật, cần mẫu mới để hiệu
       chuẩn posterior fusion.
     </p>

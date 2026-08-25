@@ -356,7 +356,10 @@ const GRID_START = 450.0, GRID_STEP = 2.0, GRID_N = 1376;
 const GRID_END = GRID_START + GRID_STEP * (GRID_N - 1);
 const MIN_OVERLAP = Math.floor(0.30 * GRID_N);
 // Calibrated constants — keep in sync with bayes.py (see evaluate_bayes.py output).
-const LAMBDA = 0.003, N_BASE = 6, KAPPA = 0.08, NULL_TAU = 0.684;
+const LAMBDA = 0.01, N_BASE = 6, KAPPA = 0.04, NULL_TAU = 0.657;
+// Baseline-free evidence threshold (bayes.NULL_TAU0) — diagnostic only; the verdict
+// uses NULL_TAU on the full evidence (frozen external test, 26/08/2026).
+const NULL_TAU0 = 1.084;
 const ALS_LAM = 1e5, ALS_P = 0.01, ALS_ITER = 10;
 
 function gridWavenumber(i) { return GRID_START + GRID_STEP * i; }
@@ -598,9 +601,71 @@ function pairBF(q, spec) {
   return (ev1 - ev0) / nv;
 }
 
+// Baseline-free per-channel log BF of q against every library entry
+// (bayes.pair_bf_nobase_all): H_t: y = a*t + eps  vs  H_0: y = eps, closed form
+//   A = sum(t^2) + LAMBDA,  S1 = sum(y^2) - sum(t*y)^2 / A,  S0 = sum(y^2)
+//   bf0 = (0.5*log(LAMBDA/A) - (n/2)*log(S1/S0)) / n
+// Only the open-set flag uses it; ranking keeps the full evidence (pairBF).
+function pairBfNobaseAll(q, library) {
+  let max = -Infinity, label = null, entry = null;
+  for (const e of library) {
+    const a0 = Math.max(q.i0, e.i0), a1 = Math.min(q.i1, e.i1);
+    const nv = a1 - a0 + 1;
+    if (nv < MIN_OVERLAP) continue;
+    let dot = 0, tt = 0, yy = 0;
+    for (let i = a0; i <= a1; i++) {
+      const y = q.v[i], t = e.v[i];
+      dot += t * y; tt += t * t; yy += y * y;
+    }
+    const A = tt + LAMBDA;
+    const S1 = Math.max(yy - dot * dot / A, 1e-12), S0 = Math.max(yy, 1e-12);
+    const bf0 = (0.5 * Math.log(LAMBDA / A) - 0.5 * nv * Math.log(S1 / S0)) / nv;
+    if (bf0 > max) { max = bf0; label = e.label; entry = e; }
+  }
+  return { max, label, entry };
+}
+
+// Second pass (see bayes.rerank_top): the top RERANK_TOP classes are re-scored
+// as the max over small x-shifts of the query (+-1 channel) and over both the
+// within-class model and every individual spectrum of the class.
+const RERANK_TOP = 20, RERANK_SHIFTS = [-1, 0, 1];
+
+function shiftQuery(q, k) {
+  if (k === 0) return q;
+  const v = new Float64Array(GRID_N).fill(NaN);
+  const i0 = Math.max(0, q.i0 + k), i1 = Math.min(GRID_N - 1, q.i1 + k);
+  for (let i = i0; i <= i1; i++) v[i] = q.v[i - k];
+  return { v, i0, i1 };
+}
+
+function rerankTop(q, best, library, wcModels) {
+  const labs = [...best.keys()].sort((a, b) => best.get(b).bf - best.get(a).bf).slice(0, RERANK_TOP);
+  const labset = new Set(labs);
+  const byLabel = new Map(labs.map(l => [l, []]));
+  for (const entry of library) if (labset.has(entry.label)) byLabel.get(entry.label).push(entry);
+  const models = new Map();
+  if (wcModels) for (const m of wcModels) if (labset.has(m.label)) models.set(m.label, m);
+  for (const lab of labs) {
+    const cur = best.get(lab);
+    for (const k of RERANK_SHIFTS) {
+      const qs = shiftQuery(q, k);
+      const model = models.get(lab);
+      if (model) {
+        const bf = pairBfWc(qs, model);
+        if (bf !== null && bf > cur.bf) cur.bf = bf;
+      }
+      for (const entry of byLabel.get(lab)) {
+        const bf = pairBF(qs, entry);
+        if (bf !== null && bf > cur.bf) { cur.bf = bf; cur.entry = entry; }
+      }
+    }
+  }
+  return best;
+}
+
 // Match query against the whole library (with optional within-class models).
-function classify(q, library, wcModels) {
-  const best = new Map();
+function classify(q, library, wcModels, rerank = true) {
+  let best = new Map();
   const wcDone = new Set();
   if (wcModels) {
     for (const model of wcModels) {
@@ -618,6 +683,7 @@ function classify(q, library, wcModels) {
     if (!cur || bf > cur.bf) best.set(entry.label, { bf, entry });
   }
   if (!best.size) return { results: [], unknown: true };
+  if (rerank) best = rerankTop(q, best, library, wcModels);
   const labs = [...best.keys()];
   const bfs = labs.map(l => best.get(l).bf);
   const mx = Math.max(...bfs);
@@ -626,7 +692,10 @@ function classify(q, library, wcModels) {
   const results = labs
     .map((l, i) => ({ label: l, bf: bfs[i], post: z[i] / zs, entry: best.get(l).entry }))
     .sort((a, b) => b.bf - a.bf);
-  return { results, unknown: mx < NULL_TAU };
+  // Verdict on the full evidence; the baseline-free statistic is reported alongside.
+  const nb = pairBfNobaseAll(q, library);
+  return { results, unknown: mx < NULL_TAU, unknownNobase: nb.max < NULL_TAU0,
+           bf0: nb.max, bf0Label: nb.label };
 }
 
 // ---- peaks -----------------------------------------------------------------
@@ -856,7 +925,7 @@ function decodeWcModels(data, atob_) {
 
 if (typeof module !== "undefined") {
   module.exports = { parseSpectrum, preprocess, classify, findPeaks, decodeLibrary,
-                     pairBF, pairBfWc, gridWavenumber, GRID_N, NULL_TAU, KAPPA,
+                     pairBF, pairBfWc, pairBfNobaseAll, gridWavenumber, GRID_N, NULL_TAU, NULL_TAU0, KAPPA,
                      decodeLibraryMm, decodeWcModels, preprocessNm, pairBFNm,
                      fluorClassBFs, absClassBFs, ramanCategoryBFs, fuse, parseEx,
                      FLUOR_GRID, ABS_GRID, MIN_XMAX, CATEGORY_MAP };
@@ -967,7 +1036,7 @@ function submitContribution() {
 
 (async function init() {
   try {
-    var DATA_SIZE = 34101973;
+    var DATA_SIZE = 34523072;
     const resp = await fetch("data.json");
     if (!resp.ok) throw new Error("Không tải được thư viện (" + resp.status + ")");
     const total = DATA_SIZE || 0;
@@ -1139,6 +1208,7 @@ function renderAll() {
         '<div class="verdict-score"><div class="num"></div><div class="lbl">kết quả tốt nhất</div></div>';
       banner.querySelector(".verdict-note").textContent =
         "bằng chứng tốt nhất " + top.bf.toFixed(3) + " < τ=" + NULL_TAU +
+        " (bằng chứng không nền " + bestRaman.res.bf0.toFixed(3) + (bestRaman.res.unknownNobase ? " < " : " ≥ ") + "τ0=" + NULL_TAU0 + ")" +
         " — lớp gần nhất: " + top.label + ". Xác suất hậu nghiệm bên dưới chỉ có ý nghĩa xếp hạng tương đối." + peaklessNote;
       banner.querySelector(".verdict-score .num").textContent = fmtPct(top.post);
     } else {
@@ -1149,7 +1219,8 @@ function renderAll() {
         '<div class="verdict-title"></div><div class="verdict-note"></div></div>' +
         '<div class="verdict-score"><div class="num"></div><div class="lbl">xác suất hậu nghiệm</div></div>';
       banner.querySelector(".verdict-title").textContent = top.label;
-      banner.querySelector(".verdict-note").textContent = "log BF/kênh = " + top.bf.toFixed(3) + peaklessNote;
+      banner.querySelector(".verdict-note").textContent = "log BF/kênh = " + top.bf.toFixed(3) +
+        "; bằng chứng không nền " + bestRaman.res.bf0.toFixed(3) + (bestRaman.res.unknownNobase ? " < τ0=" + NULL_TAU0 + " (có thể là chất họ hàng)" : " ≥ τ0=" + NULL_TAU0) + peaklessNote;
       banner.querySelector(".verdict-score .num").textContent = fmtPct(top.post);
     }
   }
