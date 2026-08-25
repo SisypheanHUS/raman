@@ -356,7 +356,7 @@ const GRID_START = 450.0, GRID_STEP = 2.0, GRID_N = 1376;
 const GRID_END = GRID_START + GRID_STEP * (GRID_N - 1);
 const MIN_OVERLAP = Math.floor(0.30 * GRID_N);
 // Calibrated constants — keep in sync with bayes.py (see evaluate_bayes.py output).
-const LAMBDA = 0.003, N_BASE = 6, KAPPA = 0.12, NULL_TAU = 1.062;
+const LAMBDA = 0.003, N_BASE = 6, KAPPA = 0.08, NULL_TAU = 0.684;
 const ALS_LAM = 1e5, ALS_P = 0.01, ALS_ITER = 10;
 
 function gridWavenumber(i) { return GRID_START + GRID_STEP * i; }

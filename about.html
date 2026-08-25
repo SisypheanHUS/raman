@@ -228,8 +228,8 @@
       Điểm số = log Bayes factor mỗi kênh so với mô hình chỉ-nền (null model).
     </p>
     <p>
-      Hậu nghiệm softmax với hệ số làm mềm &kappa; = 0.12 (ECE 0.024 trên LOO của VAST).
-      Ngưỡng open-set &tau; = 1.062 — mẫu có log BF dưới ngưỡng được gắn cờ
+      Hậu nghiệm softmax với hệ số làm mềm &kappa; = 0.08 (ECE 0.078 trên LOO nghiêm ngặt của VAST).
+      Ngưỡng open-set &tau; = 0.684 — mẫu có log BF dưới ngưỡng được gắn cờ
       "có thể không có trong thư viện".
     </p>
     <p>
@@ -264,31 +264,32 @@
         </tr>
         <tr>
           <td>Top-1 accuracy (tất cả)</td>
-          <td class="mono"><strong>96.8%</strong> (240/248)</td>
-          <td>Tỉ lệ lần nhận diện đúng ngay kết quả đầu tiên — tính trên mọi loại phổ</td>
+          <td class="mono"><strong>87.1%</strong> (216/248)</td>
+          <td>Tỉ lệ lần nhận diện đúng ngay kết quả đầu tiên — mọi loại phổ, LOO nghiêm ngặt (mô hình lớp dựng lại không có phổ đang chấm), gộp đồng nghĩa xuyên nguồn</td>
         </tr>
         <tr>
           <td>Top-1 accuracy (hoá chất)</td>
-          <td class="mono"><strong>95.6%</strong> (172/180)</td>
-          <td>Riêng nhóm hoá chất tinh khiết — dễ nhận diện hơn khoáng vật/sinh học</td>
+          <td class="mono"><strong>90.0%</strong> (162/180)</td>
+          <td>Riêng nhóm hoá chất tinh khiết — dễ nhận diện hơn vật liệu bao bì/danh mục</td>
         </tr>
         <tr>
           <td>ECE (sai số hiệu chuẩn)</td>
-          <td class="mono"><strong>0.024</strong></td>
-          <td>Xác suất báo ra sát xác suất thực tế (0 = hoàn hảo); cho thấy mô hình Bayes
-            được hiệu chuẩn tốt, không quá tự tin cũng không quá bi quan</td>
+          <td class="mono"><strong>0.069</strong></td>
+          <td>Xác suất báo ra sát xác suất thực tế (0 = hoàn hảo); ngang cosine (0.055) khi cả hai
+            được hiệu chuẩn tốt nhất — lợi thế của Bayes là xếp hạng đúng hơn, không phải hiệu chuẩn tốt hơn</td>
         </tr>
         <tr>
           <td>Ngưỡng "không có trong thư viện"</td>
-          <td class="mono">&tau; = 1.062</td>
-          <td>Tại ngưỡng này, tỉ lệ từ chối nhầm (mẫu đúng bị cờ là lạ) chỉ 10% — giúp
-            cảnh báo khi gặp vật liệu chưa có trong thư viện</td>
+          <td class="mono">&tau; = 0.684</td>
+          <td>Tại ngưỡng này, tỉ lệ từ chối nhầm (mẫu đúng bị cờ là lạ) là 10%; từ chối được 35.6% chất
+            lạ trong thử loại-lớp — điểm yếu đã biết, xem trang Thuật toán §9.3</td>
         </tr>
       </tbody>
     </table>
     <p>
       So sánh: cosine (v1) 79.7% → Bayes đơn mẫu (v2) 83.7% → phiên bản hiện tại
-      (v3, within-class Bayes + đa kênh) 96.8% tổng thể, 95.6% hoá chất — chi tiết ở mục dưới.
+      (v3, within-class Bayes + đa kênh) 87.1% tổng thể, 90.0% hoá chất trên LOO nghiêm ngặt — chi tiết ở mục dưới;
+      cùng giao thức, cosine đạt 81.9% và không gian con kiểu SIMCA 82.3%.
     </p>
   </div>
 
@@ -333,16 +334,17 @@
             tổng có trọng số log BF (1.0 / 0.25 / 1.0); tự suy bước sóng kích thích huỳnh quang
             (đúng 96.5%) nên không cần khai báo.
             <br><strong>Tối ưu siêu tham số:</strong> &lambda; = 0.003, tối đa 7 thành phần chính,
-            giữ 95% phương sai — đưa 90.1% lên 96.0% trên tập 202 phổ. Sau khi gán lại nhãn toàn bộ
-            "Plastic" thành PE/PP/PS/PET và bỏ PVP (248 phổ): hiệu chuẩn lại &kappa; = 0.12,
-            &tau; = 1.062, đồng bộ Python và JavaScript (19/19 kiểm tra parity).
+            giữ 95% phương sai. Sau khi gán lại nhãn toàn bộ "Plastic" thành PE/PP/PS/PET, bỏ PVP (248 phổ)
+            và chuyển sang LOO nghiêm ngặt (25/08): hiệu chuẩn lại &kappa; = 0.08, &tau; = 0.684,
+            đồng bộ Python và JavaScript; benchmark cùng giao thức với cosine, SIMCA, χ² (trang Thuật toán §9.4).
           </td>
-          <td class="mono"><strong>96.8%</strong> tổng thể<br><strong>95.6%</strong> hoá chất<br>ECE <strong>0.024</strong><br>Đa kênh: 71.4% (49 mẫu vật), nhận được 15/27 mẫu không có tín hiệu Raman<br>Xuyên máy (NICODOM): 4/4 đúng, 12/13 chất lạ bị từ chối</td>
+          <td class="mono"><strong>87.1%</strong> tổng thể<br><strong>90.0%</strong> hoá chất<br>ECE <strong>0.069</strong><br>Đa kênh: 71.4% (49 mẫu vật), nhận được 15/27 mẫu không có tín hiệu Raman<br>Xuyên máy (NICODOM): 4/4 đúng, 12/13 chất lạ bị từ chối</td>
         </tr>
       </tbody>
     </table>
     <p>
-      Còn dở: 8 lỗi LOO còn lại là 3 phổ PE (SNR thấp / biến thiên mẫu) và 5 phổ Ethanol-Water (hỗn hợp nhiều nồng độ);
+      Còn dở: 32 lỗi LOO nghiêm ngặt tập trung ở bao bì (Paper/PE/PP nhầm nhau, SNR thấp) và Ethanol-Water (6/51, khớp về Ethanol);
+      khả năng từ chối chất lạ còn thấp (35.6%) do số hạng nền — hướng sửa đã xác định;
       trọng số đa kênh mới được xác nhận bằng nested CV trên cùng 49 mẫu vật, cần mẫu mới để hiệu
       chuẩn posterior fusion.
     </p>
