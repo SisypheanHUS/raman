@@ -1,4 +1,4 @@
-# RamanID — Nhận diện phổ Raman trên trình duyệt
+# RamanIOP — Nhận diện phổ Raman trên trình duyệt
 
 [![Live](https://img.shields.io/badge/live-sisypheanhus.github.io%2Framan-2ea44f?logo=github)](https://sisypheanhus.github.io/raman/)
 ![Static](https://img.shields.io/badge/backend-none-blue)
@@ -22,7 +22,7 @@ sinh tự động từ mã nguồn nghiên cứu. Không sửa tay các file ở
 | `data.json` | 34 MB (~23 MB gzip) | Thư viện phổ tham chiếu + mô hình within-class, mã hoá base64 uint16 (lo/hi từng đoạn) |
 | `catalog.html` | ~27 KB | Duyệt/xem toàn bộ phổ trong thư viện theo nguồn |
 | `about.html` | ~20 KB | Mô tả phương pháp, độ chính xác, lịch sử phiên bản |
-| `algorithm.html` | ~100 KB | Tài liệu thuật toán kiểu bài báo: khung RamanID, tổng quan tài liệu, benchmark LOO nghiêm ngặt |
+| `algorithm.html` | ~100 KB | Tài liệu thuật toán kiểu bài báo: khung RamanIOP, tổng quan tài liệu, benchmark LOO nghiêm ngặt |
 
 ## Vì sao trang web tái lập chính xác thuật toán và thư viện
 

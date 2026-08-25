@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Thuật toán — RamanID</title>
+<title>Thuật toán — RamanIOP</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -169,7 +169,7 @@
 <nav class="nav">
   <div class="nav-brand">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 18l3-4 2-6 2 4 2-9 2 9 2-2 3 4 4 4"></path></svg>
-    RamanID
+    RamanIOP
   </div>
   <span class="tagline">Nhận diện phổ trên trình duyệt</span>
   <a href="index.html">Nhận diện</a>
@@ -183,7 +183,7 @@
 
   <div class="paper-head">
     <div class="kind">Bản mô tả kỹ thuật · Technical note</div>
-    <h1>RamanID: một khung hợp lý biên Bayes giải tích cho nhận diện vật liệu từ phổ quang học</h1>
+    <h1>RamanIOP: một khung hợp lý biên Bayes giải tích cho nhận diện vật liệu từ phổ quang học</h1>
     <p class="authors">Đinh Thái Tuấn, Vũ Dương</p>
     <p class="affil">Trung tâm Điện tử Lượng tử, Viện Vật lý (IOP), Viện Hàn lâm Khoa học và Công nghệ Việt Nam (VAST)</p>
     <div class="date">Phiên bản 3.1 · 08/2026</div>
@@ -192,7 +192,7 @@
   <div class="abstract">
     <div class="lbl">Tóm tắt</div>
     <p>
-      Chúng tôi giới thiệu RamanID, một khung (framework) nhận diện vật liệu từ phổ quang học xây trên
+      Chúng tôi giới thiệu RamanIOP, một khung (framework) nhận diện vật liệu từ phổ quang học xây trên
       <em>hợp lý biên Bayes</em> (Bayesian marginal likelihood) tính theo công thức đóng. Khung gồm bốn tầng
       ghép được và thay được độc lập: (i) tầng bằng chứng — điểm so khớp là log Bayes factor giữa mô hình
       "phổ mẫu + nền Legendre + nhiễu" và mô hình "chỉ nền", với biên độ, nền và phương sai nhiễu được tích
@@ -201,7 +201,7 @@
       mềm (κ = 0.04, hiệu chuẩn theo ECE) và cờ open-set (τ = 0.657, hiệu chuẩn tại 10% từ chối nhầm);
       (iv) tầng hợp nhất — bằng chứng Raman, huỳnh quang và hấp thụ cộng trên cùng thang log-evidence. Trên
       thư viện 16 070 phổ (2 495 lớp) và giao thức leave-one-out <em>nghiêm ngặt</em> (mô hình lớp dựng lại
-      không có phổ đang chấm) với 248 phổ đo tại VAST, RamanID đạt top-1 90.3% (93.9% trên hoá chất; đồng
+      không có phổ đang chấm) với 248 phổ đo tại VAST, RamanIOP đạt top-1 90.3% (93.9% trên hoá chất; đồng
       nghĩa xuyên nguồn đã gộp trong thư viện) so với 81.9% của HQI/cosine, 83.5% của phân loại không gian con kiểu SIMCA và
       74.6% của kiểm định χ² phần dư kiểu TruScan, với hiệu chuẩn tương đương (ECE 0.065 so với 0.054). Trong
       thử loại-lớp nội bộ, số hạng nền mua độ chính xác xếp hạng bằng khả năng từ chối chất lạ (30.0% so với
@@ -244,7 +244,7 @@
     <p>
       Các phương pháp học sâu (CNN trên phổ) giải quyết một phần vấn đề nhưng đòi hỏi hàng trăm đến
       hàng nghìn phổ mỗi lớp — điều kiện không thể có với thư viện thực tế, nơi đa số lớp chỉ có 1–3
-      phổ. RamanID chọn hướng thứ ba, tiếp nối dòng công trình của Zhong, Girolami và cộng sự [2] và
+      phổ. RamanIOP chọn hướng thứ ba, tiếp nối dòng công trình của Zhong, Girolami và cộng sự [2] và
       Moores và cộng sự [3]: đặt so khớp thư viện vào khuôn khổ <em>so sánh mô hình Bayes</em>, trong
       đó mỗi lớp ứng viên là một mô hình sinh của phổ đo, và điểm số là <em>Bayes factor</em> giữa mô
       hình "có chất" và mô hình "chỉ có nền". Vì mô hình tuyến tính theo tham số với tiên nghiệm liên
@@ -252,7 +252,7 @@
       trình duyệt hay thiết bị cầm tay.
     </p>
     <p>
-      Bài này trình bày RamanID như một <em>khung</em> bốn tầng, trong đó mỗi tầng có giao diện rõ với tầng
+      Bài này trình bày RamanIOP như một <em>khung</em> bốn tầng, trong đó mỗi tầng có giao diện rõ với tầng
       kế tiếp và có thể thay thế độc lập: tầng <em>bằng chứng</em> (§5) biến một cặp phổ đo–lớp ứng viên thành
       một log Bayes factor theo kênh; tầng <em>biến thiên trong lớp</em> (§6) quyết định lớp được đại diện bằng
       gì; tầng <em>quyết định</em> (§7) biến vector Bayes factor thành hậu nghiệm hiệu chuẩn và cờ open-set;
@@ -283,7 +283,7 @@
   <div class="sec" id="s2">
     <h2><span class="num">2</span>Tổng quan tài liệu</h2>
     <p>
-      Mục này đặt RamanID vào bối cảnh các công trình đã có, theo bốn trục tương ứng với bốn khối của
+      Mục này đặt RamanIOP vào bối cảnh các công trình đã có, theo bốn trục tương ứng với bốn khối của
       thuật toán: điểm so khớp thư viện (§5), mô hình biến thiên trong lớp (§6), quyết định open-set và
       hiệu chuẩn xác suất (§7, §9), hợp nhất đa phương thức (§8). Khảo sát được thực hiện tháng 8/2026
       trên văn liệu tiếng Anh, Trung, Nga, sáng chế và mã nguồn mở; phạm vi và giới hạn của khảo sát
@@ -311,7 +311,7 @@
       lượng hợp lý biên bằng BIC, tích phân nhiệt động và phương pháp Chib trên RJMCMC; Moores và cộng sự
       [3] mô hình peak Lorentz/Voigt cộng nền spline và suy luận bằng SMC; Härkönen và cộng sự [7] mở
       rộng sang CARS. Cả ba đều dùng lấy mẫu, làm việc trên một hoặc vài chất đã biết, và không nhắm tới
-      tra cứu thư viện quy mô nghìn lớp. RamanID giữ lại ý tưởng cốt lõi — mỗi chất là một mô hình sinh,
+      tra cứu thư viện quy mô nghìn lớp. RamanIOP giữ lại ý tưởng cốt lõi — mỗi chất là một mô hình sinh,
       điểm số là Bayes factor [8] — nhưng chọn mô hình tuyến tính với tiên nghiệm liên hợp để hợp lý biên
       có công thức đóng theo khuôn khổ evidence của MacKay [9], đủ rẻ để chấm hàng nghìn ứng viên trong
       trình duyệt.
@@ -338,7 +338,7 @@
       để hiệu chỉnh tín hiệu bằng bình phương tối thiểu, không phải để chấm điểm phân loại.
     </p>
     <p>
-      Mô hình trong lớp của RamanID (§6) là giao của ba dòng trên: không gian con PCA của SIMCA, ma trận
+      Mô hình trong lớp của RamanIOP (§6) là giao của ba dòng trên: không gian con PCA của SIMCA, ma trận
       thiết kế "tham chiếu + nền" của EMSC, và hợp lý biên đóng của hồi quy ridge Bayes. Điểm khác về cơ
       chế là các hệ số của PC, của nền và phương sai nhiễu đều được tích phân loại bỏ, nên yếu tố Occam
       trong (12) tự phạt việc thêm thành phần, và điểm lớp vẫn là một log Bayes factor so với cùng mô hình
@@ -355,7 +355,7 @@
       hiệu chuẩn kỳ vọng ECE [20] là công cụ chuẩn trong học máy, nhưng theo khảo sát của
       chúng tôi chưa có công trình nhận diện phổ Raman/IR/NIR nào báo cáo ECE hay biểu đồ độ tin cậy
       cho xác suất mà nó xuất ra; thực hành thương mại vẫn là ngưỡng HQI cố định hoặc kiểm định p-value
-      trên phần dư đa biến. RamanID ghép hai mảnh này lên một điểm số sinh: softmax làm mềm trên log Bayes
+      trên phần dư đa biến. RamanIOP ghép hai mảnh này lên một điểm số sinh: softmax làm mềm trên log Bayes
       factor với κ chọn theo ECE (§7.2, §9.2) và ngưỡng τ hiệu chuẩn theo tỉ lệ từ chối nhầm (§7.3).
     </p>
 
@@ -364,7 +364,7 @@
       Hợp nhất dữ liệu phổ thường được phân thành mức thấp (ghép dữ liệu thô), trung (ghép đặc trưng) và
       cao (ghép quyết định), với Raman hay được ghép cùng LIBS, NIR hoặc XRF bằng PLS-DA, rừng ngẫu nhiên
       hay CNN. Xu và cộng sự [21] dùng quy tắc Bayes để nhân hậu nghiệm của hai bộ phân loại
-      NIR và Raman — hợp nhất mức quyết định. RamanID hợp nhất ở mức <em>bằng chứng</em>: tổng có trọng số
+      NIR và Raman — hợp nhất mức quyết định. RamanIOP hợp nhất ở mức <em>bằng chứng</em>: tổng có trọng số
       của log hợp lý biên từng kênh, tức một logarithmic opinion pool [22] trên Bayes factor,
       cùng số hạng phạt log(số phổ mẫu) cho sai lệch chọn-max. Chúng tôi không tìm thấy công trình nào
       hợp nhất Raman với huỳnh quang và hấp thụ theo cách này, dùng đường huỳnh quang làm bằng chứng
@@ -373,7 +373,7 @@
     </p>
 
     <table class="data-table">
-      <thead><tr><th>Khối của RamanID</th><th>Tiền lệ gần nhất</th><th>Điểm khác</th></tr></thead>
+      <thead><tr><th>Khối của RamanIOP</th><th>Tiền lệ gần nhất</th><th>Điểm khác</th></tr></thead>
       <tbody>
         <tr><td>Bayes factor đóng làm điểm tra cứu (§5)</td><td>Zhong và cộng sự [2]; Mikhalychev và Ulyanenkov [10]; sáng chế TruScan [11]</td><td>Không MCMC; nền Legendre tích phân giống nhau dưới H<sub>c</sub> và H<sub>0</sub>; quy mô 2 500 lớp</td></tr>
         <tr><td>Không gian con trong lớp + nền (§6)</td><td>SIMCA [12], SIMCA xác suất [13], EMSC [17]</td><td>Hệ số và phương sai tích phân loại bỏ; điểm là log BF so với null</td></tr>
@@ -383,7 +383,7 @@
         <tr><td>Chạy trong trình duyệt (§10)</td><td>Open Specy [5]</td><td>Toàn bộ suy luận Bayes ở phía máy khách, không máy chủ</td></tr>
       </tbody>
     </table>
-    <p class="caption"><b>Bảng 1.</b> Vị trí của từng khối RamanID so với tiền lệ gần nhất tìm được. Không khối nào là mới về mặt toán học; đóng góp nằm ở cách ghép và hiệu chuẩn.</p>
+    <p class="caption"><b>Bảng 1.</b> Vị trí của từng khối RamanIOP so với tiền lệ gần nhất tìm được. Không khối nào là mới về mặt toán học; đóng góp nằm ở cách ghép và hiệu chuẩn.</p>
 
     <div class="note">
       <b>Giới hạn của khảo sát.</b> Tìm kiếm dùng công cụ web và GitHub (tiếng Anh, Trung, Nga), tra cứu
@@ -422,7 +422,7 @@
       </tbody>
     </table>
     <div class="figure">
-      <svg viewBox="0 0 760 118" xmlns="http://www.w3.org/2000/svg" font-family="Barlow, system-ui, sans-serif" font-size="12" fill="currentColor" role="img" aria-label="Sơ đồ pipeline RamanID">
+      <svg viewBox="0 0 760 118" xmlns="http://www.w3.org/2000/svg" font-family="Barlow, system-ui, sans-serif" font-size="12" fill="currentColor" role="img" aria-label="Sơ đồ pipeline RamanIOP">
         <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
         <g stroke="currentColor" fill="none" stroke-width="1">
           <rect x="4" y="30" width="118" height="58"/><rect x="160" y="30" width="118" height="58"/><rect x="316" y="30" width="118" height="58"/><rect x="472" y="30" width="118" height="58"/><rect x="628" y="30" width="128" height="58"/>
@@ -758,7 +758,7 @@
     <h3>7.3 Quyết định open-set</h3>
     <p>
       Hậu nghiệm (19) chỉ phân bố xác suất <em>giữa các lớp trong thư viện</em>; nó không thể nói "không
-      có lớp nào phù hợp" vì luôn có tổng bằng 1. Vì vậy RamanID tách quyết định thứ hai — theo tinh thần
+      có lớp nào phù hợp" vì luôn có tổng bằng 1. Vì vậy RamanIOP tách quyết định thứ hai — theo tinh thần
       tách P(đúng | có trong thư viện) khỏi P(có trong thư viện) của Stein [6] — dựa trên bằng
       chứng tuyệt đối thay vì tương đối:
     </p>
@@ -772,7 +772,7 @@
       thang cường độ, ngưỡng này có thể áp dụng cho mọi phổ bất kể độ phủ.
     </p>
     <p>
-      Bên cạnh <span class="m">B<sub>c</sub></span>, RamanID tính một thống kê thứ hai cho open-set: bằng chứng
+      Bên cạnh <span class="m">B<sub>c</sub></span>, RamanIOP tính một thống kê thứ hai cho open-set: bằng chứng
       <em>không nền</em> <span class="m">B<sup>0</sup><sub>j</sub></span> của phổ đo so với từng phổ thư viện
       <span class="m">j</span>, tức mô hình <span class="m"><b>y</b> = a·<b>t</b><sub>j</sub> + ε</span> so với
       <span class="m"><b>y</b> = ε</span>. Với <span class="m">A = <b>t</b><sub>j</sub>·<b>t</b><sub>j</sub> + λ</span>,
@@ -980,8 +980,8 @@
     <table class="data-table">
       <thead><tr><th>Phương pháp</th><th class="r">Top-1, toàn bộ</th><th class="r">Top-1, hoá chất</th><th class="r">ECE*</th><th class="r">Từ chối chất lạ</th></tr></thead>
       <tbody>
-        <tr><td><b>RamanID</b> — evidence + mô hình trong lớp + nền</td><td class="mono r"><b>90.3%</b></td><td class="mono r"><b>93.9%</b></td><td class="mono r">0.065</td><td class="mono r">30.0%</td></tr>
-        <tr><td>RamanID, phổ mẫu đơn (không mô hình trong lớp)</td><td class="mono r">85.9%</td><td class="mono r">90.6%</td><td class="mono r">0.079</td><td class="mono r">35.0%</td></tr>
+        <tr><td><b>RamanIOP</b> — evidence + mô hình trong lớp + nền</td><td class="mono r"><b>90.3%</b></td><td class="mono r"><b>93.9%</b></td><td class="mono r">0.065</td><td class="mono r">30.0%</td></tr>
+        <tr><td>RamanIOP, phổ mẫu đơn (không mô hình trong lớp)</td><td class="mono r">85.9%</td><td class="mono r">90.6%</td><td class="mono r">0.079</td><td class="mono r">35.0%</td></tr>
         <tr><td>Evidence không nền (ablation)</td><td class="mono r">81.9%</td><td class="mono r">86.7%</td><td class="mono r">0.053</td><td class="mono r"><b>62.8%</b></td></tr>
         <tr><td>HQI / cosine [1]</td><td class="mono r">81.9%</td><td class="mono r">86.7%</td><td class="mono r"><b>0.054</b></td><td class="mono r"><b>62.8%</b></td></tr>
         <tr><td>Không gian con LS kiểu SIMCA/CLAFIC [13]</td><td class="mono r">83.5%</td><td class="mono r">85.6%</td><td class="mono r">0.068</td><td class="mono r">50.0%</td></tr>
@@ -990,7 +990,7 @@
         <tr><td>Quy tắc lai (top-1): cờ B⁰ của lớp xếp hạng nhất</td><td class="mono r"><b>90.3%</b></td><td class="mono r"><b>93.9%</b></td><td class="mono r">0.065</td><td class="mono r"><b>62.8%</b></td></tr>
       </tbody>
     </table>
-    <p class="caption"><b>Bảng 3.</b> Benchmark LOO nghiêm ngặt, 248 phổ VAST, thư viện 16 070 phổ (2 495 lớp, đồng nghĩa xuyên nguồn đã gộp trong thư viện). ECE* = cực tiểu theo nhiệt độ softmax riêng của từng phương pháp. Từ chối chất lạ = loại cả nhóm, τ riêng tại 10% từ chối nhầm, 180 phổ hoá chất. "Không gian con" dùng đúng các mô hình lớp của RamanID nhưng chiếu bình phương tối thiểu, không tiên nghiệm, không nền; "χ²" hồi quy y trên [1, t] với phương sai nhiễu ước lượng từ sai phân bậc hai. So cặp với RamanID (RamanID đúng–phương pháp kia sai / ngược lại): cosine 22/1, không gian con 18/1, χ² 39/0, phổ mẫu đơn 11/0. Quy tắc cố định để tham chiếu: cosine cắt 0.95 từ chối 66.7% nhưng từ chối nhầm 11.3%; cắt 0.90 chỉ từ chối 37.2%; χ² với p &lt; 0.05 từ chối nhầm 80.2% phổ nội máy. AUROC known-vs-unknown (điểm tốt nhất trong thư viện so với điểm tốt nhất khi loại cả nhóm, 180 phổ hoá chất): evidence đầy đủ 0.853, không nền 0.888, cosine 0.888, không gian con 0.863, χ² 0.880; quy tắc lai (max/top-1) 0.888/0.892. Từ chối ở 5% từ chối nhầm: đầy đủ 17.8%, không nền 51.7%, lai top-1 55.0%.</p>
+    <p class="caption"><b>Bảng 3.</b> Benchmark LOO nghiêm ngặt, 248 phổ VAST, thư viện 16 070 phổ (2 495 lớp, đồng nghĩa xuyên nguồn đã gộp trong thư viện). ECE* = cực tiểu theo nhiệt độ softmax riêng của từng phương pháp. Từ chối chất lạ = loại cả nhóm, τ riêng tại 10% từ chối nhầm, 180 phổ hoá chất. "Không gian con" dùng đúng các mô hình lớp của RamanIOP nhưng chiếu bình phương tối thiểu, không tiên nghiệm, không nền; "χ²" hồi quy y trên [1, t] với phương sai nhiễu ước lượng từ sai phân bậc hai. So cặp với RamanIOP (RamanIOP đúng–phương pháp kia sai / ngược lại): cosine 22/1, không gian con 18/1, χ² 39/0, phổ mẫu đơn 11/0. Quy tắc cố định để tham chiếu: cosine cắt 0.95 từ chối 66.7% nhưng từ chối nhầm 11.3%; cắt 0.90 chỉ từ chối 37.2%; χ² với p &lt; 0.05 từ chối nhầm 80.2% phổ nội máy. AUROC known-vs-unknown (điểm tốt nhất trong thư viện so với điểm tốt nhất khi loại cả nhóm, 180 phổ hoá chất): evidence đầy đủ 0.853, không nền 0.888, cosine 0.888, không gian con 0.863, χ² 0.880; quy tắc lai (max/top-1) 0.888/0.892. Từ chối ở 5% từ chối nhầm: đầy đủ 17.8%, không nền 51.7%, lai top-1 55.0%.</p>
     <p>
       Ba điều rút ra. <em>Thứ nhất</em>, tầng bằng chứng thắng rõ về xếp hạng: +8.4 điểm so với cosine và
       +6.8 so với không gian con, và phần thắng đến từ hai nguồn tách được — nền Legendre (+4.0 điểm, so
@@ -1064,7 +1064,7 @@
       evidence đầy đủ bằng hoặc cao hơn ở 4/5 nguồn (Bērziņš 0.81 so với 0.73). Lợi thế 62.8% so với 30.0% ở §9.3
       là tạo tác của thử loại-lớp cùng máy: khi "chất lạ" được đo trên đúng máy của thư viện, nền linh hoạt chỉ
       còn giúp giải thích họ hàng hoá học; khi đổi máy, chính nền đó hấp thụ lệch dụng cụ cho cả chất đúng lẫn
-      chất lạ, và hai thống kê phân biệt như nhau. Vì thế kết luận open-set của RamanID dùng evidence đầy đủ (20),
+      chất lạ, và hai thống kê phân biệt như nhau. Vì thế kết luận open-set của RamanIOP dùng evidence đầy đủ (20),
       và evidence không nền được giữ như chỉ báo phụ. <em>Thứ tư</em>, lỗi nhận diện ngoài có cấu trúc hoá học
       dễ đọc — PE khớp magnesium stearate (chuỗi alkyl), gypsum khớp anhydrite, PDMS khớp khoáng silicat, "dentin"
       và "amylopectin" bị coi là chất lạ dù khớp đúng hydroxylapatite và tinh bột — nên phần "unknown-xa được
@@ -1168,7 +1168,7 @@
   </div>
 
   <div class="footer">
-    RamanID · Viện Vật lý (IOP), VAST · Mã nguồn thuật toán: <code>bayes.py</code>, <code>multimodal.py</code>, <code>web/core.js</code>
+    RamanIOP · Viện Vật lý (IOP), VAST · Mã nguồn thuật toán: <code>bayes.py</code>, <code>multimodal.py</code>, <code>web/core.js</code>
   </div>
 
 </div>
