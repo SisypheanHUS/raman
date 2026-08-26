@@ -356,7 +356,7 @@ const GRID_START = 450.0, GRID_STEP = 2.0, GRID_N = 1376;
 const GRID_END = GRID_START + GRID_STEP * (GRID_N - 1);
 const MIN_OVERLAP = Math.floor(0.30 * GRID_N);
 // Calibrated constants — keep in sync with bayes.py (see evaluate_bayes.py output).
-const LAMBDA = 0.01, N_BASE = 6, KAPPA = 0.04, NULL_TAU = 0.657;
+const LAMBDA = 0.01, N_BASE = 6, KAPPA = 0.04, NULL_TAU = 0.661;
 // Baseline-free evidence threshold (bayes.NULL_TAU0) — diagnostic only; the verdict
 // uses NULL_TAU on the full evidence (frozen external test, 26/08/2026).
 const NULL_TAU0 = 1.084;
@@ -629,6 +629,127 @@ function pairBfNobaseAll(q, library) {
 // as the max over small x-shifts of the query (+-1 channel) and over both the
 // within-class model and every individual spectrum of the class.
 const RERANK_TOP = 20, RERANK_SHIFTS = [-1, 0, 1];
+// Resolution matching (bayes.BLUR_MATCH): widen each class's template to the
+// query's own peak width before scoring, capped at this many channels of sigma.
+const BLUR_MATCH = 4;
+
+// --- scipy.signal.find_peaks / peak_widths, the subset bayes.peak_fwhm uses ---
+// Ported rather than approximated: the sigma these produce feeds straight into
+// the evidence, so a JS estimator that merely resembled scipy's would put the
+// two implementations on different models. Operates on the contiguous valid
+// slice, which equals numpy's spec[~isnan(spec)] because no library or query
+// spectrum has an interior gap (checked over all 16070 library spectra).
+
+function localMaxima(y) {  // scipy _local_maxima_1d: plateaus report their middle
+  const out = [];
+  const iMax = y.length - 1;
+  let i = 1;
+  while (i < iMax) {
+    if (y[i - 1] < y[i]) {
+      let iAhead = i + 1;
+      while (iAhead < iMax && y[iAhead] === y[i]) iAhead++;
+      if (y[iAhead] < y[i]) { out.push((i + iAhead - 1) >> 1); i = iAhead; }
+    }
+    i++;  // scipy advances on every iteration, including after a plateau jump
+  }
+  return out;
+}
+
+function peakProminences(y, peaks) {  // scipy _peak_prominences, wlen unset
+  return peaks.map(peak => {
+    let i = peak, leftMin = y[peak], leftBase = peak;
+    while (i >= 0 && y[i] <= y[peak]) {
+      if (y[i] < leftMin) { leftMin = y[i]; leftBase = i; }
+      i--;
+    }
+    i = peak;
+    let rightMin = y[peak], rightBase = peak;
+    while (i < y.length && y[i] <= y[peak]) {
+      if (y[i] < rightMin) { rightMin = y[i]; rightBase = i; }
+      i++;
+    }
+    return { prominence: y[peak] - Math.max(leftMin, rightMin), leftBase, rightBase };
+  });
+}
+
+function peakWidths(y, peaks, proms, relHeight = 0.5) {  // scipy _peak_widths
+  return peaks.map((peak, n) => {
+    const { prominence, leftBase, rightBase } = proms[n];
+    const height = y[peak] - prominence * relHeight;
+    let i = peak;
+    while (leftBase < i && height < y[i]) i--;
+    let leftIp = i;
+    if (y[i] < height) leftIp = i + (height - y[i]) / (y[i + 1] - y[i]);
+    i = peak;
+    while (i < rightBase && height < y[i]) i++;
+    let rightIp = i;
+    if (y[i] < height) rightIp = i - (height - y[i]) / (y[i - 1] - y[i]);
+    return rightIp - leftIp;
+  });
+}
+
+function quantileLinear(sorted, q) {  // numpy default 'linear' interpolation
+  const pos = q * (sorted.length - 1);
+  const lo = Math.floor(pos), hi = Math.ceil(pos);
+  return lo === hi ? sorted[lo] : sorted[lo] + (sorted[hi] - sorted[lo]) * (pos - lo);
+}
+
+// Which quantile of the peak widths stands in for this spectrum's resolution
+// (bayes.FWHM_QUANTILE). Instrument resolution is a lower bound on peak width --
+// nothing can be narrower, while real bands can be wider -- so the median
+// conflates an intrinsically broad band with a resolution-limited one. Must
+// equal the Python value; test_blur.mjs checks that it does.
+const FWHM_QUANTILE = 0.10;
+
+// Low-quantile FWHM of the prominent peaks, in grid channels; NaN if unmeasurable.
+function peakFwhm(spec, prominenceFrac = 0.05, q = FWHM_QUANTILE) {
+  const n = spec.i1 - spec.i0 + 1;
+  if (n < 20) return NaN;
+  const y = new Float64Array(n);
+  for (let i = 0; i < n; i++) y[i] = spec.v[spec.i0 + i];
+  const sorted = Float64Array.from(y).sort();
+  const span = quantileLinear(sorted, 0.99) - quantileLinear(sorted, 0.5);
+  if (!(span > 0)) return NaN;
+  const peaks = localMaxima(y);
+  const proms = peakProminences(y, peaks);
+  const keep = peaks.filter((_, i) => proms[i].prominence >= prominenceFrac * span);
+  const keptProms = proms.filter(p => p.prominence >= prominenceFrac * span);
+  if (!keep.length) return NaN;
+  const w = peakWidths(y, keep, keptProms).sort((a, b) => a - b);
+  return quantileLinear(w, q);  // numpy.quantile default interpolation
+}
+
+// Sigma widening a template of FWHM wt to the query's wq (Gaussian widths add in
+// quadrature); zero when the template is already at least as broad.
+function matchSigma(wq, wt, cap) {
+  if (!(wq === wq) || !(wt === wt)) return 0;
+  const d = wq * wq - wt * wt;
+  if (d <= 0) return 0;
+  return Math.min(Math.sqrt(d) / 2.3548, cap);
+}
+
+// Gaussian smoothing by sigma channels, mask-aware (normalised convolution);
+// the valid range is preserved, so coverage is never invented.
+function blurSpectrum(spec, sigma) {
+  if (!(sigma > 0)) return spec;
+  const r = Math.ceil(3 * sigma);
+  const k = new Float64Array(2 * r + 1);
+  let ksum = 0;
+  for (let j = -r; j <= r; j++) { k[j + r] = Math.exp(-0.5 * (j / sigma) ** 2); ksum += k[j + r]; }
+  for (let j = 0; j < k.length; j++) k[j] /= ksum;
+  const v = new Float64Array(GRID_N).fill(NaN);
+  for (let i = spec.i0; i <= spec.i1; i++) {
+    let num = 0, den = 0;
+    for (let j = -r; j <= r; j++) {
+      const s = i - j;                       // np.convolve orientation
+      if (s < spec.i0 || s > spec.i1) continue;
+      num += spec.v[s] * k[j + r];
+      den += k[j + r];
+    }
+    v[i] = den > 0.5 ? num / den : NaN;
+  }
+  return { v, i0: spec.i0, i1: spec.i1, label: spec.label };
+}
 
 function shiftQuery(q, k) {
   if (k === 0) return q;
@@ -645,18 +766,31 @@ function rerankTop(q, best, library, wcModels) {
   for (const entry of library) if (labset.has(entry.label)) byLabel.get(entry.label).push(entry);
   const models = new Map();
   if (wcModels) for (const m of wcModels) if (labset.has(m.label)) models.set(m.label, m);
+  const wq = BLUR_MATCH > 0 ? peakFwhm(q) : NaN;
+  const shifted = RERANK_SHIFTS.map(k => shiftQuery(q, k));
   for (const lab of labs) {
     const cur = best.get(lab);
-    for (const k of RERANK_SHIFTS) {
-      const qs = shiftQuery(q, k);
-      const model = models.get(lab);
+    let model = models.get(lab);
+    let entries = byLabel.get(lab);
+    if (BLUR_MATCH > 0) {
+      // One sigma per class, off the class mean or its first spectrum in library
+      // order — the same reference bayes.rerank_top uses.
+      const ref = model ? model.mean : entries[0];
+      const sigma = matchSigma(wq, peakFwhm(ref), BLUR_MATCH);
+      if (sigma > 0) {
+        if (model) model = { label: model.label, mean: blurSpectrum(model.mean, sigma),
+                             pcs: model.pcs.map(pc => blurSpectrum(pc, sigma)) };
+        entries = entries.map(e => blurSpectrum(e, sigma));
+      }
+    }
+    for (const qs of shifted) {
       if (model) {
         const bf = pairBfWc(qs, model);
         if (bf !== null && bf > cur.bf) cur.bf = bf;
       }
-      for (const entry of byLabel.get(lab)) {
-        const bf = pairBF(qs, entry);
-        if (bf !== null && bf > cur.bf) { cur.bf = bf; cur.entry = entry; }
+      for (let n = 0; n < entries.length; n++) {
+        const bf = pairBF(qs, entries[n]);
+        if (bf !== null && bf > cur.bf) { cur.bf = bf; cur.entry = byLabel.get(lab)[n]; }
       }
     }
   }
@@ -700,6 +834,13 @@ function classify(q, library, wcModels, rerank = true) {
 
 // ---- peaks -----------------------------------------------------------------
 
+// The peak list shown to the user; mirrors ramanlib.find_spectrum_peaks, whose
+// exact positions test_core.mjs asserts. Its prominence walk looks like the one
+// in peakProminences above, but the two must NOT be merged: this one follows
+// ramanlib (strict maxima, absolute prominence, positions in cm^-1) while that
+// one follows scipy, because the width it feeds into the evidence has to match
+// what bayes.peak_fwhm computes. Making either agree with the other would put
+// one of the two paths on a different definition than its Python counterpart.
 function findPeaks(q, prominence = 0.03) {
   const v = q.v, peaks = [];
   for (let i = q.i0 + 1; i < q.i1; i++) {
@@ -925,6 +1066,7 @@ function decodeWcModels(data, atob_) {
 
 if (typeof module !== "undefined") {
   module.exports = { parseSpectrum, preprocess, classify, findPeaks, decodeLibrary,
+                     peakFwhm, matchSigma, blurSpectrum, BLUR_MATCH, FWHM_QUANTILE,
                      pairBF, pairBfWc, pairBfNobaseAll, gridWavenumber, GRID_N, NULL_TAU, NULL_TAU0, KAPPA,
                      decodeLibraryMm, decodeWcModels, preprocessNm, pairBFNm,
                      fluorClassBFs, absClassBFs, ramanCategoryBFs, fuse, parseEx,
