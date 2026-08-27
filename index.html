@@ -283,6 +283,8 @@
       <button class="btn" data-demo="1">Glucose 532 nm (Raman)</button>
       <button class="btn" id="demomm">Vỏ lon kim loại (huỳnh quang + hấp thụ)</button>
       <button class="btn" id="clearall" style="display:none">Xoá tất cả</button>
+      <button class="btn" id="calib" style="display:none" title="Các file Raman đang nạp phải là chất CÓ trong thư viện, đo trên máy của bạn. Ngưỡng unknown sẽ được dịch theo mức bằng chứng của máy đó.">Hiệu chuẩn máy từ các file này (τ)</button>
+      <button class="btn" id="calibinfo" style="display:none" title="Bấm để bỏ hiệu chuẩn, quay về τ chuẩn"></button>
     </div>
   </div>
 </div>
@@ -797,8 +799,26 @@ function rerankTop(q, best, library, wcModels) {
   return best;
 }
 
+// Per-instrument unknown threshold (bayes.instrument_tau). NULL_TAU is the 10%
+// quantile of the strict-LOO best BFs on the VAST instrument; another instrument
+// shifts the whole BF distribution, so tau moves by the amount the median of a
+// few known spectra moved. At k = 5 on the frozen external evaluation this brings
+// false rejection to within two points of 10% on every source (Berzins 22.7% ->
+// 14.5%, low-resolution RRUFF 13.4% -> 4.3%). Fewer than the minimum returns tau.
+const VAST_LOO_MEDIAN_BF = 1.577, INSTRUMENT_TAU_MIN_K = 3;
+
+function instrumentTau(knownBfs, tau = NULL_TAU) {
+  const v = knownBfs.filter(Number.isFinite).sort((a, b) => a - b);
+  if (v.length < INSTRUMENT_TAU_MIN_K) return tau;
+  const m = v.length >> 1;
+  const med = v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2;
+  return tau + med - VAST_LOO_MEDIAN_BF;
+}
+
 // Match query against the whole library (with optional within-class models).
-function classify(q, library, wcModels, rerank = true) {
+// tau: the unknown threshold to apply -- NULL_TAU, or instrumentTau(...) when
+// the user has calibrated on known spectra from their own instrument.
+function classify(q, library, wcModels, rerank = true, tau = NULL_TAU) {
   let best = new Map();
   const wcDone = new Set();
   if (wcModels) {
@@ -828,7 +848,7 @@ function classify(q, library, wcModels, rerank = true) {
     .sort((a, b) => b.bf - a.bf);
   // Verdict on the full evidence; the baseline-free statistic is reported alongside.
   const nb = pairBfNobaseAll(q, library);
-  return { results, unknown: mx < NULL_TAU, unknownNobase: nb.max < NULL_TAU0,
+  return { results, unknown: mx < tau, tau, unknownNobase: nb.max < NULL_TAU0,
            bf0: nb.max, bf0Label: nb.label };
 }
 
@@ -1067,6 +1087,7 @@ function decodeWcModels(data, atob_) {
 if (typeof module !== "undefined") {
   module.exports = { parseSpectrum, preprocess, classify, findPeaks, decodeLibrary,
                      peakFwhm, matchSigma, blurSpectrum, BLUR_MATCH, FWHM_QUANTILE,
+                     instrumentTau, VAST_LOO_MEDIAN_BF, INSTRUMENT_TAU_MIN_K,
                      pairBF, pairBfWc, pairBfNobaseAll, gridWavenumber, GRID_N, NULL_TAU, NULL_TAU0, KAPPA,
                      decodeLibraryMm, decodeWcModels, preprocessNm, pairBFNm,
                      fluorClassBFs, absClassBFs, ramanCategoryBFs, fuse, parseEx,
@@ -1081,6 +1102,21 @@ const MOD_VN = { raman: "Raman", fluor: "Huỳnh quang", abs: "Hấp thụ" };
 const SUBMIT_URL = "https://script.google.com/macros/s/AKfycbwMyQla1UuQ6VrET1yMlMunR6AJ5JKp6S4jmEarb8X86QL5q8fxZ1f-HqWDIyq25cUD/exec";
 const $ = id => document.getElementById(id);
 let tray = [];
+
+// ---- per-instrument threshold (few-shot calibration) ----------------------
+// NULL_TAU was calibrated on the VAST instrument. On another instrument the
+// whole evidence scale shifts, so the user can load a few spectra of substances
+// they KNOW are in the library, measured on their own instrument, and tau moves
+// by the amount their median evidence differs from VAST's (core.js
+// instrumentTau). Stored per browser; one click clears it.
+const CALIB_KEY = "ramaniop.instrumentTau.v1";
+let INST = null;   // { tau, k, names } or null
+try { INST = JSON.parse(localStorage.getItem(CALIB_KEY)) || null; } catch (e) { INST = null; }
+function currentTau() { return INST ? INST.tau : NULL_TAU; }
+function saveCalib(v) {
+  INST = v;
+  try { v ? localStorage.setItem(CALIB_KEY, JSON.stringify(v)) : localStorage.removeItem(CALIB_KEY); } catch (e) {}
+}
 
 let renderGen = 0;
 
@@ -1277,6 +1313,11 @@ function renderTray() {
     el.appendChild(c);
   }
   $("clearall").style.display = tray.length ? "inline-flex" : "none";
+  // Calibration needs at least INSTRUMENT_TAU_MIN_K usable Raman spectra of KNOWN substances.
+  const nCal = tray.filter(t => t.kind === "raman" && !t.peakless).length;
+  $("calib").style.display = nCal >= INSTRUMENT_TAU_MIN_K ? "inline-flex" : "none";
+  $("calibinfo").style.display = INST ? "inline-flex" : "none";
+  if (INST) $("calibinfo").textContent = "τ máy = " + INST.tau.toFixed(3) + " (từ " + INST.k + " phổ; chuẩn " + NULL_TAU + ") ✕";
 }
 
 function renderAll() {
@@ -1291,7 +1332,7 @@ function renderAll() {
   if (ramanUsable.length) {
     const best = new Map();
     for (const t of ramanUsable) {
-      const r = classify(t.q, LIBRARY, WC_MODELS);
+      const r = classify(t.q, LIBRARY, WC_MODELS, true, currentTau());
       t.res = r;
       for (const [lab, bf] of ramanCategoryBFs(r.results))
         if (!best.has(lab) || bf > best.get(lab)) best.set(lab, bf);
@@ -1349,7 +1390,7 @@ function renderAll() {
         '<div class="verdict-title">Có thể không có trong thư viện</div><div class="verdict-note"></div></div>' +
         '<div class="verdict-score"><div class="num"></div><div class="lbl">kết quả tốt nhất</div></div>';
       banner.querySelector(".verdict-note").textContent =
-        "bằng chứng tốt nhất " + top.bf.toFixed(3) + " < τ=" + NULL_TAU +
+        "bằng chứng tốt nhất " + top.bf.toFixed(3) + " < " + (INST ? "τ máy=" : "τ=") + bestRaman.res.tau.toFixed(3) +
         " (bằng chứng không nền " + bestRaman.res.bf0.toFixed(3) + (bestRaman.res.unknownNobase ? " < " : " ≥ ") + "τ0=" + NULL_TAU0 + ")" +
         " — lớp gần nhất: " + top.label + ". Xác suất hậu nghiệm bên dưới chỉ có ý nghĩa xếp hạng tương đối." + peaklessNote;
       banner.querySelector(".verdict-score .num").textContent = fmtPct(top.post);
@@ -1523,6 +1564,19 @@ function wireEvents() {
     if (errors.length) showError(errors.join(" "));
   });
   $("clearall").addEventListener("click", () => { tray = []; renderAll(); });
+  $("calib").addEventListener("click", () => {
+    // Each usable Raman file's best full-evidence BF is one known-spectrum
+    // measurement of this instrument. The BF does not depend on tau, so results
+    // computed under the previous threshold are the right input here.
+    const known = tray.filter(t => t.kind === "raman" && !t.peakless && t.res && t.res.results.length);
+    const bfs = known.map(t => t.res.results[0].bf);
+    const tau = instrumentTau(bfs);
+    if (tau === NULL_TAU) return;
+    saveCalib({ tau, k: bfs.length, names: known.map(t => t.name) });
+    tray = [];
+    renderAll();
+  });
+  $("calibinfo").addEventListener("click", () => { saveCalib(null); renderAll(); });
   $("contributeBtn").addEventListener("click", submitContribution);
   $("rescanBtn").addEventListener("click", () => {
     tray = [];

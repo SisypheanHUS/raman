@@ -228,7 +228,7 @@
       Điểm số = log Bayes factor mỗi kênh so với mô hình chỉ-nền (null model).
     </p>
     <p>
-      Hậu nghiệm softmax với hệ số làm mềm &kappa; = 0.04 (ECE 0.064 trên LOO nghiêm ngặt của VAST, softmax trên toàn bộ lớp).
+      Hậu nghiệm softmax với hệ số làm mềm &kappa; = 0.04 (ECE 0.053 trên LOO nghiêm ngặt của VAST, softmax trên toàn bộ lớp).
       Ngưỡng open-set &tau; = 0.661 — mẫu có log BF dưới ngưỡng được gắn cờ
       "có thể không có trong thư viện"; bằng chứng không nền (&tau;<sub>0</sub> = 1.084) hiển thị kèm như chỉ báo phụ.
     </p>
@@ -296,6 +296,15 @@
       So sánh: cosine (v1) 79.7% → Bayes đơn mẫu (v2) 83.7% → phiên bản hiện tại
       (v3, within-class Bayes + đa kênh) 90.3% tổng thể, 93.9% hoá chất trên LOO nghiêm ngặt — chi tiết ở mục dưới;
       cùng giao thức, cosine đạt 81.9% và không gian con kiểu SIMCA 83.5%.
+    </p>
+    <p>
+      <b>Khi đổi máy, hai con số khác nhau, đừng gộp.</b> Trên 1 165 phổ chưa từng vào thư viện
+      (đánh giá ngoài đóng băng, freeze #2): với phổ <em>chất lượng tham chiếu</em> đo trên bốn máy
+      khác (RaSPI, Wasatch cầm tay 785 nm, Bērziņš FT-Raman 1064 nm, Miller), top-1 là <b>71.1%</b>
+      (97 phổ) — đó là giá của việc đổi máy. Với phổ RRUFF <em>độ phân giải thấp</em> là 47.7%, và
+      phổ RRUFF "poor" 14.1% — đó là giá của chất lượng phổ, không phải của máy. Con số gộp 65.1%
+      trộn cả hai và không nói lên điều gì rõ ràng. Nếu máy của bạn cho từ chối nhầm cao, hãy dùng
+      nút "Hiệu chuẩn máy" với vài phổ chất đã biết để dịch ngưỡng &tau; theo máy.
     </p>
   </div>
 

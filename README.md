@@ -88,7 +88,15 @@ luôn nên đọc cạnh số LOO ở trên.
 | **Gộp (bỏ RRUFF "poor")** | **65.1 %** |
 
 Khớp độ phân giải (freeze #2) nâng nhóm LR-Raman từ 38.9 % lên 47.7 % và gộp từ
-60.9 % lên 65.1 %, không đổi số LOO nội máy.
+60.9 % lên 65.1 %, không đổi số LOO nội máy. Hai con số khác nhau ở đây: **71.1 %**
+trên bốn máy khác ở chất lượng tham chiếu là giá của việc đổi máy; LR-Raman và
+"poor" là giá của chất lượng phổ. Trích 71.1 % cho xuyên máy, không phải 65.1 %.
+
+**Hiệu chuẩn máy (28/08/2026).** Ngưỡng unknown τ được hiệu chuẩn trên máy VAST; máy
+khác dịch cả thang bằng chứng nên từ chối nhầm chạy từ 7 % đến 23 % tuỳ máy. Nạp
+≥ 3 phổ của chất *có trong thư viện* đo trên máy của bạn rồi bấm **"Hiệu chuẩn máy"**:
+τ dịch theo trung vị bằng chứng của máy đó (`bayes.instrument_tau`), lưu trong trình
+duyệt, bỏ bằng một chạm. Với 5 phổ: Bērziņš 22.7 % → 14.5 %, LR-Raman 13.4 % → 4.3 %.
 
 ## Giấy phép dữ liệu
 
