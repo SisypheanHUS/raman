@@ -37,7 +37,7 @@ ramanlib.py + bayes.py + multimodal.py     library_ext.npz (16 070 phổ)
             ▼                                        ▼
          core.js  ──── inline ────▶  index.html      data.json
             │
-            └── test_core.mjs: so sánh với kết quả Python (22/22 PASS)
+            └── test_core.mjs: so sánh với kết quả Python (26/26 PASS)
 ```
 
 | Thành phần | Cách đảm bảo giống Python |
