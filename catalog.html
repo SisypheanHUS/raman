@@ -154,7 +154,8 @@ code { font-family: var(--font-mono); font-size: .92em; }
 .data-table th { font-size: 9px; text-transform: uppercase; letter-spacing: .08em; color: var(--t25); font-weight: 500; border-bottom-color: var(--cyan-06); }
 .data-table td { color: var(--t60); }
 .data-table td:first-child { color: var(--t85); }
-.data-table .mono { font-family: var(--font-mono); font-size: 11px; color: var(--cyan); white-space: nowrap; }
+.data-table .mono { font-family: var(--font-mono); font-size: 11px; color: var(--cyan); min-width: 5.5ch; }
+.data-table td.mono { word-break: normal; }
 .data-table .r { text-align: right; }
 .algo-formula { background: var(--cyan-02); border: 1px solid var(--cyan-06); padding: 14px 18px; font-family: var(--font-mono); font-size: 12.5px; line-height: 1.7; margin: 12px 0; color: rgba(226,232,240,.7); overflow-x: auto; }
 
