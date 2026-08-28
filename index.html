@@ -1092,8 +1092,10 @@ function decodeSegment(e, n, dec) {
 
 function decodeLibrary(data, atob_) {
   const dec = atob_ || (typeof atob !== "undefined" ? atob : null);
-  return data.entries.map(e =>
-    ({ label: e.label, source: e.source, ...decodeSegment(e, GRID_N, dec) }));
+  return data.entries.map(e => {
+    const {b64, lo, hi, ...rest} = e;
+    return { ...rest, ...decodeSegment(e, GRID_N, dec) };
+  });
 }
 
 // {fluor: [...], abs: [...]} with per-entry label/ex on the nm grids.
@@ -1247,7 +1249,7 @@ function submitContribution() {
 
 (async function init() {
   try {
-    var DATA_SIZE = 34523072;
+    var DATA_SIZE = 36127794;
     const resp = await fetch("data.json");
     if (!resp.ok) throw new Error("Không tải được thư viện (" + resp.status + ")");
     const total = DATA_SIZE || 0;

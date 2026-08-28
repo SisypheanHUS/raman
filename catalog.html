@@ -388,7 +388,7 @@ var $ = function(id) { return document.getElementById(id); };
 
 (async function init() {
   try {
-    var DATA_SIZE = 34523072;
+    var DATA_SIZE = 36127794;
     var resp = await fetch("data.json");
     if (!resp.ok) throw new Error("HTTP " + resp.status);
     var total = DATA_SIZE || 0;
