@@ -212,7 +212,7 @@ code { font-family: var(--font-mono); font-size: .92em; }
 @media (max-width: 640px) {
   .content { padding: 14px; }
   .controls { flex-direction: column; align-items: stretch; }
-  .table th:nth-child(4), .table td:nth-child(4) { display: none; }
+  .table th:nth-child(n+4), .table td:nth-child(n+4) { display: none; }
 }
 </style>
 
@@ -271,6 +271,8 @@ code { font-family: var(--font-mono); font-size: .92em; }
               <th data-col="idx">#<span class="sort-arrow"></span></th>
               <th data-col="label">Chất<span class="sort-arrow"></span></th>
               <th data-col="source">Nguồn<span class="sort-arrow"></span></th>
+              <th data-col="laser">Laser (nm)<span class="sort-arrow"></span></th>
+              <th data-col="chemistry">Công thức<span class="sort-arrow"></span></th>
               <th data-col="range">Khoảng (cm⁻¹)<span class="sort-arrow"></span></th>
               <th data-col="nch" class="r">Kênh<span class="sort-arrow"></span></th>
             </tr>
@@ -422,6 +424,9 @@ var $ = function(id) { return document.getElementById(id); };
       idx: i + 1,
       label: e.label,
       source: e.source || "vast",
+      laser: e.laser_nm || 0,
+      chemistry: e.chemistry || "",
+      instrument: e.instrument || "",
       i0: e.i0,
       i1: i1,
       nch: nch,
@@ -490,6 +495,8 @@ function renderTable() {
   switch (sortCol) {
     case "label": compare = function(a, b) { return a.label.localeCompare(b.label); }; break;
     case "source": compare = function(a, b) { return a.source.localeCompare(b.source); }; break;
+    case "laser": compare = function(a, b) { return a.laser - b.laser; }; break;
+    case "chemistry": compare = function(a, b) { return a.chemistry.localeCompare(b.chemistry); }; break;
     case "range": compare = function(a, b) { return a.rangeMin - b.rangeMin; }; break;
     case "nch": compare = function(a, b) { return a.nch - b.nch; }; break;
     default: compare = function(a, b) { return a.idx - b.idx; };
@@ -520,6 +527,8 @@ function renderTable() {
       '<td class="idx">' + e.idx + "</td>" +
       "<td></td>" +
       "<td></td>" +
+      '<td class="mono">' + (e.laser ? e.laser : "—") + "</td>" +
+      "<td></td>" +
       '<td class="mono">' + e.rangeMin.toFixed(0) + "–" + e.rangeMax.toFixed(0) + "</td>" +
       '<td class="mono r">' + e.nch + "</td>";
     tr.children[1].textContent = e.label;
@@ -529,6 +538,7 @@ function renderTable() {
     tag.textContent = srcShort.toUpperCase();
     tr.children[2].textContent = "";
     tr.children[2].appendChild(tag);
+    tr.children[4].textContent = e.chemistry;
     tr.addEventListener("click", function() { selectSpectrum(e); });
     tbody.appendChild(tr);
   });
@@ -581,10 +591,13 @@ function selectSpectrum(e) {
   var viewer = $("viewer");
   viewer.style.display = "flex";
   $("viewerTitle").textContent = e.label;
-  $("viewerMeta").textContent =
-    e.source.replace(/_.*/, "").toUpperCase() +
+  var meta = e.source.replace(/_.*/, "").toUpperCase() +
     " · " + e.rangeMin.toFixed(0) + "–" + e.rangeMax.toFixed(0) + " cm⁻¹" +
     " · " + e.nch + " kênh hợp lệ";
+  if (e.laser) meta += " · λ=" + e.laser + "nm";
+  if (e.chemistry) meta += " · " + e.chemistry;
+  if (e.instrument) meta += " · " + e.instrument;
+  $("viewerMeta").textContent = meta;
   var decoded = decodeSegment(RAW_ENTRIES[e.idx - 1]);
   drawChart({ i0: decoded.i0, i1: decoded.i1, v: decoded.v, rangeMin: e.rangeMin, rangeMax: e.rangeMax });
   viewer.scrollIntoView({ behavior: "smooth", block: "nearest" });
