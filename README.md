@@ -1,4 +1,4 @@
-# RamanIOP — Nhận diện phổ Raman trên trình duyệt
+# RamanSisyphean — Nhận diện phổ Raman trên trình duyệt
 
 [![Live](https://img.shields.io/badge/live-sisypheanhus.github.io%2Framan-2ea44f?logo=github)](https://sisypheanhus.github.io/raman/)
 ![Static](https://img.shields.io/badge/backend-none-blue)
@@ -22,7 +22,7 @@ sinh tự động từ mã nguồn nghiên cứu. Không sửa tay các file ở
 | `data.json` | 34 MB (~23 MB gzip) | Thư viện phổ tham chiếu + mô hình within-class, mã hoá base64 uint16 (lo/hi từng đoạn) |
 | `catalog.html` | ~35 KB | Duyệt/xem toàn bộ phổ trong thư viện theo nguồn |
 | `about.html` | ~34 KB | Mô tả phương pháp, độ chính xác, lịch sử phiên bản |
-| `algorithm.html` | ~128 KB | Tài liệu thuật toán kiểu bài báo: khung RamanIOP, tổng quan tài liệu, benchmark LOO nghiêm ngặt |
+| `algorithm.html` | ~128 KB | Tài liệu thuật toán kiểu bài báo: khung RamanSisyphean, tổng quan tài liệu, benchmark LOO nghiêm ngặt |
 
 Giao diện hiện tại (28/08/2026) áp từ bản thiết kế Claude Design v3 (nền tối, nhấn cyan;
 Outfit · Syne · JetBrains Mono), một file `theme.css` dùng chung được inline vào cả 4 trang
