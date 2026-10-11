@@ -285,7 +285,7 @@ code { font-family: var(--font-mono); font-size: .92em; }
     <h1>RamanSisyphean: một khung hợp lý biên Bayes giải tích cho nhận diện vật liệu từ phổ quang học</h1>
     <p class="authors">Đinh Thái Tuấn, Vũ Dương</p>
     <p class="affil">Trung tâm Điện tử Lượng tử, Viện Vật lý (IOP), Viện Hàn lâm Khoa học và Công nghệ Việt Nam (VAST)</p>
-    <div class="date">Phiên bản 3.1 · 08/2026</div>
+    <div class="date">Phiên bản 4.0 · freeze #5, 09/2026</div>
   </div>
 
   <div class="abstract">
@@ -297,22 +297,21 @@ code { font-family: var(--font-mono); font-size: .92em; }
       "phổ mẫu + nền Legendre + nhiễu" và mô hình "chỉ nền", với biên độ, nền và phương sai nhiễu được tích
       phân loại bỏ giải tích dưới tiên nghiệm Jeffreys; (ii) tầng biến thiên trong lớp — không gian con PCA
       của mỗi lớp đặt ngay trong ma trận thiết kế; (iii) tầng quyết định tách đôi — hậu nghiệm softmax làm
-      mềm (κ = 0.04, hiệu chuẩn theo ECE 0.053) và cờ open-set (τ = 0.661, hiệu chuẩn tại 10% từ chối nhầm);
-      (iv) tầng hợp nhất — bằng chứng Raman, huỳnh quang và hấp thụ cộng trên cùng thang log-evidence. Trên
-      thư viện 16 070 phổ (2 495 lớp) và giao thức leave-one-out <em>nghiêm ngặt</em> (mô hình lớp dựng lại
-      không có phổ đang chấm) với 248 phổ đo tại VAST, RamanSisyphean đạt top-1 90.3% (93.9% trên hoá chất; đồng
-      nghĩa xuyên nguồn đã gộp trong thư viện) so với 81.9% của HQI/cosine, 83.5% của phân loại không gian con kiểu SIMCA và
-      74.6% của kiểm định χ² phần dư kiểu TruScan, với hiệu chuẩn tương đương (ECE 0.053 so với 0.054). Trong
-      thử loại-lớp nội bộ, số hạng nền mua độ chính xác xếp hạng bằng khả năng từ chối chất lạ (30.0% so với
-      62.8% khi bỏ nền). Một đánh giá <em>ngoài đóng băng</em> trên 1 165 phổ từ năm nguồn công khai (RRUFF
-      held-out, RaSPI, Miller, Bērziņš FT-Raman 1064 nm, Wasatch cầm tay 785 nm) cho thấy nhận diện xuyên máy
-      đạt 71.1% top-1 trên 97 phổ chất lượng tham chiếu của bốn máy khác — giá của việc đổi máy — trong khi phổ độ phân giải thấp
-      đạt 47.7% và phổ "poor" 14.1% — giá của chất lượng phổ, không phải của máy; con số gộp 65.1% trộn hai hiện tượng này —
-      và chất lạ bị từ chối 45–47% ở cùng 10% từ chối nhầm dù
-      dùng evidence nào, nhưng
-      lợi thế open-set của evidence không nền <em>không tái hiện</em> ở cùng tỉ lệ từ chối nhầm — lệch máy và
-      chất lượng phổ, chứ không phải lựa chọn evidence, chi phối open-set ngoài phòng thí nghiệm. Toàn bộ suy
-      luận chạy trong trình duyệt bằng JavaScript.
+      mềm (κ = 0.09, ECE toàn lớp 0.035) và cờ open-set (τ = 0.757, hiệu chuẩn tại 10% từ chối nhầm);
+      (iv) tầng hợp nhất — bằng chứng Raman, huỳnh quang và hấp thụ cộng trên cùng thang log-evidence. Phiên bản
+      4.0 (freeze #5) dùng thư viện hoàn toàn công khai gồm 11 601 phổ của 804 chất (RRUFF và bộ dược phẩm
+      785 nm). Trên các bản sao suy giảm do nhiễu, huỳnh quang và trôi trục của thư viện, evidence nhận dạng đúng 95.3%
+      so với 83.5% của HQI/cosine (94.0% so với 22.6% ở SNR &lt; 10), và nhận dạng đúng 20/20 phổ ghi trên một thiết bị
+      cầm tay 785 nm cùng 97.3% trong 150 phổ RRUFF giữ lại. Trên một phép chia dữ liệu cân bằng thông tin, hai mạng nơ-ron
+      tích chập (CNN) huấn luyện trên cùng dữ liệu đạt 96.0% và 95.7%, cosine 96.9%, còn evidence đạt 97.3% mà không cần
+      huấn luyện; một chất mới chỉ tốn một hàng thư viện, còn với CNN là một lần huấn luyện lại. Trên giao thức
+      leave-one-out <em>nghiêm ngặt</em> phân tầng (3 511 truy vấn, mô hình lớp dựng lại không có phổ đang chấm), dùng để
+      hiệu chuẩn, mô hình đầy đủ đạt 84.3%, phổ mẫu đơn 86.5% và cosine 86.6%: ở bài nhận một mẫu vật khác của cùng
+      khoáng, mọi tìm kiếm thư viện đạt trần khoảng 86.5%. Đánh giá <em>ngoài đóng băng</em> trên các nguồn công khai khác
+      cho thấy chất lượng phổ chi phối khả năng chuyển máy: phổ chất lượng tham chiếu được nhận đúng 97.3% (RRUFF)
+      và 100% (Wasatch cầm tay), phổ độ phân giải thấp 59.3% và phổ "poor" 32.2%; ở cùng 10% từ chối nhầm, evidence đầy
+      đủ từ chối chất lạ tốt hơn evidence không nền và cosine (33.3% so với 20.5% và 20.4% trên bốn nguồn gộp).
+      Toàn bộ suy luận chạy trong trình duyệt bằng JavaScript.
     </p>
     <p class="kw"><b>Từ khoá:</b> phổ Raman, so khớp thư viện, Bayes factor, hợp lý biên, open-set, hiệu chuẩn xác suất, đa phương thức, benchmark, đánh giá ngoài.</p>
   </div>
@@ -368,14 +367,13 @@ code { font-family: var(--font-mono); font-size: .92em; }
         lệ từ chối nhầm, kèm giải thích bằng peak và chế độ hỗn hợp (§7).</li>
       <li>Hợp nhất muộn Raman + huỳnh quang + hấp thụ trên thang log-evidence, kể cả suy luận mù bước sóng kích
         thích (§8).</li>
-      <li>Benchmark trên giao thức leave-one-out nghiêm ngặt, cùng thư viện và cùng tiền xử lý, so với ba
-        phương pháp cổ điển (HQI/cosine, không gian con kiểu SIMCA, χ² phần dư kiểu TruScan) và hai ablation
+      <li>Benchmark trên giao thức leave-one-out nghiêm ngặt phân tầng, cùng thư viện và cùng tiền xử lý, so với ba
+        phương pháp cổ điển (HQI/cosine, không gian con kiểu SIMCA, χ² phần dư kiểu TruScan), hai mạng CNN và hai ablation
         của chính khung, kể cả quy tắc lai "xếp hạng bằng evidence đầy đủ, cờ unknown bằng evidence không
-        nền" (§9.3–9.4).</li>
+        nền" (§9.3–9.4); thêm phép so sánh cân bằng thông tin với CNN và phép thử bản sao suy giảm (§9.4).</li>
       <li>Đánh giá ngoài <em>đóng băng</em>: mô hình, thư viện và mọi ngưỡng cố định trước (§9.5), rồi thử trên
-        1 165 phổ chưa từng vào thư viện từ năm nguồn công khai với máy/laser khác — kể cả một phát hiện âm:
-        lợi thế open-set của evidence không nền trong thử nội bộ là tạo tác của giao thức loại-lớp cùng máy
-        và không giữ được ở cùng tỉ lệ từ chối nhầm.</li>
+        các phổ chưa từng vào thư viện từ các nguồn công khai với máy/laser khác — RRUFF chưa xếp hạng và độ phân giải thấp,
+        thiết bị cầm tay Wasatch 785 nm, FT-Raman 1064 nm, RaSPI, Miller.</li>
       <li>Cài đặt hoàn toàn phía máy khách bằng JavaScript, đồng bộ với bản Python bằng kiểm tra parity (§10).</li>
     </ul>
   </div>
@@ -501,7 +499,7 @@ code { font-family: var(--font-mono); font-size: .92em; }
     <p>
       Cho thư viện <span class="m">𝓛 = {(<b>s</b><sub>j</sub>, c<sub>j</sub>)}<sub>j=1..N</sub></span> gồm
       <span class="m">N</span> phổ tham chiếu đã tiền xử lý, mỗi phổ gắn một nhãn lớp
-      <span class="m">c<sub>j</sub> ∈ 𝓒</span> (|𝓒| = 2 495). Cho phổ đo <span class="m"><b>y</b></span>. Cần trả về:
+      <span class="m">c<sub>j</sub> ∈ 𝓒</span> (|𝓒| = 804, N = 11 601). Cho phổ đo <span class="m"><b>y</b></span>. Cần trả về:
     </p>
     <ol>
       <li>một xếp hạng các lớp kèm xác suất hậu nghiệm <span class="m">P(c | <b>y</b>)</span>;</li>
@@ -512,14 +510,14 @@ code { font-family: var(--font-mono); font-size: .92em; }
     <table class="data-table">
       <thead><tr><th>Ký hiệu</th><th>Ý nghĩa</th><th>Giá trị</th></tr></thead>
       <tbody>
-        <tr><td class="m">ν<sub>i</sub></td><td>Lưới Raman shift chung, <span class="m">ν<sub>i</sub> = 450 + 2i</span> cm⁻¹</td><td class="mono">i = 0…1375 (n<sub>g</sub> = 1376 kênh)</td></tr>
-        <tr><td class="m">𝓜(<b>y</b>)</td><td>Mask kênh hợp lệ của một phổ (vùng máy đo phủ)</td><td class="mono">tập con của {0…1375}</td></tr>
-        <tr><td class="m">𝓜<sub>∩</sub></td><td>Phần giao mask của hai phổ đang so; <span class="m">n = |𝓜<sub>∩</sub>|</span></td><td class="mono">yêu cầu n ≥ 413 (30%)</td></tr>
+        <tr><td class="m">ν<sub>i</sub></td><td>Lưới Raman shift chung, <span class="m">ν<sub>i</sub> = 50 + 2i</span> cm⁻¹</td><td class="mono">i = 0…1975 (n<sub>g</sub> = 1976 kênh)</td></tr>
+        <tr><td class="m">𝓜(<b>y</b>)</td><td>Mask kênh hợp lệ của một phổ (vùng máy đo phủ)</td><td class="mono">tập con của {0…1975}</td></tr>
+        <tr><td class="m">𝓜<sub>∩</sub></td><td>Kênh dùng để chấm một cặp = mask của phổ đo; <span class="m">n = |𝓜(<b>y</b>)|</span></td><td class="mono">yêu cầu n ≥ 100</td></tr>
         <tr><td class="m"><b>t</b><sub>c</sub></td><td>Phổ mẫu (template) của lớp <span class="m">c</span></td><td class="mono">vector n<sub>g</sub></td></tr>
         <tr><td class="m">P<sub>k</sub>(x)</td><td>Đa thức Legendre bậc <span class="m">k</span> trên <span class="m">x ∈ [−1, 1]</span></td><td class="mono">k = 0…5</td></tr>
         <tr><td class="m">λ</td><td>Độ chính xác tiên nghiệm của hệ số hồi quy</td><td class="mono">0.01</td></tr>
-        <tr><td class="m">κ</td><td>Nhiệt độ softmax (tempering)</td><td class="mono">0.04 (Raman), 0.12 (fusion)</td></tr>
-        <tr><td class="m">τ</td><td>Ngưỡng open-set trên log BF/kênh tốt nhất</td><td class="mono">0.661</td></tr>
+        <tr><td class="m">κ</td><td>Nhiệt độ softmax (tempering)</td><td class="mono">0.09 (Raman), 0.12 (fusion)</td></tr>
+        <tr><td class="m">τ</td><td>Ngưỡng open-set trên log BF/kênh tốt nhất</td><td class="mono">0.757</td></tr>
       </tbody>
     </table>
     <div class="figure">
@@ -554,24 +552,29 @@ code { font-family: var(--font-mono); font-size: .92em; }
     <h3>4.1 Lưới chung và mask hợp lệ</h3>
     <p>
       Phổ thô <span class="m">{(x<sub>m</sub>, y<sub>m</sub>)}</span> (đã sắp xếp tăng dần theo
-      <span class="m">x</span>, loại điểm trùng) được nội suy tuyến tính về lưới cố định
-      <span class="m">ν<sub>i</sub> = 450 + 2i</span> cm⁻¹, <span class="m">i = 0, …, 1375</span>.
+      <span class="m">x</span>, loại điểm trùng) được làm mượt trên lưới đo gốc (§4.2) rồi nội suy tuyến tính về lưới cố định
+      <span class="m">ν<sub>i</sub> = 50 + 2i</span> cm⁻¹, <span class="m">i = 0, …, 1975</span>.
       Kênh nằm ngoài <span class="m">[x<sub>min</sub>, x<sub>max</sub>]</span> nhận giá trị NaN và bị loại
-      khỏi mask 𝓜. Dải 450–3200 cm⁻¹ được chọn vì: dưới 450 cm⁻¹ nhiễu Rayleigh/notch filter và
-      nhiều phổ thư viện bắt đầu từ ~400 cm⁻¹; trên 3200 cm⁻¹ hầu như không còn thông tin, nhưng vùng
-      CH-stretch 2800–3100 và OH ~3200 cần được giữ để phân biệt polymer và dung môi. Phổ phủ dưới 100
-      kênh bị từ chối.
+      khỏi mask 𝓜. Dải 50–4000 cm⁻¹ là hợp của các dải đo của các nguồn: RRUFF bắt đầu từ khoảng 50 cm⁻¹ (vùng
+      mạng tinh thể, quan trọng với khoáng vật), bộ dược phẩm đo tới khoảng 3 425 cm⁻¹ và một số phổ RRUFF tới
+      4 000 cm⁻¹. Mỗi phổ đóng góp đúng dải nó đo được; phổ phủ dưới 100 kênh bị từ chối.
+    </p>
+    <p>
+      Phổ thư viện lưu cường độ 0 ngoài dải đo của nó kèm một mặt nạ phủ (<em>coverage</em>); phổ cần nhận diện
+      mang NaN ngoài dải đo. Ở bước chấm điểm, mọi cặp (truy vấn, mẫu thư viện) được chấm trên đúng các kênh
+      của <em>truy vấn</em> (§4.5), nên phổ mẫu thiếu vùng cao đóng góp 0 ở vùng đó.
     </p>
 
     <h3>4.2 Làm mượt Savitzky–Golay</h3>
     <p>
-      Bộ lọc Savitzky–Golay [23] cửa sổ 9 điểm, bậc 3, tương đương tích chập với nhân đối xứng
+      Bộ lọc Savitzky–Golay [23] cửa sổ 9 điểm, bậc 3, áp dụng trên <em>lưới đo gốc, trước khi nội suy</em> (thứ tự của freeze #3
+      trở đi; làm mượt sau nội suy cho kết quả khác với mọi phổ có bước đo khác 2 cm⁻¹), tương đương tích chập với nhân đối xứng
     </p>
     <div class="eq"><span class="body"><i>ŷ</i><sub>i</sub> = Σ<sub>k=−4</sub><sup>4</sup> <i>h</i><sub>k</sub> <i>y</i><sub>i+k</sub>,&nbsp;&nbsp; <b>h</b> = (−21, 14, 39, 54, 59, 54, 39, 14, −21) / 231</span><span class="tag">(1)</span></div>
     <p>
       Bốn điểm biên mỗi phía được thay bằng giá trị của đa thức bậc 3 khớp bình phương tối thiểu trên
-      9 điểm đầu/cuối (ngữ nghĩa <code>mode="interp"</code> của SciPy). Cửa sổ 9 điểm × 2 cm⁻¹ = 18 cm⁻¹
-      nhỏ hơn bề rộng peak Raman điển hình nên giữ được biên độ và vị trí peak, đồng thời giảm nhiễu
+      9 điểm đầu/cuối (ngữ nghĩa <code>mode="interp"</code> của SciPy). Với bước đo cỡ 1–2 cm⁻¹, cửa sổ 9 điểm
+      (khoảng 9–18 cm⁻¹) nhỏ hơn bề rộng peak Raman điển hình nên giữ được biên độ và vị trí peak, đồng thời giảm nhiễu
       shot. Hệ quả phụ là các kênh lân cận trở nên tương quan — điểm này được xử lý ở tầng mô hình bằng
       tham số κ (§7.2).
     </p>
@@ -609,12 +612,13 @@ code { font-family: var(--font-mono); font-size: .92em; }
 
     <div class="algo">
       <div class="title">Thuật toán 1 <span>— Tiền xử lý một phổ Raman</span></div>
-      <div class="io"><b>Vào:</b> cặp cột (x, y) thô. <b>Ra:</b> vector ỹ trên lưới 1376 kênh (NaN ngoài vùng phủ), mask 𝓜.</div>
+      <div class="io"><b>Vào:</b> cặp cột (x, y) thô. <b>Ra:</b> vector ỹ trên lưới 1976 kênh (NaN ngoài vùng phủ), mask 𝓜.</div>
       <ol>
         <li>sắp xếp theo x, loại điểm trùng; <span class="kw">nếu</span> ít hơn 50 điểm → lỗi</li>
+        <li>y ← SavitzkyGolay(y, cửa sổ 9, bậc 3) trên lưới đo gốc                       ▷ pt. (1)</li>
         <li>v ← nội suy tuyến tính (x, y) lên lưới ν<sub>i</sub>; NaN ngoài [x<sub>min</sub>, x<sub>max</sub>]</li>
         <li>[i<sub>0</sub>, i<sub>1</sub>] ← đoạn kênh hợp lệ; <span class="kw">nếu</span> i<sub>1</sub> − i<sub>0</sub> + 1 &lt; 100 → lỗi</li>
-        <li>seg ← SavitzkyGolay(v[i<sub>0</sub>..i<sub>1</sub>], cửa sổ 9, bậc 3)         ▷ pt. (1)</li>
+        <li>seg ← v[i<sub>0</sub>..i<sub>1</sub>]</li>
         <li>z ← ALS(seg, λ<sub>ALS</sub> = 10⁵, p = 0.01, 10 vòng)                  ▷ pt. (2)–(3)</li>
         <li>seg ← seg − z;  seg ← seg − min(seg)</li>
         <li>seg ← seg / ‖seg‖<sub>2</sub>;  <span class="kw">nếu</span> ‖seg‖<sub>2</sub> = 0 → lỗi (phổ phẳng)</li>
@@ -624,11 +628,12 @@ code { font-family: var(--font-mono); font-size: .92em; }
 
     <h3>4.5 So khớp có mask</h3>
     <p>
-      Hai phổ chỉ được so trên phần giao <span class="m">𝓜<sub>∩</sub> = 𝓜(<b>y</b>) ∩ 𝓜(<b>s</b>)</span>.
-      Nếu <span class="m">|𝓜<sub>∩</sub>| &lt; 0.30 · 1376 = 413</span> kênh, cặp bị bỏ qua. Cơ chế này cho
-      phép phổ laser 532 nm (phủ đủ dải) so được với phổ 785 nm (thường thiếu vùng cao) mà không cần
-      cắt thư viện về dải chung nhỏ nhất. Mọi đại lượng bằng chứng ở §5 đều được chuẩn hoá theo
-      <span class="m">n = |𝓜<sub>∩</sub>|</span> để các cặp có độ phủ khác nhau ở cùng thang.
+      Một cặp (phổ đo <span class="m"><b>y</b></span>, phổ mẫu <span class="m"><b>t</b></span>) được chấm trên mask của
+      <em>phổ đo</em>, <span class="m">𝓜 = 𝓜(<b>y</b>)</span>, với <span class="m">n = |𝓜|</span>; phổ mẫu thư viện đã được điền 0 ngoài
+      dải đo của nó (§4.1), nên không còn khái niệm phần giao thay đổi theo từng cặp. Nếu <span class="m">n &lt; 100</span> kênh,
+      phổ đo bị từ chối ngay ở tiền xử lý. Cơ chế này cho phép phổ laser 785 nm (thường thiếu vùng thấp hoặc vùng
+      cao) so được với thư viện đo ở dải khác mà không cần cắt thư viện về dải chung nhỏ nhất. Mọi đại lượng bằng chứng
+      ở §5 được chuẩn hoá theo <span class="m">n</span> để các phổ có độ phủ khác nhau ở cùng thang.
     </p>
   </div>
 
@@ -644,8 +649,8 @@ code { font-family: var(--font-mono); font-size: .92em; }
     </p>
     <div class="eq"><span class="body"><i>y</i><sub>i</sub> = <i>α</i> <i>t</i><sub>c,i</sub> + Σ<sub>k=0</sub><sup>5</sup> <i>β</i><sub>k</sub> <i>P</i><sub>k</sub>(<i>x</i><sub>i</sub>) + <i>ε</i><sub>i</sub>,&nbsp;&nbsp; <i>ε</i><sub>i</sub> ~ 𝓝(0, <i>σ</i><sup>2</sup>),&nbsp;&nbsp; <i>i</i> ∈ 𝓜<sub>∩</sub></span><span class="tag">(5)</span></div>
     <p>
-      trong đó <span class="m">x<sub>i</sub> = 2(ν<sub>i</sub> − 450)/(3200 − 450) − 1 ∈ [−1, 1]</span>
-      là toạ độ chuẩn hoá trên <em>toàn</em> lưới (không phải trên phần giao, để cơ sở nền không đổi
+      trong đó <span class="m">x<sub>i</sub> = 2(ν<sub>i</sub> − 50)/(4000 − 50) − 1 ∈ [−1, 1]</span>
+      là toạ độ chuẩn hoá trên <em>toàn</em> lưới (không phải trên dải đo của từng phổ, để cơ sở nền không đổi
       hình dạng theo độ phủ), và <span class="m">P<sub>0..5</sub></span> là đa thức Legendre — cơ sở trực
       giao trên [−1, 1], điều kiện số tốt hơn nhiều so với đơn thức
       <span class="m">1, x, x², …</span>. Giả thuyết đối chứng <span class="m">H<sub>0</sub></span>
@@ -667,7 +672,7 @@ code { font-family: var(--font-mono); font-size: .92em; }
       thức đóng và Bayes factor bất biến với thang cường độ. Tham số <span class="m">λ = 0.01</span> nhỏ (tiên nghiệm
       rộng) vì sau chuẩn hoá L2, <span class="m">α</span> có bậc 1 và các <span class="m">β<sub>k</sub></span>
       có bậc 0.01–0.1; giá trị này chủ yếu đóng vai trò ổn định số và phạt nhẹ độ phức tạp mô hình (Occam
-      factor). Trên lưới nghiêm ngặt (§9.1) độ chính xác chỉ thay đổi ±1 điểm trong khoảng λ = 0.001–0.03;
+      factor). Trên giao thức nghiêm ngặt (§9.1) độ chính xác chỉ thay đổi ±1 điểm trong khoảng λ = 0.001–0.03 (kiểm trên freeze #2; λ không đổi từ đó);
       0.01 được chọn vì cho kết quả tốt nhất cùng với K ≤ 7, ngưỡng 99% phương sai.
     </p>
 
@@ -716,8 +721,8 @@ code { font-family: var(--font-mono); font-size: .92em; }
     <div class="eq"><span class="body">BF ≈ <span class="frac"><span>1</span><span>2</span></span> log <span class="frac"><span><i>S</i><sub>0</sub></span><span><i>S</i><sub>c</sub></span></span> = −<span class="frac"><span>1</span><span>2</span></span> log ( 1 − <i>R</i><sup>2</sup><sub>c|0</sub> )</span><span class="tag">(14)</span></div>
     <p>
       tức <em>một nửa log của tỉ lệ phương sai phần dư</em> mà phổ mẫu giải thích được <em>thêm</em> so với
-      nền. BF = 0 nghĩa là phổ mẫu không giải thích được gì; BF = 0.661 (ngưỡng τ, §7.3) tương ứng phần
-      dư giảm ≈ 3.7 lần; các phổ khớp tốt trong cùng máy đo thường đạt BF &gt; 1.5 (phần dư giảm hơn 20
+      nền. BF = 0 nghĩa là phổ mẫu không giải thích được gì; BF = 0.757 (ngưỡng τ, §7.3) tương ứng phần
+      dư giảm ≈ 4.5 lần; các phổ khớp tốt trong cùng máy đo thường đạt BF &gt; 1.5 (phần dư giảm hơn 20
       lần). Cách chuẩn hoá theo <span class="m">n</span> là cần thiết để so được các cặp có độ phủ khác
       nhau và để κ, τ có ý nghĩa độc lập với độ phủ.
     </p>
@@ -772,8 +777,8 @@ code { font-family: var(--font-mono); font-size: .92em; }
     <h3>6.2 Xây dựng mô hình lớp</h3>
     <p>
       Với mỗi lớp <span class="m">c</span> có <span class="m">m<sub>c</sub> ≥ 3</span> phổ
-      <span class="m"><b>s</b><sub>1..m<sub>c</sub></sub></span>, trên mask chung
-      <span class="m">𝓜<sub>c</sub> = ∩<sub>j</sub> 𝓜(<b>s</b><sub>j</sub>)</span> (yêu cầu ≥ 413 kênh):
+      <span class="m"><b>s</b><sub>1..m<sub>c</sub></sub></span>, trên toàn lưới
+      (các phổ thư viện đã điền 0 ngoài dải đo, §4.1; <span class="m">𝓜<sub>c</sub></span> là cả lưới):
     </p>
     <div class="eq"><span class="body"><b>m</b><sub>c</sub> = <span class="frac"><span>1</span><span><i>m</i><sub>c</sub></span></span> Σ<sub>j</sub> <b>s</b><sub>j</sub>,&nbsp;&nbsp; <b>R</b> = [ <b>s</b><sub>1</sub> − <b>m</b><sub>c</sub>; … ; <b>s</b><sub>m<sub>c</sub></sub> − <b>m</b><sub>c</sub> ] = <b>U</b> <b>Σ</b> <b>V</b><sup>⊤</sup></span><span class="tag">(15)</span></div>
     <p>
@@ -784,10 +789,9 @@ code { font-family: var(--font-mono); font-size: .92em; }
     <p>
       Ngưỡng 99% phương sai và trần 7 thành phần ngăn mô hình lớp hấp thụ nhiễu đo (overfit) — nếu cho
       phép đủ nhiều PC, bất kỳ phổ nào cũng có thể được biểu diễn tốt bởi bất kỳ lớp nào, và Occam factor
-      trong (12) chỉ phạt tuyến tính theo <span class="m">p</span>. Với thư viện hiện tại, 515 lớp có
-      mô hình trong lớp (<span class="m">K<sub>c</sub></span> = 1–3 ở 385 lớp, chạm trần 7 ở 63 lớp);
-      1 980 lớp còn lại dùng phổ mẫu đơn như §5 — 1 468 lớp vì có dưới 3 phổ, 512 lớp vì phần giao
-      mask của các phổ trong lớp dưới 413 kênh.
+      trong (12) chỉ phạt tuyến tính theo <span class="m">p</span>. Với thư viện hiện tại, mọi lớp đều có ít nhất 3 phổ nên cả 804 lớp có
+      mô hình trong lớp (<span class="m">K<sub>c</sub></span> = 1–3 ở 415 lớp, chạm trần 7 ở 226 lớp). Phổ mẫu đơn
+      (§5) vẫn được dùng trong lượt chấm thứ hai như một giả thuyết thay thế cho trung bình + PC.
     </p>
 
     <h3>6.3 Ma trận thiết kế mở rộng</h3>
@@ -807,7 +811,7 @@ code { font-family: var(--font-mono); font-size: .92em; }
       <ol>
         <li><span class="kw">với mỗi</span> lớp c:</li>
         <li class="i1">G ← {s<sub>j</sub> : c<sub>j</sub> = c};  <span class="kw">nếu</span> |G| &lt; 3 → model[c] ← ∅; <span class="kw">tiếp</span></li>
-        <li class="i1">𝓜<sub>c</sub> ← giao mask của G;  <span class="kw">nếu</span> |𝓜<sub>c</sub>| &lt; 413 → model[c] ← ∅; <span class="kw">tiếp</span></li>
+        <li class="i1">𝓜<sub>c</sub> ← toàn lưới (phổ thư viện đã điền 0 ngoài dải đo)</li>
         <li class="i1">m<sub>c</sub> ← trung bình G trên 𝓜<sub>c</sub>;  R ← G − m<sub>c</sub></li>
         <li class="i1">(U, Σ, V<sup>⊤</sup>) ← SVD(R);  K<sub>c</sub> ← theo pt. (16)</li>
         <li class="i1">model[c] ← ( m<sub>c</sub>, hàng 1..K<sub>c</sub> của V<sup>⊤</sup> ), NaN ngoài 𝓜<sub>c</sub></li>
@@ -835,24 +839,26 @@ code { font-family: var(--font-mono); font-size: .92em; }
       (±2 cm⁻¹) — hấp thụ lệch hiệu chuẩn trục nhỏ giữa các máy, tương đương lấy profile likelihood
       trên một tham số phiền toái rời rạc; (ii) với lớp có mô hình trong lớp, cả giả thuyết "sinh từ
       trung bình + PC" lẫn "sinh từ <em>một</em> phổ cụ thể của lớp" đều được xét — không gian con PCA
-      không phải lúc nào cũng chứa phổ gần nhất; (iii) <b>khớp độ phân giải</b> — bề rộng peak của phổ đo và của template được ước lượng (phân vị 10 % của FWHM các peak nổi bật, vì độ phân giải máy là <em>giới hạn dưới</em> của bề rộng peak chứ không phải giá trị điển hình của nó), và template được làm mờ Gauss đúng bằng hiệu cầu phương, tối đa σ = 4 kênh; template vốn đã rộng bằng hoặc hơn thì không bị đụng tới. Thư viện chủ yếu là phổ để bàn độ phân giải cao, nên phổ máy cầm tay hay LR-Raman có peak rộng hơn và template sắc không còn khớp. Giới hạn ở 20 lớp nên chi phí thêm ≈ 2% một truy vấn;
-      trên LOO nghiêm ngặt lượt này đưa top-1 từ 88.7% lên 90.3% (§9.1), phần lớn nhờ PP và Paper.
+      không phải lúc nào cũng chứa phổ gần nhất; (iii) <b>khớp độ phân giải</b> — bề rộng peak của phổ đo và của template được ước lượng (phân vị 10 % của FWHM các peak nổi bật, vì độ phân giải máy là <em>giới hạn dưới</em> của bề rộng peak chứ không phải giá trị điển hình của nó), và template được làm mờ Gauss đúng bằng hiệu cầu phương, tối đa σ = 4 kênh; template vốn đã rộng bằng hoặc hơn thì không bị đụng tới. Thư viện chủ yếu là phổ để bàn độ phân giải cao, nên phổ máy cầm tay hay LR-Raman có peak rộng hơn và template sắc không còn khớp. Giới hạn ở 20 lớp nên chi phí thêm ≈ 2% một truy vấn ở thư viện cũ; ở thư viện 11 601 phổ lượt này chiếm phần
+      lớn thời gian (0.75 s lượt thứ nhất, 1.9 s cả hai lượt, §10). Hiệu quả phụ thuộc bài toán (§9.4): khi phổ gốc có trong thư viện (bản sao suy
+      giảm) mô hình trong lớp cộng lượt chấm thứ hai hơn phổ mẫu đơn 3.1 điểm (95.3% so với 92.2%), còn khi phải nhận một mẫu vật khác
+      của cùng khoáng (LOO) nó kém 2.1 điểm (84.3% so với 86.5%).
     </p>
 
     <h3>7.2 Hậu nghiệm giữa các lớp</h3>
     <p>
       Nếu lấy (11) theo nghĩa đen với tiên nghiệm đều trên các lớp, hậu nghiệm là
-      <span class="m">P(c | <b>y</b>) ∝ exp(n B<sub>c</sub>)</span>. Với <span class="m">n ≈ 1376</span>,
+      <span class="m">P(c | <b>y</b>) ∝ exp(n B<sub>c</sub>)</span>. Với <span class="m">n ≈ 1976</span>,
       hậu nghiệm này gần như luôn là 1 cho lớp dẫn đầu — quá tự tin, vì các giả định nhiễu độc lập, đồng
       phương sai và phổ mẫu "đúng tuyệt đối" đều không đúng. Thay vào đó dùng softmax có làm mềm
       (tempered softmax, tương đương temperature scaling [19]):
     </p>
-    <div class="eq"><span class="body"><i>P</i>(<i>c</i> | <b>y</b>) = <span class="frac"><span>exp( <i>B</i><sub>c</sub> / <i>κ</i> )</span><span>Σ<sub>c′</sub> exp( <i>B</i><sub>c′</sub> / <i>κ</i> )</span></span>,&nbsp;&nbsp; <i>κ</i> = 0.04</span><span class="tag">(19)</span></div>
+    <div class="eq"><span class="body"><i>P</i>(<i>c</i> | <b>y</b>) = <span class="frac"><span>exp( <i>B</i><sub>c</sub> / <i>κ</i> )</span><span>Σ<sub>c′</sub> exp( <i>B</i><sub>c′</sub> / <i>κ</i> )</span></span>,&nbsp;&nbsp; <i>κ</i> = 0.09</span><span class="tag">(19)</span></div>
     <p>
       Tham số <span class="m">κ</span> không được chọn tay mà hiệu chuẩn bằng leave-one-out để cực tiểu sai số
       hiệu chuẩn kỳ vọng ECE (§9.2). Một cách diễn giải: (19) trùng với hậu nghiệm Bayes đúng nếu số kênh
-      độc lập hiệu dụng là <span class="m">n<sub>eff</sub> = 1/κ ≈ 25</span> thay vì 1376 — nghĩa là các
-      kênh sau làm mượt, tương quan phần dư và bất định của phổ mẫu làm mỗi phổ chỉ "đáng" khoảng 25 quan
+      độc lập hiệu dụng là <span class="m">n<sub>eff</sub> = 1/κ ≈ 11</span> thay vì 1976 — nghĩa là các
+      kênh sau làm mượt, tương quan phần dư và bất định của phổ mẫu làm mỗi phổ chỉ "đáng" khoảng 11 quan
       sát độc lập. Cài đặt trừ max trước khi lấy exp để tránh tràn số.
     </p>
 
@@ -863,10 +869,10 @@ code { font-family: var(--font-mono); font-size: .92em; }
       tách P(đúng | có trong thư viện) khỏi P(có trong thư viện) của Stein [6] — dựa trên bằng
       chứng tuyệt đối thay vì tương đối:
     </p>
-    <div class="eq"><span class="body">unknown(<b>y</b>) = 𝟙[ max<sub>c</sub> <i>B</i><sub>c</sub> &lt; <i>τ</i> ],&nbsp;&nbsp; <i>τ</i> = 0.661</span><span class="tag">(20)</span></div>
+    <div class="eq"><span class="body">unknown(<b>y</b>) = 𝟙[ max<sub>c</sub> <i>B</i><sub>c</sub> &lt; <i>τ</i> ],&nbsp;&nbsp; <i>τ</i> = 0.757</span><span class="tag">(20)</span></div>
     <p>
       Nếu ngay cả lớp tốt nhất cũng không giải thích phổ tốt hơn mô hình chỉ-nền quá một mức
-      <span class="m">τ</span> (tương đương giảm phần dư ≈ 3.7 lần theo (14)), kết quả được gắn cờ "có thể
+      <span class="m">τ</span> (tương đương giảm phần dư ≈ 4.5 lần theo (14)), kết quả được gắn cờ "có thể
       không có trong thư viện" nhưng bảng xếp hạng vẫn hiển thị để người dùng tự đánh giá. Ngưỡng
       <span class="m">τ</span> được hiệu chuẩn sao cho tỉ lệ từ chối nhầm (phổ có trong thư viện bị gắn cờ)
       là 10% trên LOO (§9.3). Vì <span class="m">B<sub>c</sub></span> là bằng chứng theo kênh và bất biến
@@ -880,10 +886,10 @@ code { font-family: var(--font-mono); font-size: .92em; }
       <span class="m">S<sub>1</sub> = <b>y</b>·<b>y</b> − (<b>t</b><sub>j</sub>·<b>y</b>)<sup>2</sup>/A</span> và
       <span class="m">S<sub>0</sub> = <b>y</b>·<b>y</b></span> trên các kênh chung, nó có dạng đóng
       <span class="m">B<sup>0</sup><sub>j</sub> = [½ log(λ/A) − (n/2) log(S<sub>1</sub>/S<sub>0</sub>)] / n</span>
-      — ba tích ma trận–vector cho cả thư viện (47 ms cho 16 070 phổ), không cần giải hệ. Ngưỡng
-      <span class="m">τ<sub>0</sub></span> = 1.084 được hiệu chuẩn cùng cách với τ. Trong thử loại-lớp nội bộ
-      (§9.3) thống kê này từ chối họ hàng hoá học tốt hơn hẳn, nhưng đánh giá ngoài (§9.5) cho thấy ở cùng tỉ
-      lệ từ chối nhầm nó không tốt hơn <span class="m">max<sub>c</sub> B<sub>c</sub></span>; vì vậy kết luận
+      — ba tích ma trận–vector cho cả thư viện (≈ 50 ms cho 11 601 phổ), không cần giải hệ. Ngưỡng
+      <span class="m">τ<sub>0</sub></span> = 0.748 được hiệu chuẩn cùng cách với τ. Trong thử loại-lớp nội bộ
+      (§9.3) thống kê này từ chối chất lạ nhỉnh hơn (53.3% so với 45.3%), nhưng đánh giá ngoài (§9.5) không nhất quán giữa các nguồn:
+      nó hơn <span class="m">max<sub>c</sub> B<sub>c</sub></span> ở RRUFF chưa xếp hạng và kém ở thiết bị cầm tay, FT-Raman và số gộp; vì vậy kết luận
       dùng (20), còn <span class="m">max<sub>j</sub> B<sup>0</sup><sub>j</sub></span> được hiển thị như chỉ báo
       phụ ("có thể là chất họ hàng").
     </p>
@@ -917,10 +923,10 @@ code { font-family: var(--font-mono); font-size: .92em; }
       <ol>
         <li>best ← ∅</li>
         <li><span class="kw">với mỗi</span> lớp c có model[c] ≠ ∅:</li>
-        <li class="i1">B ← BF<sub>wc</sub>(ỹ, model[c]) trên mask giao (bỏ nếu &lt; 413 kênh)     ▷ pt. (17), (13)</li>
+        <li class="i1">B ← BF<sub>wc</sub>(ỹ, model[c]) trên mask của ỹ                         ▷ pt. (17), (13)</li>
         <li class="i1">best[c] ← B</li>
         <li><span class="kw">với mỗi</span> (s<sub>j</sub>, c<sub>j</sub>) ∈ 𝓛 mà c<sub>j</sub> chưa có trong best qua mô hình lớp:</li>
-        <li class="i1">B ← BF(ỹ, s<sub>j</sub>) (bỏ nếu mask giao &lt; 413 kênh)                ▷ pt. (13)</li>
+        <li class="i1">B ← BF(ỹ, s<sub>j</sub>) trên mask của ỹ                         ▷ pt. (13)</li>
         <li class="i1">best[c<sub>j</sub>] ← max(best[c<sub>j</sub>], B)</li>
         <li><span class="kw">nếu</span> best = ∅ → <span class="kw">trả về</span> ([], unknown = đúng)</li>
         <li><span class="kw">với mỗi</span> c trong 20 lớp có best[c] lớn nhất:                         ▷ lượt chấm thứ hai</li>
@@ -946,6 +952,11 @@ code { font-family: var(--font-mono); font-size: .92em; }
       (Plastic, Glass, Paper, Metal, …): các lớp hoá chất PS/PE/PP/PVP/PDMS/PMMA của kênh Raman được
       ánh xạ về Plastic, thuỷ tinh borosilicate về Glass; hoá chất khác giữ nguyên lớp.
     </p>
+    <div class="note">
+      <b>Phạm vi ở phiên bản 4.</b> Tầng hợp nhất được giữ nguyên từ phiên bản 3 cùng thư viện huỳnh quang (141 đường) và hấp thụ (52 đường)
+      riêng. Thư viện Raman của phiên bản 4 chỉ còn khoáng vật và dược phẩm/dung môi, không còn các lớp polymer, thuỷ tinh của VAST,
+      nên bằng chứng Raman chỉ góp vào các lớp còn lại; các số đa phương thức ở Bảng 5 là của phiên bản 3 và chưa được chạy lại.
+    </div>
 
     <h3>8.1 Biểu diễn đường cong theo bước sóng</h3>
     <p>
@@ -1019,27 +1030,22 @@ code { font-family: var(--font-mono); font-size: .92em; }
   <div class="sec" id="s9">
     <h2><span class="num">9</span>Hiệu chuẩn và đánh giá</h2>
 
-    <h3>9.1 Giao thức leave-one-out nghiêm ngặt</h3>
+    <h3>9.1 Giao thức leave-one-out nghiêm ngặt phân tầng</h3>
     <p>
-      Tập kiểm định là 255 phổ Raman đo tại VAST (LabRAM HR Evolution, 532 nm), 34 lớp; 248 phổ thuộc 27
-      lớp có ≥ 2 phổ được chấm điểm (7 lớp đơn phổ không thể kiểm định). Với mỗi phổ: rút nó khỏi thư viện
-      đầy đủ (16 070 phổ), <em>dựng lại mô hình trong lớp của chính lớp nó không có phổ đó</em> (Thuật toán
-      3), nhận diện bằng phần còn lại, so với nhãn. Thư viện đối chứng chứa cả ~15 800 phổ từ RRUFF [26],
-      ROD [27], dược phẩm [28] — mỗi phổ VAST phải thắng ~2 500 lớp "gây nhiễu", không chỉ 26 lớp còn lại
-      của VAST. Hai quy ước bổ sung: (i) <em>gộp đồng nghĩa xuyên nguồn</em> — cùng một chất xuất hiện dưới
-      tên khác ở nguồn khác (Aceton/Acetone, Aceton Nitrile/Acetonitrile, Isopropyl/Isopropanol/2-Propanol,
-      Toluen/Toluene, Ethanol/Ethanol (denatured), PE/Polyethylene medium density, PS/Polystyrene, TiO₂/Anatase,
-      Sodium Bicarbonate/Nahcolite) được tính là một lớp, cả khi chấm điểm lẫn khi loại lớp thật để thử
-      open-set; số theo nhãn thô được báo kèm; (ii) <em>cùng giao thức cho mọi phương pháp so sánh</em> —
-      cùng tiền xử lý, cùng thư viện, cùng mô hình lớp dựng lại; mỗi phương pháp được cho nhiệt độ softmax
-      riêng tối ưu theo ECE và ngưỡng τ riêng tại 10% từ chối nhầm, tức được so ở điều kiện tốt nhất của nó.
+      Thư viện là toàn bộ 11 601 phổ của 804 lớp (RRUFF [26] excellent + fair và bộ dược phẩm 785 nm [28]; mỗi lớp ≥ 3 phổ, không giới
+      hạn số phổ mỗi lớp). Với mỗi lớp rút tối đa 5 phổ làm truy vấn (seed 0, tổng 3 511 truy vấn; chấm cả 11 601 phổ mất 3.5 giờ).
+      Mỗi truy vấn được rút khỏi thư viện, <em>mô hình trong lớp của chính lớp đó được dựng lại không có phổ ấy</em> (Thuật toán 3), rồi
+      nhận diện bằng phần còn lại, tức bằng các mẫu vật, định hướng tinh thể hoặc máy khác của cùng khoáng trong RRUFF. Mọi phương pháp
+      so sánh dùng chung tiền xử lý, thư viện và mô hình lớp dựng lại; mỗi phương pháp có nhiệt độ softmax riêng tối ưu theo ECE và
+      ngưỡng τ riêng tại 10% từ chối nhầm, tức được so ở điều kiện tốt nhất của nó. Hai mạng CNN [3] được huấn luyện 5 fold chia theo thứ hạng trong lớp
+      (không lớp nào mất hết phổ), 60 epoch, trên GPU Kaggle T4.
     </p>
     <div class="note">
-      <b>Về các số đã công bố trước 25/08/2026.</b> Các bản trước của trang này báo top-1 96.0–96.8% và ECE
-      0.024 từ một giao thức có rò rỉ: mô hình trong lớp được học <em>một lần</em> trên toàn bộ thư viện, nên
-      với 174/202 phổ, phổ đang chấm đã nằm trong trung bình và các PC của chính lớp nó. Các số dưới đây thay
-      thế hoàn toàn các số đó. Siêu tham số của §6 (λ, K, ngưỡng phương sai), vốn được tối ưu trên giao thức
-      rò rỉ, được kiểm tra lại trên giao thức nghiêm ngặt: lưới λ ∈ {0.001, 0.003, 0.01, 0.03} × K ≤ {1, 2, 3, 4, 5, 7} × ngưỡng phương sai {0.90, 0.95, 0.99} (<code>evaluate_wc_grid.py</code>, 248 phổ, chọn bằng nested CV). Không có mô hình trong lớp (v2, chỉ phổ mẫu đơn) đạt 85.5–85.9%; K ≤ 3 <em>kém hơn</em> không có mô hình (71–81%) vì trung bình cộng vài PC biểu diễn phổ đo kém hơn phổ gần nhất trong lớp; K ≤ 7 với ngưỡng 0.99 tốt nhất ở mọi λ. Cấu hình λ = 0.01, K ≤ 7, 0.99 cho 88.7% (nested CV chọn đúng cấu hình này ở 248/248 fold) so với 87.1% của cấu hình cũ (λ = 0.003, 0.95). Lượt chấm thứ hai (§7.1) đưa lên 90.3% (nested CV trên 7 biến thể thử nghiệm: 90.3%, biến thể này được chọn ở mọi fold; các hướng khác — prior chặt hơn cho hệ số PC, PC dùng chung giữa các lớp — đều làm giảm độ chính xác, <code>evaluate_wc_extra.py</code>).
+      <b>Về các số của các bản trước.</b> Các số 96.0–96.8% công bố trước 25/08/2026 đến từ một giao thức có rò rỉ (mô hình trong lớp học một lần trên
+      toàn thư viện). Các số 90.3% (freeze #2, 248 phổ VAST) và 89.5% (freeze #3) thuộc thư viện cũ gồm VAST, ROD, NICODOM; từ 11/09/2026 VAST không còn
+      được dùng để huấn luyện hay kiểm tra, và các số dưới đây thay thế hoàn toàn. Siêu tham số của §6 (λ = 0.01, K ≤ 7, ngưỡng phương sai 99%)
+      được chọn bằng nested CV ở freeze #2 (cùng cấu hình được chọn ở 248/248 fold) và không đổi; chỉ κ, τ và τ<sub>0</sub> được hiệu chuẩn lại ở
+      freeze #5. Giao thức này chỉ dùng để chọn κ, τ, τ<sub>0</sub> và chia fold cho CNN; các bộ đánh giá của bài báo là §9.4–9.5.
     </div>
 
     <h3>9.2 Hiệu chuẩn κ bằng ECE</h3>
@@ -1052,65 +1058,73 @@ code { font-family: var(--font-mono); font-size: .92em; }
       Vì các <span class="m">B<sub>c</sub></span> của LOO không phụ thuộc κ, quét κ chỉ cần tính lại (19):
     </p>
     <table class="data-table">
-      <thead><tr><th>κ</th><th class="r">0.02</th><th class="r">0.03</th><th class="r"><b>0.04</b></th><th class="r">0.05</th><th class="r">0.06</th><th class="r">0.08</th><th class="r">0.12</th></tr></thead>
-      <tbody><tr><td>ECE</td><td class="mono r">0.072</td><td class="mono r">0.063</td><td class="mono r"><b>0.064</b></td><td class="mono r">0.074</td><td class="mono r">0.073</td><td class="mono r">0.096</td><td class="mono r">0.196</td></tr></tbody>
+      <thead><tr><th>κ</th><th class="r">0.03</th><th class="r">0.06</th><th class="r"><b>0.09</b></th><th class="r">0.12</th><th class="r">0.15</th><th class="r">0.20</th><th class="r">0.25</th></tr></thead>
+      <tbody><tr><td>ECE</td><td class="mono r">0.111</td><td class="mono r">0.059</td><td class="mono r"><b>0.035</b></td><td class="mono r">0.085</td><td class="mono r">0.175</td><td class="mono r">0.351</td><td class="mono r">0.527</td></tr></tbody>
     </table>
-    <p class="caption"><b>Bảng 2.</b> ECE theo κ trên LOO nghiêm ngặt, 248 phổ, softmax trên <em>toàn bộ</em> 2 495 lớp (đúng như ứng dụng tính; ECE chỉ tính trên top-5 cho giá trị thấp hơn và κ tối ưu lớn hơn — 0.043 tại κ = 0.10 — nhưng không phải xác suất mà người dùng thấy). κ nhỏ → quá tự tin; κ lớn → quá bi quan. Cực tiểu 0.063–0.064 nằm phẳng trong κ = 0.03–0.04; chọn κ = 0.04.</p>
+    <p class="caption"><b>Bảng 2.</b> ECE theo κ trên LOO nghiêm ngặt phân tầng, 3 511 truy vấn, softmax trên <em>toàn bộ</em> 804 lớp (đúng như ứng dụng tính). κ nhỏ → quá tự tin; κ lớn → quá bi quan. Cực tiểu nằm ở κ = 0.09 (ECE 0.035); ở freeze #2, thư viện VAST + ROD + NICODOM + dược phẩm cho κ = 0.04. κ lớn hơn một cách có hệ thống khi thư viện có nhiều phổ lặp gần nhau: hậu nghiệm cần mềm hơn vì các kênh càng tương quan.</p>
 
     <h3>9.3 Hiệu chuẩn τ và thử open-set</h3>
     <p>
-      τ là phân vị 10% của phân bố <span class="m">max<sub>c</sub> B<sub>c</sub></span> trên các phổ LOO
-      nghiêm ngặt (trung bình 1.450): τ = 0.661, tỉ lệ từ chối nhầm 10.1%. Khả năng từ chối chất lạ được ước
-      lượng bằng <em>loại cả nhóm</em>: loại toàn bộ lớp thật và các lớp đồng nghĩa khỏi thư viện rồi nhận
-      diện lại, đếm tỉ lệ <span class="m">max<sub>c</sub> B<sub>c</sub> &lt; τ</span> trên 180 phổ hoá chất.
-      Kết quả 30.0% là thấp và cần đọc đúng: (a) phần lớn "không từ chối" là họ hàng hoá học hoặc vật liệu
-      thật còn trong thư viện — 36/51 phổ Ethanol-Water khớp Ethanol, 23/29 phổ PP khớp Paper (bao bì trên
-      nền giấy), 6 phổ PE khớp magnesium stearate (cùng chuỗi alkyl), 5 phổ PS khớp opal, các dung dịch loãng
-      khớp nhau qua phổ nước; loại Ethanol-Water khỏi tập đếm, tỉ lệ là 37.2% (129 phổ). Phép thử loại-lớp trên thư viện gộp nhiều nguồn vì thế là cận dưới; thử với chất lạ thật chưa
-      đo là việc còn nợ (§11). (b) So sánh cùng giao thức (Bảng 3) chỉ ra nguyên nhân cấu trúc: cùng mô
-      hình evidence nhưng <em>bỏ nền Legendre</em> từ chối 62.8% — nền linh hoạt cho phép một phổ mẫu sai
+      τ là phân vị 10% của phân bố <span class="m">max<sub>c</sub> B<sub>c</sub></span> trên các truy vấn LOO
+      nghiêm ngặt (trung bình 1.459, trung vị 1.524): τ = 0.757, tỉ lệ từ chối nhầm 10.0%. Khả năng từ chối chất lạ được ước
+      lượng bằng <em>loại cả nhóm</em>: loại lớp thật khỏi thư viện (cùng các lớp đồng nghĩa) rồi nhận
+      diện lại, đếm tỉ lệ <span class="m">max<sub>c</sub> B<sub>c</sub> &lt; τ</span>. Kết quả 45.3% (28.5% ở 5% từ chối nhầm) là cận dưới:
+      thư viện còn nhiều họ hàng hoá học của lớp bị loại (khoáng cùng dãy, đa hình, hydrate), vốn giải thích phổ gần như phổ gốc,
+      và phép thử không có chất lạ thật chưa đo là việc còn nợ (§11). So sánh cùng giao thức (Bảng 3) chỉ ra
+      yếu tố cấu trúc: cùng mô hình evidence nhưng <em>bỏ nền Legendre</em> từ chối 53.3% — nền linh hoạt cho phép một phổ mẫu sai
       vẫn giải thích được một phần phổ đo, nên khoảng cách giữa "có chất" và "không có chất" bị co lại.
       Vì tầng quyết định tách rời, hướng xử lý tự nhiên là quy tắc lai: xếp hạng bằng evidence đầy đủ, cờ
-      unknown bằng evidence không nền (§7.3). Trên chính tập LOO này quy tắc lai giữ nguyên 90.3% top-1 và nâng
-      từ chối lên 62.8% ở cùng FRR (Bảng 3, hàng "lai"), AUROC known-vs-unknown 0.888 so với 0.853. Câu hỏi
-      còn lại — và là lý do của §9.5 — là liệu lợi thế này có phải tính chất của evidence hay chỉ là tạo tác
-      của việc "chất lạ" trong thử loại-lớp đều được đo trên cùng một máy với thư viện.
+      unknown bằng evidence không nền (§7.3). Trên chính tập LOO này quy tắc lai giữ nguyên 84.3% top-1, nâng
+      từ chối lên 53.3% (56.6% nếu cờ theo lớp xếp hạng nhất) ở cùng FRR, AUROC 0.839 (0.848) so với 0.806. Câu hỏi
+      còn lại — và là lý do của §9.5 — là liệu lợi thế này có giữ được khi đổi máy hay chỉ là tạo tác
+      của việc "chất lạ" trong thử loại-lớp đều được đo trên cùng một máy với thư viện. Kết quả ngoài (§9.5) không nhất quán giữa các nguồn,
+      nên sản phẩm giữ evidence đầy đủ cho kết luận và dùng không nền như chỉ báo phụ.
     </p>
 
     <h3>9.4 Benchmark</h3>
     <table class="data-table">
-      <thead><tr><th>Phương pháp</th><th class="r">Top-1, toàn bộ</th><th class="r">Top-1, hoá chất</th><th class="r">ECE*</th><th class="r">Từ chối chất lạ</th></tr></thead>
+      <thead><tr><th>Phương pháp</th><th class="r">Top-1</th><th class="r">ECE*</th><th class="r">Từ chối chất lạ @10% FRR</th><th class="r">AUROC</th><th class="r">Δ ghép cặp vs đầy đủ [95% CI]</th></tr></thead>
       <tbody>
-        <tr><td><b>RamanSisyphean</b> — evidence + mô hình trong lớp + nền</td><td class="mono r"><b>90.3%</b></td><td class="mono r"><b>93.9%</b></td><td class="mono r">0.053</td><td class="mono r">29.4%</td></tr>
-        <tr><td>RamanSisyphean, phổ mẫu đơn (không mô hình trong lớp)</td><td class="mono r">85.9%</td><td class="mono r">90.6%</td><td class="mono r">0.079</td><td class="mono r">35.0%</td></tr>
-        <tr><td>Evidence không nền (ablation)</td><td class="mono r">81.9%</td><td class="mono r">86.7%</td><td class="mono r">0.053</td><td class="mono r"><b>62.8%</b></td></tr>
-        <tr><td>HQI / cosine [1]</td><td class="mono r">81.9%</td><td class="mono r">86.7%</td><td class="mono r"><b>0.054</b></td><td class="mono r"><b>62.8%</b></td></tr>
-        <tr><td>Không gian con LS kiểu SIMCA/CLAFIC [13]</td><td class="mono r">83.5%</td><td class="mono r">85.6%</td><td class="mono r">0.068</td><td class="mono r">50.0%</td></tr>
-        <tr><td>χ² phần dư rút gọn kiểu TruScan [11]</td><td class="mono r">74.6%</td><td class="mono r">81.7%</td><td class="mono r">0.162</td><td class="mono r">59.4%</td></tr>
-        <tr><td>Quy tắc lai (max): xếp hạng đầy đủ, cờ max<sub>j</sub> B⁰<sub>j</sub></td><td class="mono r"><b>90.3%</b></td><td class="mono r"><b>93.9%</b></td><td class="mono r">0.065</td><td class="mono r"><b>62.8%</b></td></tr>
-        <tr><td>Quy tắc lai (top-1): cờ B⁰ của lớp xếp hạng nhất</td><td class="mono r"><b>90.3%</b></td><td class="mono r"><b>93.9%</b></td><td class="mono r">0.065</td><td class="mono r"><b>62.8%</b></td></tr>
+        <tr><td><b>RamanSisyphean</b> — evidence + mô hình trong lớp + nền + lượt chấm thứ hai</td><td class="mono r">84.3%</td><td class="mono r">0.039</td><td class="mono r">45.3%</td><td class="mono r">0.806</td><td class="mono r">—</td></tr>
+        <tr><td>RamanSisyphean, phổ mẫu đơn (không mô hình trong lớp)</td><td class="mono r">86.5%</td><td class="mono r">0.052</td><td class="mono r">46.9%</td><td class="mono r">0.819</td><td class="mono r">+2.1 [+1.3, +3.0]</td></tr>
+        <tr><td>Evidence không nền (ablation)</td><td class="mono r"><b>86.7%</b></td><td class="mono r">0.040</td><td class="mono r">53.3%</td><td class="mono r"><b>0.839</b></td><td class="mono r">+2.3 [+1.5, +3.2]</td></tr>
+        <tr><td>HQI / cosine [1]</td><td class="mono r">86.6%</td><td class="mono r"><b>0.020</b></td><td class="mono r">53.1%</td><td class="mono r"><b>0.839</b></td><td class="mono r">+2.3 [+1.4, +3.2]</td></tr>
+        <tr><td>Không gian con LS kiểu SIMCA/CLAFIC [13]</td><td class="mono r">84.5%</td><td class="mono r">0.028</td><td class="mono r">49.9%</td><td class="mono r">0.823</td><td class="mono r">+0.2 [−0.5, +0.9]</td></tr>
+        <tr><td>χ² phần dư rút gọn kiểu TruScan [11]</td><td class="mono r">86.5%</td><td class="mono r">0.101</td><td class="mono r">30.5%</td><td class="mono r">0.731</td><td class="mono r">+2.2</td></tr>
+        <tr><td>CNN 1D [3] (5 fold, 60 epoch)</td><td class="mono r">69.9%</td><td class="mono r">0.023</td><td class="mono r">36.2%</td><td class="mono r">0.787</td><td class="mono r"><b>−14.4 [−15.9, −13.0]</b></td></tr>
+        <tr><td>CNN 2D scalogram [3] (5 fold)</td><td class="mono r">74.9%</td><td class="mono r">0.012</td><td class="mono r">43.8%</td><td class="mono r">0.833</td><td class="mono r"><b>−9.4 [−10.7, −8.1]</b></td></tr>
+        <tr><td>Quy tắc lai (max): xếp hạng đầy đủ, cờ max<sub>j</sub> B⁰<sub>j</sub></td><td class="mono r">84.3%</td><td class="mono r">0.039</td><td class="mono r">53.3%</td><td class="mono r">0.839</td><td class="mono r">—</td></tr>
+        <tr><td>Quy tắc lai (top-1): cờ B⁰ của lớp xếp hạng nhất</td><td class="mono r">84.3%</td><td class="mono r">0.039</td><td class="mono r">56.6%</td><td class="mono r">0.848</td><td class="mono r">—</td></tr>
       </tbody>
     </table>
-    <p class="caption"><b>Bảng 3.</b> Benchmark LOO nghiêm ngặt, 248 phổ VAST, thư viện 16 070 phổ (2 495 lớp, đồng nghĩa xuyên nguồn đã gộp trong thư viện). ECE* = cực tiểu theo nhiệt độ softmax riêng của từng phương pháp. Từ chối chất lạ = loại cả nhóm, τ riêng tại 10% từ chối nhầm, 180 phổ hoá chất. "Không gian con" dùng đúng các mô hình lớp của RamanSisyphean nhưng chiếu bình phương tối thiểu, không tiên nghiệm, không nền; "χ²" hồi quy y trên [1, t] với phương sai nhiễu ước lượng từ sai phân bậc hai. So cặp với RamanSisyphean (RamanSisyphean đúng–phương pháp kia sai / ngược lại): cosine 22/1, không gian con 18/1, χ² 39/0, phổ mẫu đơn 11/0. Quy tắc cố định để tham chiếu: cosine cắt 0.95 từ chối 66.7% nhưng từ chối nhầm 11.3%; cắt 0.90 chỉ từ chối 37.2%; χ² với p &lt; 0.05 từ chối nhầm 80.2% phổ nội máy. AUROC known-vs-unknown (điểm tốt nhất trong thư viện so với điểm tốt nhất khi loại cả nhóm, 180 phổ hoá chất): evidence đầy đủ 0.853, không nền 0.888, cosine 0.888, không gian con 0.863, χ² 0.880; quy tắc lai (max/top-1) 0.888/0.892. Từ chối ở 5% từ chối nhầm: đầy đủ 17.8%, không nền 51.7%, lai top-1 55.0%.</p>
+    <p class="caption"><b>Bảng 3.</b> Benchmark LOO nghiêm ngặt phân tầng, 3 511 truy vấn, thư viện 11 601 phổ (804 lớp). ECE* = cực tiểu theo nhiệt độ softmax riêng của từng phương pháp. Từ chối chất lạ = loại cả nhóm, τ riêng tại 10% từ chối nhầm. AUROC known-vs-unknown: điểm tốt nhất trong thư viện so với điểm tốt nhất khi loại lớp thật. Top-1 theo nguồn: RRUFF 83.7–85.9%, dược phẩm 96.9–100%. "Không gian con" dùng đúng các mô hình lớp của RamanSisyphean nhưng chiếu bình phương tối thiểu, không tiên nghiệm, không nền; "χ²" hồi quy y trên [1, t] với phương sai nhiễu ước lượng từ sai phân bậc hai. Quy tắc cố định để tham chiếu: cosine cắt 0.90 từ chối nhầm 12.4% và từ chối 58.6% chất lạ, cắt 0.95 từ chối nhầm 30.9%; χ² với p &lt; 0.05 từ chối nhầm 90.8% phổ nội máy.</p>
+
     <p>
-      Ba điều rút ra. <em>Thứ nhất</em>, tầng bằng chứng thắng rõ về xếp hạng: +8.4 điểm so với cosine và
-      +6.8 so với không gian con, và phần thắng đến từ hai nguồn tách được — nền Legendre (+4.0 điểm, so
-      hàng "không nền") và mô hình trong lớp cộng lượt chấm thứ hai (+4.4 điểm, so hàng "phổ mẫu đơn"). <em>Thứ hai</em>, khi mỗi
-      phương pháp được hiệu chuẩn tốt nhất có thể, ECE của các điểm số liên tục (cosine, không gian con,
-      evidence) đều nằm trong 0.05–0.07; lợi thế của evidence không phải hiệu chuẩn tốt hơn mà là xếp hạng
-      đúng hơn ở cùng mức hiệu chuẩn — trong khi χ² kiểu TruScan không hiệu chuẩn được (0.162) vì thang của nó
-      phụ thuộc ước lượng nhiễu. <em>Thứ ba</em>, trong thử loại-lớp nội bộ, số hạng nền mua độ chính xác bằng khả năng từ chối, và quy
-      tắc lai lấy lại phần đó mà không mất xếp hạng — nhưng §9.5 cho thấy kết quả này không chuyển sang dữ liệu
-      ngoài.
+      Hai bộ đánh giá còn lại của bài báo trả lời các câu hỏi mà LOO không trả lời. <b>Chia cân bằng thông tin</b> (232 chất có ít nhất 10 phổ thực, chia 80/20 theo phổ thực;
+      2 797 hàng kiểm tra gồm 1 806 phổ thực và 991 bản sao suy giảm): CNN được huấn luyện trên phần huấn luyện (11 293 hàng), còn thư viện evidence dùng đúng 7 243 phổ
+      thực của phần đó, nên hai phương pháp dựa trên cùng dữ liệu. <b>Bản sao suy giảm</b>: 2 000 bản của 400 phổ thư viện (300 khoáng vật, 100 dung môi) thêm nhiễu Gauss
+      (SNR đỉnh 5–80), nền huỳnh quang 0.2–5× đỉnh (70%), co giãn trục ≤ 0.5% và dịch ≤ 5 cm⁻¹ (50%); vì phổ gốc vẫn nằm trong thư viện, bộ này đo ảnh hưởng của suy giảm
+      chất lượng lên điểm số, không đo độ khó nhận dạng.
     </p>
+    <table class="data-table">
+      <thead><tr><th>Phương pháp</th><th class="r">Chia cân bằng thông tin, top-1 (phổ gốc)</th><th class="r">Bản sao suy giảm, top-1</th><th class="r">SNR &lt; 10</th><th class="r">Lưu trữ</th><th class="r">Thời gian / truy vấn</th></tr></thead>
+      <tbody>
+        <tr><td><b>Evidence, cấu hình production</b></td><td class="mono r"><b>97.3%</b></td><td class="mono r">95.3%</td><td class="mono r"><b>94.0%</b></td><td class="mono r">26 MB</td><td class="mono r">2.8 s</td></tr>
+        <tr><td>Cosine HQI [1, 2]</td><td class="mono r">96.9%</td><td class="mono r">83.5%</td><td class="mono r">22.6%</td><td class="mono r">26 MB</td><td class="mono r">0.07 s</td></tr>
+        <tr><td>CNN 1D [3]</td><td class="mono r">96.0%</td><td class="mono r">97.4%</td><td class="mono r">85.7%</td><td class="mono r">4 MB</td><td class="mono r">9 ms</td></tr>
+        <tr><td>CNN 2D scalogram [3]</td><td class="mono r">95.7%</td><td class="mono r"><b>97.9%</b></td><td class="mono r">90.2%</td><td class="mono r">4 MB</td><td class="mono r">16 ms</td></tr>
+      </tbody>
+    </table>
+    <p class="caption"><b>Bảng 4.</b> Hai bộ đánh giá của bài báo (freeze #5) kèm chi phí. Thời gian đo trên một luồng CPU của máy tính xách tay (Intel Core i7-10750H); ở bộ cân bằng thông tin evidence mất 2.8 s vì thư viện là 7 243 phổ thực kèm mô hình lớp và lượt thứ hai, ở thư viện 11 601 phổ là 1.9 s (§10). Ở bộ suy giảm CNN được huấn luyện trên toàn thư viện (11 601 phổ) có kèm phổ gốc của các bản sao. Thêm một chất mới: evidence — một hàng thư viện (cấu hình production: một hàng và một mô hình lớp); CNN — huấn luyện lại, &gt; 1 giờ trên GPU và ≥ 10 phổ lặp mỗi chất.</p>
     <p>
-      Theo lớp: 20/27 lớp đạt 100%, gồm toàn bộ dung môi, Glass 18/18, Glucose 9/9, PET 14/14, PS 8/8,
-      TiO₂ 4/4. Trong 24 lỗi còn lại, 17 nằm ở vật liệu bao bì và danh mục không thuần chất — PE 24/29,
-      PP 27/29, Paper 21/26, Other 10/13, Vỏ hoa quả 6/11 — nơi PE/PP/Paper/Other nhầm lẫn lẫn nhau (nhãn
-      nhiễu, SNR thấp trên nền huỳnh quang 532 nm); 3 ở Ethanol-Water (dung dịch loãng khớp Glass/Paper qua
-      phổ nước); 7 là phổ yếu bị một khoáng vật hoặc dược chất của thư viện ngoài "cướp" với BF thấp
-      (Cabalzarite, Cinnabar, Artesunate, Gadolinite, Weloganite, Augelite) — đúng loại lỗi mà cờ unknown
-      và một ngưỡng theo nguồn (§11) nhắm tới.
+      Rút ra. <em>Thứ nhất</em>, ở bài nhận <em>một mẫu vật khác của cùng khoáng</em> (LOO), mọi tìm kiếm thư viện chạm trần khoảng 86.5% (cosine 86.6%, phổ mẫu đơn 86.5%), và mô hình đầy đủ với
+      mô hình lớp kém phổ mẫu đơn 2.1 điểm (ghép cặp 158 đúng/83 sai theo hướng ngược, p &lt; 0.001); các CNN thấp hơn 9–14 điểm vì thư viện có trung vị 4 phổ mỗi lớp. Evidence không hơn
+      cosine ở bài này; điều nó thêm là điểm xác suất, quy tắc từ chối và thư viện mở rộng không cần huấn luyện.
+      <em>Thứ hai</em>, trên cùng thông tin huấn luyện (cân bằng thông tin), evidence đạt 97.3% so với 96.0% và 95.7% của hai CNN và 96.9% của cosine — hơn CNN 1.3–1.6 điểm mà không cần huấn luyện;
+      vì bài này dễ (mỗi lớp ≥ 10 phổ), phép so sánh chủ yếu là tương đối. <em>Thứ ba</em>, với phổ suy giảm evidence hơn cosine 11.8 điểm (95.3% so với 83.5%) và tốt nhất ở SNR &lt; 10 (94.0%
+      so với 90.2% và 85.7% của CNN, 22.6% của cosine); nhiễu và huỳnh quang không phải vấn đề của evidence (không trôi trục: 99.0–99.3%). CNN dẫn đầu tổng thể (97.4–97.9%) vì
+      được tăng cường dữ liệu bằng chính các phép dịch trục, còn điểm yếu của evidence là trôi trục vượt cửa sổ ±1 kênh (91–92%); tìm kiếm ±2 kênh kèm co giãn trục khôi phục phần lớn lỗi nhưng
+      tốn khoảng 5 lần chi phí. Tách riêng: ở SNR &lt; 10 evidence và CNN 2D chưa được tách bạch về thống kê (McNemar p = 0.33).
     </p>
     <table class="data-table">
       <thead><tr><th>Kiểm định</th><th>Giao thức</th><th class="r">Kết quả</th></tr></thead>
@@ -1122,54 +1136,43 @@ code { font-family: var(--font-mono); font-size: .92em; }
         <tr><td>Tổng quát hoá xuyên máy</td><td>18 phổ FT-Raman NICODOM (máy khác, laser khác) so với thư viện VAST của phiên bản 2 (τ = 0.659)</td><td class="mono r">4/4 chất có trong thư viện đúng; 12/13 chất lạ bị từ chối</td></tr>
       </tbody>
     </table>
-    <p class="caption"><b>Bảng 4.</b> Các kiểm định bổ sung. Nested CV: trọng số (23) được chọn lại trong vòng trong, không nhìn mẫu đang chấm — chênh 2 điểm so với giá trị lạc quan cho thấy thiên lệch chọn lọc nhỏ. Kiểm định xuyên máy chỉ có trên phiên bản 2: từ phiên bản 3, 18 phổ NICODOM đã nằm trong thư viện 16 k nên phép thử không lặp lại được nguyên trạng; log BF xuyên máy tới lớp VAST tương ứng hiện là 0.74 (paracetamol), 1.18 (Si), 1.48 (PS), 1.80 (PE) — đo ở cấu hình λ = 0.003 trên thư viện 16 024 phổ; cả bốn đều trên τ đương thời = 0.657 nhưng thấp hơn hẳn mức nội máy &gt; 1.5 (xem §11).</p>
+    <p class="caption"><b>Bảng 5.</b> Các kiểm định bổ sung của phiên bản 3 (freeze #2, thư viện VAST + RRUFF + ROD + dược phẩm + NICODOM); <em>chưa được chạy lại</em> ở freeze #5. Nested CV: trọng số (23) được chọn lại trong vòng trong, không nhìn mẫu đang chấm — chênh 2 điểm so với giá trị lạc quan cho thấy thiên lệch chọn lọc nhỏ. Kiểm định xuyên máy chỉ có trên phiên bản 2 và không lặp lại được nguyên trạng; log BF xuyên máy tới lớp VAST tương ứng khi đó là 0.74 (paracetamol), 1.18 (Si), 1.48 (PS), 1.80 (PE), thấp hơn hẳn mức nội máy &gt; 1.5 (xem §11).</p>
 
     <h3>9.5 Đánh giá ngoài đóng băng</h3>
     <p>
       Mọi thành phần — thư viện (sha256 ghi lại), λ, K, κ, τ, τ<sub>0</sub>, lượt chấm thứ hai — được đóng băng
-      trước khi chấm bất kỳ phổ ngoài nào; không ngưỡng nào được tinh chỉnh sau đó. Phổ ngoài đến từ năm nguồn
-      công khai chưa từng vào thư viện (Bảng 5): 6 228 phổ RRUFF bị loại khi dựng thư viện vì chất lượng
-      "unrated", "LR-Raman" (máy phân giải thấp) hoặc "poor" [26]; RaSPI [29] (Renishaw inVia, 532/633 nm,
-      14 loại nhựa); thư viện polymer đại dương của Miller và cộng sự [30] (Thermo DXR 532 nm, XploRA 785
-      nm); tá dược dược phẩm của Bērziņš và cộng sự [31] (Bruker MultiRAM FT-Raman 1064 nm và 785 nm);
-      thư viện so khớp của máy cầm tay Wasatch WP-785XS [32]. Tên chất ngoài được đối chiếu với 2 495 lớp
+      trước khi chấm bất kỳ phổ ngoài nào; không ngưỡng nào được tinh chỉnh sau đó. Phổ ngoài đến từ các nguồn
+      công khai chưa từng vào thư viện (Bảng 6): phổ RRUFF bị loại khi dựng thư viện vì chất lượng
+      "unrated", "LR-Raman" (máy phân giải thấp) hoặc "poor" [26]; Wasatch WP-785XS cầm tay [32]; tá dược dược phẩm của Bērziņš và cộng sự [31]
+      (Bruker MultiRAM FT-Raman 1064 nm và 785 nm); RaSPI [29] (Renishaw inVia, 532/633 nm, 14 loại nhựa) và thư viện polymer đại dương của Miller và cộng sự [30]
+      (Thermo DXR 532 nm, XploRA 785 nm). Tên chất ngoài được đối chiếu với 804 lớp
       bằng một bảng ánh xạ cố định phía đánh giá: <em>known</em> nếu là cùng chất; <em>unknown-gần</em> nếu trùng
-      công thức hoặc gốc tên với một lớp (đa hình, hydrate, PMMA so với MMA); <em>unknown-xa</em> nếu không. Phổ
-      trùng thư viện (cosine &gt; 0.9999) bị loại (4 phổ RRUFF). Ngoài số ở ngưỡng đóng băng, mỗi điểm số còn được
-      so ở <em>cùng</em> 10% từ chối nhầm hiệu chuẩn trên phổ known của chính nguồn đó, và bằng AUROC
-      known-vs-unknown-xa — hai phép đo không phụ thuộc ngưỡng.
+      công thức hoặc gốc tên với một lớp; <em>unknown-xa</em> nếu không. Phổ trùng thư viện (cosine &gt; 0.9999) bị loại.
+      Ngoài số ở ngưỡng đóng băng, mỗi điểm số còn được so ở <em>cùng</em> 10% từ chối nhầm hiệu chuẩn trên phổ known của chính nguồn đó,
+      và bằng AUROC known-vs-unknown-xa — hai phép đo không phụ thuộc ngưỡng.
     </p>
     <table class="data-table">
-      <thead><tr><th>Nguồn (máy / laser)</th><th class="r">Known: n · top-1 · FRR@τ / τ<sub>0</sub></th><th class="r">Unknown-xa: n · từ chối đầy đủ / không nền</th><th class="r">AUROC đầy đủ / không nền / cosine</th><th class="r">Từ chối xa ở FRR 10% ngoài: đầy đủ / không nền</th></tr></thead>
+      <thead><tr><th>Nguồn (máy / laser)</th><th class="r">Known: n · top-1 · FRR@τ / τ<sub>0</sub></th><th class="r">Unknown-xa: n · từ chối đầy đủ / không nền</th><th class="r">AUROC đầy đủ / không nền / cosine</th><th class="r">Từ chối xa ở FRR 10% ngoài: đầy đủ / không nền / cosine</th></tr></thead>
       <tbody>
-        <tr><td>RRUFF held-out, known "unrated" (nhiều máy; 514 nm chủ yếu)</td><td class="mono r">149 · 78.5% · 9.4 / 15.4%</td><td class="mono r">188 · 61.7 / 84.6%</td><td class="mono r">0.932 / 0.919 / 0.918</td><td class="mono r">66.5 / 64.4%</td></tr>
-        <tr><td>RRUFF held-out, known "LR-Raman" (phân giải thấp; 780/532 nm)</td><td class="mono r">149 · <b>47.7%</b> · 13.4 / 50.3%</td><td class="mono r">— (cùng 188)</td><td class="mono r">0.755 / 0.719 / 0.703</td><td class="mono r">—</td></tr>
-        <tr><td>RRUFF held-out, known "poor"</td><td class="mono r">149 · 14.1% · 76.5 / 89.9%</td><td class="mono r">— (cùng 188)</td><td class="mono r">0.411 / 0.452 / 0.483</td><td class="mono r">—</td></tr>
-        <tr><td>RaSPI (inVia 532/633 nm; nhựa)</td><td class="mono r">30 · 73.3% · 10.0 / 36.7%</td><td class="mono r">132 · 27.3 / 51.5%</td><td class="mono r">0.720 / 0.688 / 0.689</td><td class="mono r">28.0 / 27.3%</td></tr>
-        <tr><td>Miller (DXR 532, XploRA 785 nm; polymer đại dương)</td><td class="mono r">10 · 60.0% · 10.0 / 50.0%</td><td class="mono r">52 · 44.2 / 67.3%</td><td class="mono r">0.694 / 0.698 / 0.698</td><td class="mono r">44.2 / 25.0%</td></tr>
-        <tr><td>Bērziņš (FT-Raman 1064 nm + 785 nm; tá dược)</td><td class="mono r">22 · 68.2% · 22.7 / 54.5%</td><td class="mono r">118 · 74.6 / 89.8%</td><td class="mono r">0.809 / 0.728 / 0.725</td><td class="mono r">23.7 / 5.1%</td></tr>
-        <tr><td>Wasatch WP-785XS (máy cầm tay 785 nm; dung môi, dược)</td><td class="mono r">35 · 74.3% · 11.4 / 28.6%</td><td class="mono r">41 · 56.1 / 95.1%</td><td class="mono r">0.879 / 0.883 / 0.886</td><td class="mono r">75.6 / 65.9%</td></tr>
-        <tr><td><b>Gộp năm nguồn đo (bỏ RRUFF "poor")</b></td><td class="mono r"><b>395 · 65.1% · 11.6 / 34.4%</b></td><td class="mono r"><b>531 · 53.5 / 76.6%</b></td><td class="mono r"><b>0.818 / 0.800 / 0.799</b></td><td class="mono r"><b>45.0 / 46.9%</b></td></tr>
+        <tr><td>RRUFF held-out, known "unrated" (nhiều máy; 514 nm chủ yếu)</td><td class="mono r">150 · <b>97.3%</b> · 2.7 / 0.7%</td><td class="mono r">992 · 68.6 / 81.4%</td><td class="mono r">0.974 / 0.983 / 0.982</td><td class="mono r">92.4 / 96.4 / 96.1%</td></tr>
+        <tr><td>RRUFF held-out, known "LR-Raman" (phân giải thấp; 780/532 nm)</td><td class="mono r">150 · <b>59.3%</b> · 47.3 / 62.0%</td><td class="mono r">— (cùng 992)</td><td class="mono r">0.634 / 0.555 / 0.548</td><td class="mono r">11.5 / 5.5 / 5.5%</td></tr>
+        <tr><td>RRUFF held-out, known "poor"</td><td class="mono r">149 · 32.2% · 77.9 / 69.1%</td><td class="mono r">— (cùng 992)</td><td class="mono r">0.410 / 0.667 / 0.688</td><td class="mono r">6.4 / 39.0 / 43.9%</td></tr>
+        <tr><td>Wasatch WP-785XS (máy cầm tay 785 nm; dung môi, dược, chất rắn vô cơ)</td><td class="mono r">20 · <b>100%</b> · 5.0 / 15.0%</td><td class="mono r">60 · 76.7 / 83.3%</td><td class="mono r">0.948 / 0.938 / 0.949</td><td class="mono r">90.0 / 83.3 / 85.0%</td></tr>
+        <tr><td>Bērziņš (FT-Raman 1064 nm + 785 nm; tá dược)</td><td class="mono r">8 · 62.5% · 25.0 / 37.5%</td><td class="mono r">136 · 80.9 / 86.0%</td><td class="mono r">0.923 / 0.865 / 0.870</td><td class="mono r">70.6 / 67.6 / 66.9%</td></tr>
+        <tr><td>RaSPI (inVia 532/633 nm; nhựa) · Miller (DXR 532, XploRA 785 nm; polymer đại dương)</td><td class="mono r">0 known (polymer không còn trong thư viện)</td><td class="mono r">402 · 88.6 / 86.1% · 75 · 81.3 / 82.7%</td><td class="mono r">—</td><td class="mono r">—</td></tr>
+        <tr><td><b>Gộp các nguồn đo (bỏ RRUFF "poor", RaSPI, Miller, ramanbiolib)</b></td><td class="mono r"><b>328 · 79.3% · 23.8 / 30.5%</b></td><td class="mono r"><b>1 665 · 75.3 / 83.0%</b></td><td class="mono r"><b>0.831 / 0.793 / 0.792</b></td><td class="mono r"><b>33.3 / 20.5 / 20.4%</b></td></tr>
       </tbody>
     </table>
-    <p class="caption"><b>Bảng 5.</b> Đánh giá ngoài đóng băng. Known: top-1 theo lớp thư viện đã đối chiếu; FRR = tỉ lệ bị gắn cờ unknown ở τ (đầy đủ) và τ<sub>0</sub> (không nền) đóng băng. Unknown-xa: tỉ lệ bị từ chối ở hai ngưỡng đó. Cột cuối: ngưỡng đặt lại tại 10% từ chối nhầm trên phổ known của từng nguồn (điểm vận hành bằng nhau). Unknown-gần (81 phổ): từ chối ở ngưỡng đóng băng 29.6% (đầy đủ) / 77.8% (không nền), ở FRR bằng nhau 23.5% / 18.5%. RRUFF known "unrated" gồm 127/149 phổ 514 nm. Bộ ramanbiolib [33] (202 phổ số hoá từ hình bài báo) được chấm riêng và không gộp: 8 known top-1 50%, từ chối nhầm 50% (τ) / 88% (τ<sub>0</sub>); 189 unknown-xa bị từ chối 79% / 95%; AUROC 0.69 / 0.54 — phổ số hoá không đủ trung thực để làm chuẩn.</p>
+    <p class="caption"><b>Bảng 6.</b> Đánh giá ngoài đóng băng (freeze #5). Known: top-1 theo lớp thư viện đã đối chiếu; FRR = tỉ lệ bị gắn cờ unknown ở τ (đầy đủ) và τ<sub>0</sub> (không nền) đóng băng. Unknown-xa: tỉ lệ bị từ chối ở hai ngưỡng đó. Cột cuối: ngưỡng đặt lại tại 10% từ chối nhầm trên phổ known của từng nguồn (điểm vận hành bằng nhau). Unknown-gần (117 phổ, bộ gộp): từ chối ở ngưỡng đóng băng 68.4% (đầy đủ) / 77.8% (không nền), ở FRR bằng nhau 43.6% / 17.1%. Bộ ramanbiolib [33] (202 phổ số hoá từ hình bài báo) được chấm riêng và không gộp (từ chối unknown-xa 99.0% / 100%).</p>
     <p>
-      Bốn điều rút ra. <em>Thứ nhất</em>, nhận diện xuyên máy hoạt động khi phổ ngoài có chất lượng tham chiếu:
-      58–77% top-1 trên RRUFF "unrated", RaSPI, Wasatch cầm tay, Bērziņš (kể cả FT-Raman 1064 nm so với thư viện
-      532 nm), với tỉ lệ từ chối nhầm 9–23% ở τ đóng băng; ngược lại phổ RRUFF "poor" gần như nhiễu (14%, AUROC
-      dưới 0.5), còn "LR-Raman" đạt 47.7% nhờ khớp độ phân giải (§7.1) — trước khi có nó chỉ 38.9%. Chất lượng phổ, không phải chất, quyết định khả năng chuyển, và phần chất lượng do độ phân giải gây ra thì sửa được ở phía mô hình.
-      <em>Thứ hai</em>, ngưỡng nội máy chuyển được một phần: τ giữ FRR 9–23% trên các nguồn đo tốt, còn
-      τ<sub>0</sub> từ chối nhầm 29–55% vì bằng chứng không nền tụt mạnh hơn khi đổi máy (median 1.05–1.40 so với
-      1.72 nội máy). <em>Thứ ba — phát hiện âm</em>: ở cùng tỉ lệ từ chối nhầm, evidence không nền không từ chối
-      chất lạ tốt hơn evidence đầy đủ (gộp 46.9% so với 45.0%; unknown-gần 18.5% so với 23.5%), và AUROC của
-      evidence đầy đủ bằng hoặc cao hơn ở 4/5 nguồn (Bērziņš 0.81 so với 0.73). Lợi thế 62.8% so với 30.0% ở §9.3
-      là tạo tác của thử loại-lớp cùng máy: khi "chất lạ" được đo trên đúng máy của thư viện, nền linh hoạt chỉ
-      còn giúp giải thích họ hàng hoá học; khi đổi máy, chính nền đó hấp thụ lệch dụng cụ cho cả chất đúng lẫn
-      chất lạ, và hai thống kê phân biệt như nhau. Vì thế kết luận open-set của RamanSisyphean dùng evidence đầy đủ (20),
-      và evidence không nền được giữ như chỉ báo phụ. <em>Thứ tư</em>, lỗi nhận diện ngoài có cấu trúc hoá học
-      dễ đọc — PE khớp magnesium stearate (chuỗi alkyl), gypsum khớp anhydrite, PDMS khớp khoáng silicat, "dentin"
-      và "amylopectin" bị coi là chất lạ dù khớp đúng hydroxylapatite và tinh bột — nên phần "unknown-xa được
-      chấp nhận" một phần là giới hạn của đối chiếu tên, không phải của mô hình.
+      Bốn điều rút ra. <em>Thứ nhất</em>, chất lượng phổ quyết định khả năng chuyển: phổ chất lượng tham chiếu được nhận đúng 97.3% (RRUFF "unrated", 146/150) và 20/20 trên thiết bị cầm tay
+      785 nm (cận dưới Clopper–Pearson 95% của 20/20 khoảng 83%, nên con số 100% chỉ nói rằng phương pháp chuyển được chứ chưa nói tỉ lệ chính xác), trong khi phổ độ phân giải thấp chỉ đạt 59.3% và phổ "poor"
+      32.2% (gần như nhiễu, AUROC dưới 0.5 với evidence đầy đủ). <em>Thứ hai</em>, ngưỡng nội máy chuyển được một phần: τ giữ từ chối nhầm 2.7% và 5.0% trên phổ tốt (RRUFF unrated,
+      Wasatch) nhưng 47.3% và 77.9% trên phổ độ phân giải thấp và "poor" — hiệu chuẩn theo máy từ vài phổ known (nút "Hiệu chuẩn máy") là cần thiết. <em>Thứ ba</em>, về open-set bằng chứng không nhất quán:
+      ở cùng 10% từ chối nhầm, evidence không nền và cosine từ chối chất lạ nhỉnh hơn evidence đầy đủ ở RRUFF "unrated" (96.4 / 96.1% so với 92.4%), còn evidence đầy đủ hơn ở thiết bị cầm tay (90.0%),
+      FT-Raman (70.6%) và số gộp (33.3% so với 20.5% và 20.4%); vì vậy kết luận open-set dùng evidence đầy đủ (20) và evidence không nền giữ vai trò chỉ báo phụ. <em>Thứ tư</em>, các bộ này đo
+      khả năng nhận lại <em>chất</em> đã có đại diện, và số phổ known từ thiết bị khác còn ít (20 phổ cầm tay, 8 phổ FT-Raman) vì thư viện chỉ gồm khoáng vật và dung môi/thuốc thử; RaSPI và Miller (polymer) không còn
+      known nào để đánh giá nhận diện.
     </p>
   </div>
 
@@ -1180,18 +1183,18 @@ code { font-family: var(--font-mono); font-size: .92em; }
       Thuật toán được cài đặt hai lần: bản tham chiếu Python (NumPy/SciPy — <code>ramanlib.py</code>,
       <code>bayes.py</code>, <code>multimodal.py</code>) dùng để dựng thư viện, hiệu chuẩn và đánh giá; và
       bản JavaScript thuần (<code>core.js</code>, không phụ thuộc thư viện ngoài) chạy trong trình duyệt.
-      Hai bản được kiểm tra tương đương (parity test) trên cùng bộ phổ: 22/22 kiểm tra (log BF, thứ hạng,
-      vị trí peak, điểm hợp nhất, mô hình trong lớp) trùng với bản Python trong dung sai 0.02 — điều này
+      Hai bản được kiểm tra tương đương (parity test) trên cùng bộ phổ, gồm phổ đo trên máy để bàn, phổ cầm tay Wasatch và phổ RRUFF giữ lại: hơn 90 kiểm tra (log BF, thứ hạng, hậu nghiệm, cờ unknown, bằng chứng không nền,
+      vị trí peak, bề rộng peak và làm mờ, điểm hợp nhất, mô hình trong lớp) trùng với bản Python trong dung sai 0.02 — điều này
       quan trọng vì κ và τ được hiệu chuẩn trên bản Python và áp dụng trên bản JS.
     </p>
     <table class="data-table">
       <thead><tr><th>Thành phần</th><th>Chi phí</th><th>Ghi chú</th></tr></thead>
       <tbody>
         <tr><td>Tiền xử lý một phổ</td><td class="mono">O(n<sub>g</sub>)</td><td>SG là tích chập 9 điểm; ALS 10 vòng Cholesky dải</td></tr>
-        <tr><td>Evidence một cặp</td><td class="mono">O(n p²) + O(p³)</td><td>n ≤ 1376, p ≤ 14 (1 mẫu + ≤7 PC + 6 nền); Gram matrix chiếm đa số</td></tr>
-        <tr><td>Một truy vấn toàn thư viện</td><td class="mono">O(N n p²)</td><td>N = 16 070 phổ, 515 lớp qua mô hình trong lớp; vài giây trên trình duyệt</td></tr>
+        <tr><td>Evidence một cặp</td><td class="mono">O(n p²) + O(p³)</td><td>n ≤ 1976, p ≤ 14 (1 mẫu + ≤7 PC + 6 nền); Gram matrix chiếm đa số</td></tr>
+        <tr><td>Một truy vấn toàn thư viện</td><td class="mono">O(N n p²)</td><td>N = 11 601 phổ, 804 lớp qua mô hình trong lớp; vài giây trên trình duyệt (trên CPU máy tính xách tay: 0.75 s lượt thứ nhất, 1.9 s cả hai lượt)</td></tr>
         <tr><td>Mô hình trong lớp</td><td class="mono">O(m<sub>c</sub> n<sub>g</sub> min(m<sub>c</sub>, n<sub>g</sub>))</td><td>SVD một lần khi dựng thư viện, không lặp lại lúc truy vấn</td></tr>
-        <tr><td>Dữ liệu tải về</td><td class="mono">33.9 MB (gzip ≈ 23 MB)</td><td>Toàn bộ 16 024 phổ + 516 mô hình trong lớp; mỗi đoạn kênh hợp lệ lượng tử hoá uint16 trên [min, max] của đoạn (sai số ≤ 8·10⁻⁶ biên độ) rồi mã hoá base64, kèm i<sub>0</sub></td></tr>
+        <tr><td>Dữ liệu tải về</td><td class="mono">40.4 MB (gzip ≈ 27 MB)</td><td>Toàn bộ 11 601 phổ + 804 mô hình trong lớp; mỗi đoạn kênh hợp lệ lượng tử hoá uint16 trên [min, max] của đoạn (sai số ≤ 8·10⁻⁶ biên độ) rồi mã hoá base64, kèm i<sub>0</sub></td></tr>
       </tbody>
     </table>
     <p>
@@ -1212,10 +1215,11 @@ code { font-family: var(--font-mono); font-size: .92em; }
         <tr><td>Peak phát hiện bằng ngưỡng cố định</td><td>Giải thích không mang xác suất</td><td>Suy luận peak theo Bayes (hướng của Härkönen và cộng sự [7])</td></tr>
         <tr><td>Hỗn hợp tham lam 2 thành phần</td><td>Chưa kiểm chứng định lượng</td><td>Đo hỗn hợp có kiểm soát; suy luận tổ hợp với tiên nghiệm thưa</td></tr>
         <tr><td>κ<sub>mm</sub> fusion chưa hiệu chuẩn</td><td>Hậu nghiệm đa phương thức chỉ dùng để xếp hạng</td><td>Cần thêm mẫu vật ghép cặp để hiệu chuẩn ECE riêng</td></tr>
-        <tr><td>Ngưỡng hiệu chuẩn nội máy</td><td>Ở τ đóng băng, từ chối nhầm 9–23% trên máy khác với phổ tốt nhưng 77% với phổ RRUFF "poor" và 17% với LR-Raman; τ<sub>0</sub> từ chối nhầm 29–55% (§9.5)</td><td>Hiệu chuẩn τ theo máy/nguồn từ vài phổ known của chính máy đó; cờ chất lượng phổ (SNR, độ phủ) trước khi kết luận unknown</td></tr>
-        <tr><td>Nền Legendre và open-set</td><td>Nội bộ: bỏ nền từ chối 62.8% so với 30.0%; ngoài: không khác biệt ở cùng FRR, evidence đầy đủ AUROC cao hơn ở 4/5 nguồn (§9.5)</td><td>Giữ kết luận trên evidence đầy đủ; nghiên cứu tiên nghiệm riêng cho hệ số nền và ngưỡng theo máy thay vì đổi thống kê</td></tr>
-        <tr><td>Chất lạ ngoài chỉ có từ nguồn công khai</td><td>Đối chiếu tên có sai số (dentin ≈ hydroxylapatite, amylopectin ≈ tinh bột); không có chất lạ đo tại VAST trên đúng máy</td><td>Đo 5–10 chất lạ thật trên LabRAM; mở rộng bảng đối chiếu bằng công thức/CAS</td></tr>
-        <tr><td>Đa số lớp thư viện 1–2 phổ</td><td>1 991 lớp không có mô hình trong lớp</td><td>Chia sẻ PC giữa các lớp cùng họ (hierarchical prior); bổ sung phổ qua đóng góp cộng đồng</td></tr>
+        <tr><td>Ngưỡng hiệu chuẩn trên thư viện</td><td>Ở τ đóng băng, từ chối nhầm 2.7% (RRUFF unrated) và 5.0% (Wasatch) nhưng 25.0% với FT-Raman (8 phổ), 47.3% với LR-Raman và 77.9% với phổ "poor"; τ<sub>0</sub> từ chối nhầm 0.7–69% (§9.5)</td><td>Hiệu chuẩn τ theo máy/nguồn từ vài phổ known của chính máy đó (đã có trong ứng dụng); cờ chất lượng phổ (SNR, độ phủ) trước khi chấm</td></tr>
+        <tr><td>Nền Legendre và open-set</td><td>Nội bộ: bỏ nền từ chối 53.3% so với 45.3%; ngoài: không nhất quán giữa các nguồn, evidence đầy đủ hơn ở số gộp (33.3% so với 20.5%) nhưng kém ở RRUFF unrated (§9.5)</td><td>Giữ kết luận trên evidence đầy đủ; nghiên cứu tiên nghiệm riêng cho hệ số nền và ngưỡng theo máy thay vì đổi thống kê</td></tr>
+        <tr><td>Chất lạ ngoài chỉ có từ nguồn công khai</td><td>Đối chiếu tên có sai số; thư viện chỉ gồm khoáng vật và 32 dung môi/thuốc thử nên số known từ thiết bị khác ít (20 phổ cầm tay); không có chất lạ đo trên đúng máy của thư viện</td><td>Mở rộng thư viện sang polymer và dược chất, đo thêm phổ known trên thiết bị cầm tay; mở rộng bảng đối chiếu bằng công thức/CAS</td></tr>
+        <tr><td>Bộ đánh giá chưa đo mẫu vật mới</td><td>Các bộ giữ trong thư viện cùng mẫu vật hoặc phổ lặp cùng lọ nên đo khả năng nhận lại chất đã có đại diện; ở LOO xuyên mẫu vật mọi tìm kiếm thư viện chạm trần ≈ 86.5%</td><td>Bộ đánh giá với mẫu vật độc lập đo trên thiết bị cầm tay; lấy mẫu thêm mẫu vật cho mỗi lớp (trung vị hiện tại 4 phổ)</td></tr>
+        <tr><td>Trôi trục vượt quá ±1 kênh và chi phí tính toán</td><td>Độ chính xác trên bản sao suy giảm giảm còn 91–92%; tìm kiếm ±2 kênh kèm co giãn trục tốn khoảng 5 lần. Thời gian đo trên CPU máy tính xách tay, chưa phải bộ xử lý nhúng; lượt thứ nhất 0.75 s, cấu hình đầy đủ 1.9 s</td><td>Triển khai duyệt dữ liệu một lần (≈ 0.1 s), lượt hai với giả thuyết co giãn trục, quy tắc chọn giữa cấu hình một phổ mẫu và cấu hình trong lớp</td></tr>
       </tbody>
     </table>
     <p>

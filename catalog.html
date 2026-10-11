@@ -256,11 +256,8 @@ code { font-family: var(--font-mono); font-size: .92em; }
       </div>
       <div class="chips">
         <button class="filter-btn active" data-src="all">Tất cả</button>
-        <button class="filter-btn" data-src="vast" data-label="VAST">VAST</button>
         <button class="filter-btn" data-src="rruff" data-label="RRUFF">RRUFF</button>
-        <button class="filter-btn" data-src="rod" data-label="ROD">ROD</button>
-        <button class="filter-btn" data-src="pharma" data-label="Dược phẩm">Dược phẩm</button>
-        <button class="filter-btn" data-src="nicodom" data-label="NICODOM">NICODOM</button>
+        <button class="filter-btn" data-src="pharma" data-label="Dược phẩm 785 nm">Dược phẩm 785 nm</button>
       </div>
       <div class="stats" id="stats"></div>
 
@@ -291,7 +288,7 @@ code { font-family: var(--font-mono); font-size: .92em; }
 
   <div class="foot">
     <div style="display:flex;gap:16px;flex-wrap:wrap">
-      <span><span id="totalCount">…</span> phổ Raman tham chiếu · <span id="classCount">…</span> chất · 5 nguồn, lưới chung 450–3200 cm⁻¹</span>
+      <span><span id="totalCount">…</span> phổ Raman tham chiếu · <span id="classCount">…</span> chất · 2 nguồn, lưới chung 50–4000 cm⁻¹</span>
     </div>
     <div><a href="index.html">Ứng dụng</a><a href="about.html">Giới thiệu</a><a href="algorithm.html">Thuật toán</a></div>
   </div>
@@ -356,7 +353,7 @@ code { font-family: var(--font-mono); font-size: .92em; }
   document.getElementById("studMascot").insertAdjacentHTML("afterbegin", mkSprite(studGrid, "HUS", "#ffffff"));
 })();
 
-const GRID_START = 450.0, GRID_STEP = 2.0, GRID_N = 1376;
+const GRID_START = 50.0, GRID_STEP = 2.0, GRID_N = 1976;
 function gridWn(i) { return GRID_START + GRID_STEP * i; }
 
 // Segments are uint16-quantized (2 bytes/channel) with per-segment lo/hi — keep in sync with core.js decodeSegment.
@@ -390,7 +387,7 @@ var $ = function(id) { return document.getElementById(id); };
 
 (async function init() {
   try {
-    var DATA_SIZE = 36127794;
+    var DATA_SIZE = 40419252;
     var resp = await fetch("data.json");
     if (!resp.ok) throw new Error("HTTP " + resp.status);
     var total = DATA_SIZE || 0;
@@ -423,7 +420,7 @@ var $ = function(id) { return document.getElementById(id); };
     ALL.push({
       idx: i + 1,
       label: e.label,
-      source: e.source || "vast",
+      source: e.source || "rruff",
       laser: e.laser_nm || 0,
       chemistry: e.chemistry || "",
       instrument: e.instrument || "",
@@ -437,7 +434,7 @@ var $ = function(id) { return document.getElementById(id); };
 
   $("totalCount").textContent = ALL.length.toLocaleString();
   $("classCount").textContent = new Set(ALL.map(function(e) { return e.label; })).size.toLocaleString();
-  // Per-source counts on the filter chips (design 1e shows "VAST (255)" etc.).
+  // Per-source counts on the filter chips (e.g. "RRUFF (8,091)").
   var perSrc = {};
   ALL.forEach(function(e) { var k = e.source.replace(/_.*/, ""); perSrc[k] = (perSrc[k] || 0) + 1; });
   document.querySelectorAll(".filter-btn[data-label]").forEach(function(btn) {

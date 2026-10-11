@@ -217,55 +217,38 @@ code { font-family: var(--font-mono); font-size: .92em; }
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 21 19V5"></path><path d="M3 12A9 3 0 0 0 21 12"></path></svg>
       Nguồn dữ liệu
     </h2>
-    <p>Thư viện gồm <strong>16 070 phổ</strong> thuộc <strong>2 495 lớp hợp chất</strong>, tổng hợp từ nhiều nguồn:</p>
+    <p>Thư viện gồm <strong>11&nbsp;601 phổ</strong> thuộc <strong>804 lớp hợp chất</strong>, hoàn toàn từ dữ liệu công khai (mỗi lớp có ít nhất 3 phổ):</p>
     <table class="data-table">
       <thead>
         <tr><th>Nguồn</th><th>Nội dung</th><th>Số phổ</th><th>Tham chiếu</th></tr>
       </thead>
       <tbody>
         <tr>
-          <td>VAST</td>
-          <td>Phổ Raman, huỳnh quang, hấp thụ — đo tại phòng thí nghiệm VAST bằng máy LabRAM HR Evolution 532 nm</td>
-          <td class="mono">255</td>
-          <td>Dữ liệu nội bộ</td>
-        </tr>
-        <tr>
           <td>RRUFF</td>
-          <td>Phổ Raman khoáng vật chuẩn (tất cả excellent + fair)</td>
-          <td class="mono">11&nbsp;154</td>
+          <td>Phổ Raman khoáng vật chuẩn, chất lượng excellent + fair, 772 khoáng vật, nhiều mẫu vật và định hướng tinh thể, laser 514–785 nm; bỏ các tên biến thể mà phổ không phân biệt được</td>
+          <td class="mono">8&nbsp;091</td>
           <td><a href="https://rruff.info" target="_blank" rel="noopener">rruff.info</a></td>
         </tr>
         <tr>
-          <td>Dược phẩm</td>
-          <td>Phổ Raman dược phẩm — tất cả bản đo lặp (figshare, Springer)</td>
+          <td>Dược phẩm 785 nm</td>
+          <td>Dung môi và thuốc thử trên máy Kaiser Raman Rxn2 (785 nm, ~1 cm⁻¹): 32 chất, ~110 phổ lặp mỗi chất (Flanagan &amp; Glavin, <em>Sci. Data</em> 2025)</td>
           <td class="mono">3&nbsp;510</td>
-          <td><a href="https://figshare.com" target="_blank" rel="noopener">figshare.com</a></td>
-        </tr>
-        <tr>
-          <td>ROD</td>
-          <td>Raman Open Database — phổ đóng góp cộng đồng</td>
-          <td class="mono">1&nbsp;121</td>
-          <td><a href="https://solsa.crystallography.net/rod/" target="_blank" rel="noopener">crystallography.net/rod</a></td>
-        </tr>
-        <tr>
-          <td>NICODOM</td>
-          <td>Bộ demo phổ Raman polymer/hoá chất</td>
-          <td class="mono">18</td>
-          <td><a href="https://www.nicodom.cz" target="_blank" rel="noopener">nicodom.cz</a></td>
-        </tr>
-        <tr>
-          <td>Dung môi</td>
-          <td>Phổ Raman 12 dung môi phổ biến</td>
-          <td class="mono">12</td>
-          <td>—</td>
+          <td><a href="https://doi.org/10.1038/s41597-025-04848-6" target="_blank" rel="noopener">doi:10.1038/s41597-025-04848-6</a></td>
         </tr>
       </tbody>
     </table>
     <p>
-      Tất cả phổ trong thư viện đã được tiền xử lý: nội suy về lưới chung 450–3200 cm⁻¹ (bước 2 cm⁻¹),
-      làm mượt Savitzky-Golay bậc 3, <strong>trừ nền bằng ALS</strong> (Asymmetric Least Squares, Eilers &amp; Boelens 2005),
-      dịch min về 0, và chuẩn hoá L2. Phổ bạn nhìn thấy trên trang Thư viện và trong kết quả so khớp
-      đều là phổ đã trừ nền — không phải phổ thô.
+      Hai bộ chỉ dùng để kiểm tra, không nằm trong thư viện: RRUFF <em>unrated</em> (150 phổ) và phổ
+      cầm tay Wasatch WP-785XS (20 phổ, <a href="https://github.com/WasatchPhotonics/ENLIGHTEN" target="_blank" rel="noopener">ENLIGHTEN</a>, MIT).
+      Từ 11/09/2026 thư viện không còn phổ đo tại VAST, ROD, NICODOM và dung môi lẻ như các bản trước.
+    </p>
+    <p>
+      Mọi phổ đi qua cùng một chuỗi tiền xử lý: làm mượt Savitzky-Golay (cửa sổ 9, bậc 3) trên lưới đo gốc,
+      nội suy về lưới chung 50–4000 cm⁻¹ (bước 2 cm⁻¹, 1 976 kênh),
+      <strong>trừ nền bằng ALS</strong> (Asymmetric Least Squares, Eilers &amp; Boelens 2005),
+      dịch min về 0, và chuẩn hoá L2. Phần ngoài dải đo của một phổ thư viện được điền 0 và kèm mặt nạ
+      phủ; phổ cần nhận diện được chấm điểm trên đúng các kênh nó đo được (tối thiểu 100 kênh). Phổ bạn nhìn thấy
+      trên trang Thư viện và trong kết quả so khớp đều là phổ đã trừ nền — không phải phổ thô.
     </p>
   </div>
 
@@ -286,16 +269,16 @@ code { font-family: var(--font-mono); font-size: .92em; }
       Điểm số = log Bayes factor mỗi kênh so với mô hình chỉ-nền (null model).
     </p>
     <p>
-      Hậu nghiệm softmax với hệ số làm mềm &kappa; = 0.04 (ECE 0.053 trên LOO nghiêm ngặt của VAST, softmax trên toàn bộ lớp).
-      Ngưỡng open-set &tau; = 0.661 — mẫu có log BF dưới ngưỡng được gắn cờ
-      "có thể không có trong thư viện"; bằng chứng không nền (&tau;<sub>0</sub> = 1.084) hiển thị kèm như chỉ báo phụ.
+      Hậu nghiệm softmax với hệ số làm mềm &kappa; = 0.09 (ECE toàn lớp 0.035 trên LOO nghiêm ngặt phân tầng, 3 511 truy vấn).
+      Ngưỡng open-set &tau; = 0.757 — mẫu có log BF dưới ngưỡng được gắn cờ
+      "có thể không có trong thư viện"; bằng chứng không nền (&tau;<sub>0</sub> = 0.748) hiển thị kèm như chỉ báo phụ.
     </p>
     <p>
-      Đánh giá ngoài đóng băng (26/08/2026): 1 165 phổ chưa từng vào thư viện từ 5 nguồn công khai đo trên
-      máy khác (RRUFF held-out, RaSPI, Miller 2022, Bērziņš FT-Raman 1064 nm, Wasatch cầm tay 785 nm) —
-      nhận diện đúng 68–78% với phổ chất lượng tham chiếu (71.1% gộp trên bốn máy khác, freeze #2), từ chối nhầm
-      7–23% ở ngưỡng chuẩn — về ~10% sau khi hiệu chuẩn máy bằng 5 phổ; chất lạ bị từ chối 45–47% ở cùng 10%
-      từ chối nhầm dù dùng bằng chứng nào (chi tiết: trang Thuật toán §9.5).
+      Kiểm tra trên các phổ không nằm trong thư viện, thư viện và ngưỡng cố định trước khi chấm
+      (freeze #5, 11/09/2026): 146/150 phổ RRUFF <em>unrated</em> (97.3%) và 20/20 phổ Wasatch đo trên thiết bị cầm tay
+      785 nm được nhận đúng; từ chối nhầm chất có trong thư viện 2.7% và 5.0%. Phổ RRUFF độ phân giải thấp và chất lượng
+      "poor" khó hơn nhiều (59.3% và 32.2%, từ chối nhầm 47.3% và 77.9% ở ngưỡng cố định) — ngưỡng cần được hiệu chuẩn lại theo máy,
+      xem nút "Hiệu chuẩn máy" (chi tiết: trang Thuật toán §9.5).
     </p>
     <p>
       Kết hợp đa kênh (v3): tổng có trọng số log BF từng kênh
@@ -313,57 +296,51 @@ code { font-family: var(--font-mono); font-size: .92em; }
       Độ chính xác
     </h2>
     <p>
-      Đánh giá bằng phương pháp leave-one-out (LOO) trên 248 phổ VAST (27 lớp có ≥3 phổ mỗi lớp):
-      lần lượt bỏ ra 1 phổ, dùng phổ còn lại làm tham chiếu, rồi nhận diện phổ bị bỏ — lặp lại cho
-      tất cả 248 phổ.
+      Ba bộ đánh giá trong bài báo, cộng với leave-one-out dùng để hiệu chuẩn. Mọi phổ truy vấn đều là phổ của chất
+      <em>có</em> trong thư viện; các bộ đo khả năng nhận lại một chất đã có đại diện, không đo khả năng nhận một mẫu vật mới.
     </p>
     <table class="data-table">
       <thead>
-        <tr><th>Chỉ số</th><th>Giá trị</th><th>Ý nghĩa</th></tr>
+        <tr><th>Bộ đánh giá</th><th>Kết quả top-1</th><th>Ý nghĩa</th></tr>
       </thead>
       <tbody>
         <tr>
-          <td>Thư viện tham chiếu</td>
-          <td class="mono">~16 000 phổ, ~2 500 lớp</td>
-          <td>Tổng phổ trong thư viện mở rộng (VAST + RRUFF + ROD + dược phẩm + NICODOM)</td>
+          <td>Chia cân bằng thông tin<br>(232 chất ≥10 phổ, 80/20; 2 797 phổ kiểm tra)</td>
+          <td class="mono"><strong>97.3%</strong> evidence<br>96.9% cosine HQI<br>96.0% CNN 1D · 95.7% CNN 2D</td>
+          <td>Cùng dữ liệu huấn luyện cho evidence và hai CNN. Evidence không cần huấn luyện; chất mới chỉ thêm một hàng thư viện, còn CNN phải huấn luyện lại</td>
         </tr>
         <tr>
-          <td>Top-1 accuracy (tất cả)</td>
-          <td class="mono"><strong>90.3%</strong> (224/248)</td>
-          <td>Tỉ lệ lần nhận diện đúng ngay kết quả đầu tiên — mọi loại phổ, LOO nghiêm ngặt (mô hình lớp dựng lại không có phổ đang chấm), gộp đồng nghĩa xuyên nguồn</td>
+          <td>Bản sao suy giảm<br>(2 000 bản của 400 phổ thư viện)</td>
+          <td class="mono"><strong>95.3%</strong> evidence<br>83.5% cosine HQI</td>
+          <td>Nhiễu Gauss (SNR đỉnh 5–80), nền huỳnh quang, trôi trục. Ở SNR &lt; 10: 94.0% so với 22.6%. Điểm yếu chính là trôi trục quá ±1 kênh (91–92%)</td>
         </tr>
         <tr>
-          <td>Top-1 accuracy (hoá chất)</td>
-          <td class="mono"><strong>93.9%</strong> (169/180)</td>
-          <td>Riêng nhóm hoá chất tinh khiết — dễ nhận diện hơn vật liệu bao bì/danh mục</td>
+          <td>Phổ giữ lại và khác thiết bị</td>
+          <td class="mono"><strong>97.3%</strong> RRUFF unrated (150)<br><strong>100%</strong> Wasatch cầm tay (20/20)</td>
+          <td>Chấm trên thư viện đã cố định, không tinh chỉnh; số phổ khác thiết bị còn ít (20)</td>
         </tr>
         <tr>
-          <td>ECE (sai số hiệu chuẩn)</td>
-          <td class="mono"><strong>0.064</strong></td>
-          <td>Xác suất báo ra sát xác suất thực tế (0 = hoàn hảo); ngang cosine (0.054) khi cả hai
-            được hiệu chuẩn tốt nhất — lợi thế của Bayes là xếp hạng đúng hơn, không phải hiệu chuẩn tốt hơn</td>
+          <td>LOO nghiêm ngặt phân tầng<br>(3 511 truy vấn)</td>
+          <td class="mono">84.3% đầy đủ<br>86.5% phổ mẫu đơn<br>86.6% cosine</td>
+          <td>Chỉ dùng để chọn &kappa;, &tau; và chia fold cho CNN. Trên giao thức này cosine ngang hoặc nhỉnh hơn; lợi thế của evidence nằm ở độ bền với suy giảm, điểm xác suất, quy tắc từ chối và thư viện mở rộng không cần huấn luyện</td>
         </tr>
         <tr>
           <td>Ngưỡng "không có trong thư viện"</td>
-          <td class="mono">&tau; = 0.661</td>
-          <td>Tại ngưỡng này, tỉ lệ từ chối nhầm (mẫu đúng bị cờ là lạ) là 10%; từ chối được 30.0% chất
-            lạ trong thử loại-lớp — điểm yếu đã biết, xem trang Thuật toán §9.3</td>
+          <td class="mono">&tau; = 0.757</td>
+          <td>Tại ngưỡng này tỉ lệ từ chối nhầm (mẫu đúng bị cờ là lạ) là 10% trên LOO; chất lạ bị từ chối 45.3% trong thử loại-lớp — điểm yếu đã biết, xem trang Thuật toán §9.3</td>
+        </tr>
+        <tr>
+          <td>Chi phí trên một truy vấn<br>(CPU một luồng, thư viện 11 601 phổ)</td>
+          <td class="mono">0.75 s lượt thứ nhất<br>1.9 s cấu hình đầy đủ</td>
+          <td>Cosine 0.07 s, CNN 9–16 ms; đổi lại, thêm một chất không cần huấn luyện lại (CNN: &gt; 1 giờ trên GPU, ≥ 10 phổ lặp mỗi chất)</td>
         </tr>
       </tbody>
     </table>
     <p>
-      So sánh: cosine (v1) 79.7% → Bayes đơn mẫu (v2) 83.7% → phiên bản hiện tại
-      (v3, within-class Bayes + đa kênh) 90.3% tổng thể, 93.9% hoá chất trên LOO nghiêm ngặt — chi tiết ở mục dưới;
-      cùng giao thức, cosine đạt 81.9% và không gian con kiểu SIMCA 83.5%.
-    </p>
-    <p>
-      <b>Khi đổi máy, hai con số khác nhau, đừng gộp.</b> Trên 1 165 phổ chưa từng vào thư viện
-      (đánh giá ngoài đóng băng, freeze #2): với phổ <em>chất lượng tham chiếu</em> đo trên bốn máy
-      khác (RaSPI, Wasatch cầm tay 785 nm, Bērziņš FT-Raman 1064 nm, Miller), top-1 là <b>71.1%</b>
-      (97 phổ) — đó là giá của việc đổi máy. Với phổ RRUFF <em>độ phân giải thấp</em> là 47.7%, và
-      phổ RRUFF "poor" 14.1% — đó là giá của chất lượng phổ, không phải của máy. Con số gộp 65.1%
-      trộn cả hai và không nói lên điều gì rõ ràng. Nếu máy của bạn cho từ chối nhầm cao, hãy dùng
-      nút "Hiệu chuẩn máy" với vài phổ chất đã biết để dịch ngưỡng &tau; theo máy.
+      Khi đổi máy, hãy dùng nút "Hiệu chuẩn máy" với vài phổ chất đã biết: ngưỡng &tau; dịch theo mức bằng chứng của máy
+      bạn, thay vì giữ giá trị chuẩn của thư viện. Mô tả đầy đủ các phép đo ở bài báo
+      D. T. Tuan, N. T. Hieu, A. I. Vodchits, V. A. Orlovich, P. H. Minh, V. Duong, <em>Raman spectroscopic identification of chemicals
+      using a closed-form Bayesian marginal likelihood</em>, FEE 2026 (báo cáo miệng).
     </p>
   </div>
 
@@ -373,8 +350,9 @@ code { font-family: var(--font-mono); font-size: .92em; }
       Các phiên bản phát triển
     </h2>
     <p>
-      Ba phiên bản nối tiếp nhau, mỗi bản giữ nguyên quy trình đánh giá LOO trên tập phổ VAST (202 phổ ở v1–v2, 248 phổ ở v3 sau gán lại nhãn)
-      để so sánh công bằng. Hai bản đầu tóm tắt ngắn; bản v3 là bản đang chạy trên trang này.
+      Bốn phiên bản nối tiếp nhau. Ba bản đầu giữ nguyên quy trình đánh giá LOO trên tập phổ VAST (202 phổ ở v1–v2, 248 phổ ở v3 sau gán lại nhãn)
+      để so sánh công bằng; thư viện 16 070 phổ (VAST + RRUFF + ROD + dược phẩm + NICODOM) của v3 đã được thay ở v4.
+      Bản v4 là bản đang chạy trên trang này và là bản mô tả trong bài báo.
     </p>
     <table class="data-table">
       <thead>
@@ -399,7 +377,7 @@ code { font-family: var(--font-mono); font-size: .92em; }
           <td class="mono">83.7% tổng thể<br>88.9% → 92.8% hoá chất (v2.1)<br>ECE 0.082 → 0.069<br>Từ chối chất lạ 54.3% → 63.5%</td>
         </tr>
         <tr>
-          <td><strong>v3 — hiện tại</strong></td>
+          <td>v3 — freeze #2<br>(26/08/2026)</td>
           <td>
             <strong>Within-class Bayes:</strong> lớp có ≥3 phổ được mô hình hoá bằng phổ trung bình
             + các thành phần chính của phần dư (515/2 495 lớp), thay vì so với một phổ mẫu duy nhất —
@@ -413,15 +391,31 @@ code { font-family: var(--font-mono); font-size: .92em; }
             thêm lượt chấm thứ hai cho 20 lớp dẫn đầu (dịch trục &plusmn;1 kênh, so từng phổ riêng, +1.6 điểm),
             đồng bộ Python và JavaScript; benchmark cùng giao thức với cosine, SIMCA, χ² (trang Thuật toán §9.4).
           </td>
-          <td class="mono"><strong>90.3%</strong> tổng thể<br><strong>93.9%</strong> hoá chất<br>ECE <strong>0.064</strong><br>Đa kênh: 71.4% (49 mẫu vật), nhận được 15/27 mẫu không có tín hiệu Raman<br>Xuyên máy (NICODOM): 4/4 đúng, 12/13 chất lạ bị từ chối</td>
+          <td class="mono">90.3% tổng thể (LOO VAST)<br>93.9% hoá chất<br>ECE 0.064<br>Đa kênh: 71.4% (49 mẫu vật), nhận được 15/27 mẫu không có tín hiệu Raman<br>Xuyên máy (NICODOM): 4/4 đúng, 12/13 chất lạ bị từ chối</td>
+        </tr>
+        <tr>
+          <td><strong>v4 — hiện tại</strong><br>freeze #5<br>(11/09/2026)</td>
+          <td>
+            <strong>Thư viện công khai:</strong> RRUFF (excellent + fair) và bộ dược phẩm 785 nm, 11 601 phổ / 804 lớp, mỗi lớp ≥3 phổ,
+            không giới hạn số phổ mỗi lớp; bỏ VAST, ROD, NICODOM, dung môi.
+            <br><strong>Lưới 50–4000 cm⁻¹</strong> (1 976 kênh) thay cho 450–3200; phổ thư viện điền 0 ngoài dải đo kèm mặt nạ phủ, phổ truy vấn
+            được chấm trên các kênh nó đo (tối thiểu 100 kênh) thay cho quy tắc giao 30%.
+            <br><strong>Làm mượt trước nội suy</strong> (Savitzky–Golay trên lưới đo gốc), chuỗi tiền xử lý của thư viện và truy vấn giống hệt nhau.
+            <br><strong>Hiệu chuẩn lại</strong> trên LOO phân tầng 3 511 truy vấn: &kappa; = 0.09, &tau; = 0.757, &tau;<sub>0</sub> = 0.748. Giữ nguyên
+            &lambda; = 0.01, nền Legendre bậc 5, within-class PCA (≥3 phổ, 99% phương sai, tối đa 7 thành phần), lượt chấm thứ hai 20 lớp (dịch ±1 kênh),
+            khớp độ phân giải.
+            <br>So sánh với hai CNN huấn luyện trên cùng dữ liệu, đánh giá trên bản sao suy giảm và phổ khác thiết bị (bài báo FEE 2026).
+          </td>
+          <td class="mono"><strong>97.3%</strong> chia cân bằng thông tin<br><strong>95.3%</strong> bản sao suy giảm (cosine 83.5%)<br><strong>97.3%</strong> RRUFF unrated · <strong>20/20</strong> Wasatch<br>LOO phân tầng 84.3%, ECE 0.035</td>
         </tr>
       </tbody>
     </table>
     <p>
-      Còn dở: 24 lỗi LOO nghiêm ngặt tập trung ở bao bì (Paper/PE/PP/Other nhầm nhau, SNR thấp), Ethanol-Water (3/51) và 7 phổ yếu bị khoáng/dược ngoài "cướp";
-      khả năng từ chối chất lạ còn thấp (30.0%) do số hạng nền — hướng sửa đã xác định;
-      trọng số đa kênh mới được xác nhận bằng nested CV trên cùng 49 mẫu vật, cần mẫu mới để hiệu
-      chuẩn posterior fusion.
+      Còn dở (theo bài báo): các bộ đánh giá giữ trong thư viện cùng mẫu vật hoặc phổ lặp cùng lọ, nên chưa đo khả năng nhận một mẫu vật mới;
+      trôi trục vượt quá một kênh vẫn là điểm yếu (tìm kiếm ±2 kênh kèm co giãn trục khôi phục phần lớn lỗi nhưng tốn khoảng 5 lần chi phí);
+      phổ chất lượng thấp có thể bị ngưỡng cố định từ chối nên cần hiệu chuẩn theo máy; chi phí tính toán đo trên CPU máy tính xách tay chứ chưa
+      phải bộ xử lý nhúng; mô hình giả định nhiễu Gauss độc lập. Chế độ đa kênh (huỳnh quang, hấp thụ) giữ nguyên từ v3 với thư viện
+      141 + 52 đường cong riêng, không nằm trong bài báo và chưa được đánh giá lại trên thư viện v4.
     </p>
   </div>
 
