@@ -296,7 +296,7 @@ code { font-family: var(--font-mono); font-size: .92em; }
       Độ chính xác
     </h2>
     <p>
-      Ba bộ đánh giá trong bài báo, cộng với leave-one-out dùng để hiệu chuẩn. Mọi phổ truy vấn đều là phổ của chất
+      Ba bộ đánh giá trong bài báo. Mọi phổ truy vấn đều là phổ của chất
       <em>có</em> trong thư viện; các bộ đo khả năng nhận lại một chất đã có đại diện, không đo khả năng nhận một mẫu vật mới.
     </p>
     <table class="data-table">
@@ -320,14 +320,9 @@ code { font-family: var(--font-mono); font-size: .92em; }
           <td>Chấm trên thư viện đã cố định, không tinh chỉnh; số phổ khác thiết bị còn ít (20)</td>
         </tr>
         <tr>
-          <td>LOO nghiêm ngặt phân tầng<br>(3 511 truy vấn)</td>
-          <td class="mono">84.3% đầy đủ<br>86.5% phổ mẫu đơn<br>86.6% cosine</td>
-          <td>Chỉ dùng để chọn &kappa;, &tau; và chia fold cho CNN. Trên giao thức này cosine ngang hoặc nhỉnh hơn; lợi thế của evidence nằm ở độ bền với suy giảm, điểm xác suất, quy tắc từ chối và thư viện mở rộng không cần huấn luyện</td>
-        </tr>
-        <tr>
           <td>Ngưỡng "không có trong thư viện"</td>
           <td class="mono">&tau; = 0.757</td>
-          <td>Tại ngưỡng này tỉ lệ từ chối nhầm (mẫu đúng bị cờ là lạ) là 10% trên LOO; chất lạ bị từ chối 45.3% trong thử loại-lớp — điểm yếu đã biết, xem trang Thuật toán §9.3</td>
+          <td>Tại ngưỡng này tỉ lệ từ chối nhầm (mẫu đúng bị cờ là lạ) là 10% trên phổ thư viện chấm leave-one-out; chất lạ bị từ chối 45.3% trong thử loại-lớp — điểm yếu đã biết, xem trang Thuật toán §9.3</td>
         </tr>
         <tr>
           <td>Chi phí trên một truy vấn<br>(CPU một luồng, thư viện 11 601 phổ)</td>
@@ -406,7 +401,7 @@ code { font-family: var(--font-mono); font-size: .92em; }
             khớp độ phân giải.
             <br>So sánh với hai CNN huấn luyện trên cùng dữ liệu, đánh giá trên bản sao suy giảm và phổ khác thiết bị (bài báo FEE 2026).
           </td>
-          <td class="mono"><strong>97.3%</strong> chia cân bằng thông tin<br><strong>95.3%</strong> bản sao suy giảm (cosine 83.5%)<br><strong>97.3%</strong> RRUFF unrated · <strong>20/20</strong> Wasatch<br>LOO phân tầng 84.3%, ECE 0.035</td>
+          <td class="mono"><strong>97.3%</strong> chia cân bằng thông tin<br><strong>95.3%</strong> bản sao suy giảm (cosine 83.5%)<br><strong>97.3%</strong> RRUFF unrated · <strong>20/20</strong> Wasatch<br>ECE 0.035</td>
         </tr>
       </tbody>
     </table>
